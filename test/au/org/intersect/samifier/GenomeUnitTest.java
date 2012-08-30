@@ -24,7 +24,7 @@ public final class GenomeUnitTest
     }
 
     @Test
-    public void testParseGFF() 
+    public void testParsing() 
         throws Exception
     {
       Genome genome = Genome.parse(genomeFile);

@@ -18,15 +18,14 @@ public class GeneInfo
 
     public GeneInfo(String chromosome, int start, String direction)
     {
-        this();
+        this(chromosome, start, direction, new TreeSet(new GeneSequenceComparator()));
+    }
+
+    public GeneInfo(String chromosome, int start, String direction, SortedSet<GeneSequence> locations)
+    {
         setChromosome(chromosome);
         setStart(start);
         setDirection(direction);
-    }
-
-    public GeneInfo(String chromosome, int start, String direction, SortedSet locations)
-    {
-        this(chromosome, start, direction);
         this.locations = locations;
     }
 
