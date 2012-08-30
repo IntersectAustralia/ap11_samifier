@@ -1,46 +1,113 @@
-<project name="Samifier" default="dist" basedir=".">
+<project name="Samifier" default="compile" basedir=".">
     <description>
         Converts Mascot search results to SAM file format
     </description>
-  <!-- set global properties for this build -->
-  <property name="app.name" value="samifier"/>
-  <property name="src" location="src"/>
-  <property name="lib" location="lib"/>
-  <property name="test" location="test"/>
-  <property name="build" location="build"/>
-  <property name="dist"  location="dist"/>
+    <!-- set global properties for this build -->
+    <property name="app.name" value="samifier"/>
+    <property name="src.dir" value="${basedir}/src" />
+    <property name="test.dir" value="${basedir}/test" />
+    <property name="lib.dir" location="${basedir}/lib"/>
+    <property name="build.dir" location="${basedir}/build"/>
+    <property name="dist"  location="${basedir}/dist"/>
+    <property name="build.classes.dir" value="${build.dir}/classes" />
+    <property name="build.classes-test.dir" value="${build.dir}/classes-test" />
+    <property name="build.reports.dir" value="${build.dir}/reports" />
 
-  <target name="init">
-    <!-- Create the time stamp -->
-    <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
-  </target>
 
-  <target name="compile" depends="init"
-        description="compile the source " >
-    <!-- Compile the java code from ${src} into ${build} -->
-    <classpath>
-      <fileset dir="lib">
+    <path id="build.classpath">
+      <fileset dir="${lib.dir}">
         <include name="**/*.jar"/>
       </fileset>
-    </classpath>
-    <javac srcdir="${src}" destdir="${build}"/>
-  </target>
+    </path>
 
-  <target name="dist" depends="compile"
-        description="generate the distribution" >
-    <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
+    <path id="test.classpath">
+      <path refid="build.classpath" />
+      <dirset dir="${build.classes.dir}" />
+      <dirset dir="${build.classes-test.dir}" />
+      <dirset dir="${test.dir}/resources" />
+    </path>
 
-    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/lib/${app.name}-${DSTAMP}.jar" basedir="${build}"/>
-  </target>
+    <target name="init">
+      <!-- Create the time stamp -->
+      <tstamp/>
+      <!-- Create the build directory structure used by compile -->
+      <mkdir dir="${build.dir}"/>
+      <mkdir dir="${build.classes.dir}"/>
+    </target>
 
-  <target name="clean"
-        description="clean up" >
-    <!-- Delete the ${build} and ${dist} directory trees -->
-    <delete dir="${build}"/>
-    <delete dir="${dist}"/>
-  </target>
+    <target name="compile" depends="init"
+          description="compile the source " >
+      <!-- Compile the java code from ${src} into ${build} -->
+      <javac srcdir="${src.dir}" destdir="${build.classes.dir}">
+        <classpath refid="build.classpath" />
+      </javac>
+    </target>
+
+    <target name="compile-test" depends="compile">
+      <mkdir dir="${build.classes-test.dir}" />
+      <javac srcdir="${test.dir}" destdir="${build.classes-test.dir}"
+        debug="true" includeantruntime="false">
+        <classpath refid="test.classpath" />
+      </javac>
+    </target>
+
+    <target name="test" depends="compile-test">
+      <inner-unittest />
+      <fail if="tests.failed" message="Test failures." />
+    </target>
+
+    <target name="dist" depends="compile"
+          description="generate the distribution" >
+      <!-- Create the distribution directory -->
+      <mkdir dir="${dist}/lib"/>
+
+      <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+      <jar jarfile="${dist}/lib/${app.name}-${DSTAMP}.jar" basedir="${build.dir}"/>
+    </target>
+
+    <target name="clean"
+          description="clean up" >
+      <!-- Delete the ${build} and ${dist} directory trees -->
+      <delete dir="${build.dir}"/>
+      <delete dir="${dist}"/>
+    </target>
+
+    <macrodef name="inner-unittest">
+      <sequential>
+
+        <mkdir dir="${build.reports.dir}/unittest/xml" />
+        <mkdir dir="${build.reports.dir}/unittest/html" />
+
+        <junit fork="true" forkmode="once" printsummary="withOutAndErr"
+            haltonerror="on">
+          <classpath>
+            <path refid="test.classpath" />
+          </classpath>
+          <formatter type="plain" />
+          <batchtest todir="${build.reports.dir}/unittest">
+            <fileset dir="${test.dir}">
+              <include name="**/*UnitTest.java" />
+            </fileset>
+          </batchtest>
+          <!--
+          <formatter type="xml" />
+          <batchtest todir="${build.reports.dir}/unittest/xml"
+            failureproperty="tests.failed">
+            <fileset dir="${test.dir}">
+              <include name="**/*UnitTest.java" />
+            </fileset>
+          </batchtest>
+          -->
+        </junit>
+
+        <!--
+        <junitreport todir="${build.reports.dir}/unittest/xml">
+          <fileset dir="${build.reports.dir}/unittest/xml">
+            <include name="TEST-*.xml" />
+          </fileset>
+          <report format="frames" todir="${build.reports.dir}/unittest/html" />
+        </junitreport>
+        -->
+      </sequential>
+    </macrodef>
 </project>

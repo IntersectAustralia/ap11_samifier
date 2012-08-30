@@ -1,0 +1,27 @@
+##gff-version 3
+#date Sun Aug 19 19:50:12 2012
+#
+# Saccharomyces cerevisiae S288C genome
+#
+# Features from the 16 nuclear chromosomes labeled chrI to chrXIV,
+# plus the mitochondrial genome labeled chrmt.
+#
+# Created by Saccharomyces Genome Database (http://www.yeastgenome.org/)
+#
+# Weekly updates of this file are available for download from:
+# http://downloads.yeastgenome.org/curation/chromosomal_feature/saccharomyces_cerevisiae.gff
+#
+# Please send comments and suggestions to sgd-helpdesk@lists.stanford.edu
+#
+# SGD is funded as a National Human Genome Research Institute Biomedical Informatics Resource from
+# the U. S. National Institutes of Health to Stanford University.  The staff of SGD is listed at:
+# http://www.yeastgenome.org/SGD-staff.html
+#
+chrI	SGD	gene	71786	73288	.	+	.	ID=YAL038W;Name=YAL038W;gene=CDC19;Alias=CDC19,PYK1;Ontology_term=GO:0004743,GO:0005829,GO:0005886,GO:0006090,GO:0006096;Note=Pyruvate%20kinase%2C%20functions%20as%20a%20homotetramer%20in%20glycolysis%20to%20convert%20phosphoenolpyruvate%20to%20pyruvate%2C%20the%20input%20for%20aerobic%20(TCA%20cycle)%20or%20anaerobic%20(glucose%20fermentation)%20respiration;display=Pyruvate%20kinase;dbxref=SGD:S000000036;orf_classification=Verified
+chrI	SGD	CDS	71786	73288	.	+	0	Parent=YAL038W_mRNA;Name=YAL038W_CDS;orf_classification=Verified
+chrI	SGD	mRNA	71786	73288	.	+	.	ID=YAL038W_mRNA;Name=YAL038W_mRNA;Parent=YAL038W
+chrIV	SGD	gene	322226	322988	.	+	.	ID=YDL075W;Name=YDL075W;gene=RPL31A;Alias=RPL31A,RPL34;Ontology_term=GO:0002181,GO:0003735,GO:0006450,GO:0022625;Note=Protein%20component%20of%20the%20large%20(60S)%20ribosomal%20subunit%2C%20nearly%20identical%20to%20Rpl31Bp%20and%20has%20similarity%20to%20rat%20L31%20ribosomal%20protein%3B%20associates%20with%20the%20karyopherin%20Sxm1p%3B%20loss%20of%20both%20Rpl31p%20and%20Rpl39p%20confers%20lethality;display=Protein%20component%20of%20the%20large%20(60S)%20ribosomal%20subunit;dbxref=SGD:S000002233;orf_classification=Verified
+chrIV	SGD	CDS	322226	322282	.	+	0	Parent=YDL075W_mRNA;Name=YDL075W_CDS;orf_classification=Verified
+chrIV	SGD	CDS	322704	322988	.	+	0	Parent=YDL075W_mRNA;Name=YDL075W_CDS;orf_classification=Verified
+chrIV	SGD	intron	322283	322703	.	+	.	Parent=YDL075W_mRNA;Name=YDL075W_intron;orf_classification=Verified
+chrIV	SGD	mRNA	322226	322988	.	+	.	ID=YDL075W_mRNA;Name=YDL075W_mRNA;Parent=YDL075W
