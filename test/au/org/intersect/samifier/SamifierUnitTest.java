@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.*;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,4 +34,22 @@ public final class SamifierUnitTest
         assertEquals("RL31A_YEAST maps to YDL075W", "YDL075W", map.get("RL31A_YEAST"));
     }
 
+    @Test
+    public void testParsingMascotPeptideSearchResults()
+    {
+        File mascotFile = new File(getClass().getResource("/test_mascot_search_results.txt").getFile());
+
+        File mapFile = new File(getClass().getResource("/test_accession.txt").getFile());
+        List<PeptideSearchResult> list = null;
+        try {
+            Map map = Samifier.parseProteinToOLNMappingFile(mapFile);
+            list = Samifier.parseMascotPeptideSearchResults(mascotFile, map);
+        }
+        catch(Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+        assertEquals("", 6, list.size());
+    }
 }

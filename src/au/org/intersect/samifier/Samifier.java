@@ -3,8 +3,12 @@ package au.org.intersect.samifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -153,6 +157,83 @@ public class Samifier {
             }
         }
         return proteinOLN;
+    }
+
+    public static List<PeptideSearchResult> parseMascotPeptideSearchResults(File resultsFile, Map<String,String> proteinOLN)
+        throws IOException, FileNotFoundException
+    {
+        BufferedReader reader = null;
+        boolean peptidesSectionStarted = false;
+        List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
+        try{
+            reader = new BufferedReader(new FileReader(resultsFile));
+            String line;
+            int lineNumber = 0;
+            while ((line = reader.readLine()) != null)
+            {
+                lineNumber++;
+                if (peptidesSectionStarted)
+                {
+                    if (line.startsWith("--"))
+                    {
+                        break;
+                    }
+                    results.addAll(getProteinsFromQueryLine(line, proteinOLN));
+                }
+                else if (line.startsWith("Content-Type: application/x-Mascot; name=\"peptides\""))
+                {
+                    peptidesSectionStarted = true;
+                }
+            }
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.close();
+            }
+        }
+        return results;
+    }
+
+    private static List<PeptideSearchResult> getProteinsFromQueryLine(String line, Map<String,String> proteinOLN)
+        throws IOException
+    {
+        List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
+        // q21_p1=0,705.406113,-0.000065,4,EFGILK,18,00000000,25.95,0000000001000002010,0,0;"KPYK1_YEAST":0:469:474:1,"RL31B_YEAST":0:78:86:1
+        Pattern linePattern = Pattern.compile("^(q\\d+_p\\d+)=([^;]+);(.+)$");
+        Pattern proteinPartPattern = Pattern.compile("^\"([^\"]+)\":\\d\\:(\\d+)\\:(\\d+)\\:\\d$");
+        Matcher lineMatcher = linePattern.matcher(line);
+        if (lineMatcher.matches())
+        {
+            String id = lineMatcher.group(1);
+            String peptidePart = lineMatcher.group(2);
+            String proteinsPart = lineMatcher.group(3);
+            //0,705.406113,-0.000065,4,EFGILK,18,00000000,25.95,0000000001000002010,0,0
+            String[] peptideParts = peptidePart.split(",");
+            String peptide = peptideParts[4];
+
+            //"KPYK1_YEAST":0:469:474:1,"RL31B_YEAST":0:78:86:1, ...
+            String[] proteins = proteinsPart.split(",");
+            for (String proteinPart : proteins)
+            {
+                //"KPYK1_YEAST":0:469:474:1
+                Matcher proteinPartMatcher = proteinPartPattern.matcher(proteinPart);
+                if (proteinPartMatcher.matches())
+                {
+                    String protein = proteinPartMatcher.group(1);
+                    if (!proteinOLN.containsKey(protein))
+                    {
+                        // TODO: report to errors file
+                        continue;
+                    }
+                    int start = Integer.parseInt(proteinPartMatcher.group(2));
+                    int stop  = Integer.parseInt(proteinPartMatcher.group(3));
+                    results.add(new PeptideSearchResult(id, peptide, protein, start, stop));
+                }
+            }
+        }
+        return results;
     }
 
     public static void main(String[] args) {
