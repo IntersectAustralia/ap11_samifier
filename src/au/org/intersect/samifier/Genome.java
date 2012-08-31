@@ -25,12 +25,14 @@ public class Genome
     {
         Genome genome = new Genome();
         BufferedReader reader = null;
+        int lineNumber = 0;
         try{
             reader = new BufferedReader(new FileReader(genomeFile));
             
             String line;
             while ((line = reader.readLine()) != null)
             {
+                lineNumber++;
                 if (line.matches("^#.*$"))
                 {
                     continue;
@@ -39,8 +41,7 @@ public class Genome
                 String[] parts = line.split("\\s+");
                 if (parts.length < 9)
                 {
-                    // TODO: log error
-                    continue;
+                    throw new GenomeFileParsingException("Line "+lineNumber+": not in expected format");
                 }
                 String type = parts[2];
                 if (type == null)
@@ -102,18 +103,14 @@ public class Genome
     {
         String chromosome = parts[0];
         String type = parts[2];
-        String orderedLocusName = getOrderedLocusName(parts[8]);
+        String orderedLocusName = extractOrderedLocusName(parts[8]);
         int start = Integer.parseInt(parts[3]);
         String direction = parts[6];
-        if ("gene".equals(type))
-        {
-            GeneInfo gene = new GeneInfo(chromosome, start, direction);
-            genome.addGene(orderedLocusName, gene);
-        }
-        else
+        GeneInfo gene;
+        if (genome.hasGene(orderedLocusName))
         {
             int stop = Integer.parseInt(parts[4]);
-            GeneInfo gene = genome.getGene(orderedLocusName);
+            gene = genome.getGene(orderedLocusName);
             if (gene == null)
             {
                 System.err.println(orderedLocusName + " not found in genome object");
@@ -122,9 +119,14 @@ public class Genome
             GeneSequence seq = new GeneSequence(type, start, stop, direction);
             gene.addLocation(seq);
         }
+        else
+        {
+            gene = new GeneInfo(chromosome, start, direction);
+            genome.addGene(orderedLocusName, gene);
+        }
     }
 
-    private static String getOrderedLocusName(String attributes)
+    private static String extractOrderedLocusName(String attributes)
     {
         Pattern olnPattern = Pattern.compile(".*Name=([^_;]+)[_;].*");
         Matcher m = olnPattern.matcher(attributes);

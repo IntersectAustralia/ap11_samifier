@@ -1,2 +1,3 @@
+ypd_id  uniprot_acc     sprot_id        sgd_id
 YAL038W	P00549	KPYK1_YEAST	S000000036
 YDL075W	P0C2H8	RL31A_YEAST	S000002233

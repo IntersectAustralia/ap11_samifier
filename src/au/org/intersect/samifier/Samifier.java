@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class Samifier {
     // Initialised with double brace initialisation
@@ -106,9 +110,49 @@ public class Samifier {
 
     private Samifier(){}
 
-    public Samifier(Genome genome, Map<String,String> proteinOLNMap) {
+    public Samifier(Genome genome, Map<String,String> proteinOLNMap)
+    {
         this.genome = genome;
         //this.proteinOLNMap = proteinOLNMap
+    }
+
+    public static Map<String,String> parseProteinToOLNMappingFile(File f)
+        throws IOException, FileNotFoundException, ProteinToOLNMappingFileParsingException
+    {
+        Map<String,String> proteinOLN = new HashMap<String,String>();
+
+        BufferedReader reader = null;
+        try{
+            reader = new BufferedReader(new FileReader(f));
+            
+            // Skip header line
+            String line = reader.readLine();
+            int lineNumber = 1;
+            while ((line = reader.readLine()) != null)
+            {
+                lineNumber++;
+                if (line.matches("^#.*$"))
+                {
+                    continue;
+                }
+                // ordered_locus_name accession_id protein_name id
+                // Tab delimited
+                String[] parts = line.split("\\s+");
+                if (parts.length < 4)
+                {
+                    throw new ProteinToOLNMappingFileParsingException("Line "+lineNumber+" not in expected format, should be: ordered_locus_name accession_id protein_name id");
+                }
+                proteinOLN.put(parts[2], parts[0]);
+            }
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.close();
+            }
+        }
+        return proteinOLN;
     }
 
     public static void main(String[] args) {

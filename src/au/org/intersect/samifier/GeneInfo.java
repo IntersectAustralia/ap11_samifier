@@ -1,27 +1,29 @@
 package au.org.intersect.samifier;
 
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GeneInfo
 {
     private String chromosome;
     private int start;
     private String direction;
-    private SortedSet<GeneSequence> locations;
+    private List<GeneSequence> locations;
 
     public GeneInfo()
     {
-        locations = new TreeSet(new GeneSequenceComparator());
+        //locations = new TreeSet(new GeneSequenceComparator());
+        locations = new ArrayList<GeneSequence>();
     }
 
     public GeneInfo(String chromosome, int start, String direction)
     {
-        this(chromosome, start, direction, new TreeSet(new GeneSequenceComparator()));
+        //this(chromosome, start, direction, new TreeSet(new GeneSequenceComparator()));
+        this(chromosome, start, direction, new ArrayList<GeneSequence>());
     }
 
-    public GeneInfo(String chromosome, int start, String direction, SortedSet<GeneSequence> locations)
+    public GeneInfo(String chromosome, int start, String direction, List<GeneSequence> locations)
     {
         setChromosome(chromosome);
         setStart(start);
@@ -64,9 +66,10 @@ public class GeneInfo
         locations.add(location);
     }
 
-    public Iterator<GeneSequence> getLocationsIterator()
+    public List<GeneSequence> getLocations()
     {
-        return locations.iterator();
+        Collections.sort(locations, new GeneSequenceComparator());
+        return locations;
     }
 
     public String toString()
