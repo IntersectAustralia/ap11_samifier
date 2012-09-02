@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.*;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,74 @@ public final class SamifierUnitTest
             fail("Unexpected exception: " + e.getMessage());
             e.printStackTrace();
         }
-        assertEquals("", 6, list.size());
+        assertEquals("Parser should find six ", 6, list.size());
     }
+
+    @Test
+    public void testExtractSequenceParts()
+    {
+        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        List<GeneSequence> locations = new ArrayList<GeneSequence>();
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 71, 79, "+"));
+        locations.add(new GeneSequence(GeneSequence.INTRON, 80, 141, "+"));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 142, 213, "+"));
+        List<NucleotideSequence> parts = null;
+        try {
+            parts = Samifier.extractSequenceParts(chromosomeFile, locations);
+        }
+        catch(Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+        assertEquals("Creates List of 3 NucleotideSequence objects", 3, parts.size());
+        NucleotideSequence codingSequence1 = parts.get(0);
+        NucleotideSequence intron = parts.get(1);
+        NucleotideSequence codingSequence2 = parts.get(2);
+
+        assertEquals("First NucleotideSequence should be CTACCCTAA", "CTACCCTAA", codingSequence1.getSequence());
+        assertEquals("Second NucleotideSequence should be an intron", GeneSequence.INTRON, intron.getType());
+        assertEquals("Last NucleotideSequence should be ACTCGTTACCCTGTCCCATTCAACCATACCACTCCGAACCACCATCCATCCCTCTACTTACTACCACTCACC", "ACTCGTTACCCTGTCCCATTCAACCATACCACTCCGAACCACCATCCATCCCTCTACTTACTACCACTCACC", codingSequence2.getSequence());
+    }
+
+    @Test
+    public void testExtractSequencePartsForShortSequences()
+    {
+        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        List<GeneSequence> locations = new ArrayList<GeneSequence>();
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 1, 9, "+"));
+        locations.add(new GeneSequence(GeneSequence.INTRON, 10, 11, "+"));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 12, 14, "+"));
+        List<NucleotideSequence> parts = null;
+        try {
+            parts = Samifier.extractSequenceParts(chromosomeFile, locations);
+        }
+        catch(Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+        assertEquals("Creates List of 3 NucleotideSequence objects", 3, parts.size());
+        NucleotideSequence codingSequence1 = parts.get(0);
+        NucleotideSequence intron = parts.get(1);
+        NucleotideSequence codingSequence2 = parts.get(2);
+
+        assertEquals("First NucleotideSequence should be CCACACCAC", "CCACACCAC", codingSequence1.getSequence());
+        assertEquals("Second NucleotideSequence should be an intron", GeneSequence.INTRON, intron.getType());
+        assertEquals("Last NucleotideSequence should be CCA", "CCA", codingSequence2.getSequence());
+    }
+
+    @Test
+    public void testGetPeptideSequence()
+    {
+    }
+    /*
+    @Test
+    public void testCreateSAM()
+    {
+        StringWriter sam = new StringWriter();
+        Samifier.createSAM(Genome genome, Map<String,String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output);
+        assertEquals();
+    }
+    */
 }

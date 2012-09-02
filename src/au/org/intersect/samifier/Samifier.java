@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Writer;
 
 public class Samifier {
     // Initialised with double brace initialisation
@@ -165,7 +166,7 @@ public class Samifier {
         BufferedReader reader = null;
         boolean peptidesSectionStarted = false;
         List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
-        try{
+        try {
             reader = new BufferedReader(new FileReader(resultsFile));
             String line;
             int lineNumber = 0;
@@ -194,6 +195,77 @@ public class Samifier {
             }
         }
         return results;
+    }
+
+    public PeptideSequence getPeptideSequence(PeptideSearchResult peptide, List<NucleotideSequence> sequenceParts)
+    {
+        StringBuilder nucleotideSequence = new StringBuilder();
+        StringBuilder cigar = new StringBuilder();
+
+        int peptideStart = (peptide.getPeptideStart() - 1) * 3;
+        int peptideStop  = peptide.getPeptideStop() * 3 - 1;
+        int remaining = peptideStop - peptideStart + 1;
+
+        for (NucleotideSequence part : sequenceParts)
+        {
+            if (GeneSequence.INTRON.equals(part.getType()))
+            {
+                if (cigar.length() > 0)
+                {
+                    cigar.append(part.getStop()-part.getStart()+1);
+                    cigar.append("N");
+                }
+            }
+
+            int sequenceSize = part.getSequence().length();
+
+            if (peptideStart >= sequenceSize)
+            {
+                peptideStart -= sequenceSize;
+                continue;
+            }
+
+            if ((peptideStart + remaining) < sequenceSize)
+            {
+                nucleotideSequence.append(part.getSequence().substring(peptideStart, remaining+1));
+                cigar.append(remaining);
+                cigar.append("M");
+            }
+            else
+            {
+                nucleotideSequence.append(part.getSequence().substring(peptideStart, sequenceSize));
+                cigar.append(sequenceSize-peptideStart);
+                cigar.append("M");
+                remaining -= (sequenceSize - peptideStart);
+                peptideStart = 0;
+            }
+        }
+
+        return new PeptideSequence(nucleotideSequence.toString(), cigar.toString());
+    }
+
+    public void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output)
+    {
+        for (PeptideSearchResult result : peptideSearchResults)
+        {
+            String oln = proteinOLNMap.get(result.getProteinName());
+            GeneInfo gene = genome.getGene(oln);
+            if (gene == null)
+            {
+                // TODO: log to error file
+                continue;
+            }
+            // TODO: handle directionality in a future release
+            if (!"+".equals(gene.getDirection()))
+            {
+                continue;
+            }
+ 
+            File chromosomeFile = new File(chromosomeDirectory, gene.getChromosome() + ".fa");
+            List<NucleotideSequence> sequenceParts = extractSequenceParts(chromosomeFile, gene.getLocations());
+
+            PeptideSequence peptide = getPeptideSequence(result, sequenceParts);
+        }
     }
 
     private static List<PeptideSearchResult> getProteinsFromQueryLine(String line, Map<String,String> proteinOLN)
@@ -236,6 +308,77 @@ public class Samifier {
         return results;
     }
 
+    public static List<NucleotideSequence> extractSequenceParts(File chromosomeFile, List<GeneSequence> locations)
+        throws FileNotFoundException, IOException
+    {
+
+        if (!chromosomeFile.exists())
+        {
+            throw new FileNotFoundException(chromosomeFile.getAbsolutePath() + " not found");
+        }
+
+        List<NucleotideSequence> parts = new ArrayList<NucleotideSequence>();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(chromosomeFile));
+            // Skip header of FASTA file
+            String line = reader.readLine();
+ 
+            int readCursor = 0;
+            for (GeneSequence location : locations)
+            {
+                int startIndex = location.getStart();
+                int stopIndex  = location.getStop();
+
+                if (GeneSequence.INTRON.equals(location.getSequenceType()))
+                {
+                    parts.add(new NucleotideSequence(null, GeneSequence.INTRON, startIndex, stopIndex));
+                    continue;
+                }
+
+                StringBuilder sequence = new StringBuilder();
+
+                // Read forward to startIndex
+                while (readCursor < startIndex)
+                {
+                    line = reader.readLine();
+                    line = line.replace("\r", "").replace("\n", "");
+                    readCursor += line.length();
+                }
+
+                int readStart = (startIndex % line.length()) - 1;
+                int readStop  = line.length(); 
+
+                // Read in the nucleotide sequence
+                while (readCursor < stopIndex)
+                {
+                    sequence.append(line.substring(readStart, readStop));
+                    readStart = 0;
+                    line = reader.readLine();
+                    line = line.replace("\r", "").replace("\n", "");
+                    readCursor += line.length();
+                }
+
+                // Get the last piece
+                readStop = stopIndex % line.length();
+                sequence.append(line.substring(readStart, readStop));
+
+                parts.add(new NucleotideSequence(sequence.toString(), GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
+            }
+
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.close();
+            }
+        }
+
+        return parts;
+    }
+
     public static void main(String[] args) {
     }
 }
+
