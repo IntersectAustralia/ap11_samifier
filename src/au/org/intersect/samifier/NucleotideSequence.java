@@ -34,5 +34,11 @@ public class NucleotideSequence
     {
         return stopIndex;
     }
+
+    public String toString()
+    {
+        return "sequence="+sequence+", type="+type+", startIndex="+startIndex+", stopIndex="+stopIndex;
+    }
 }
+
 

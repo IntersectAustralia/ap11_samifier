@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.FileWriter;
 import java.io.Writer;
 
 public class Samifier {
@@ -197,7 +198,7 @@ public class Samifier {
         return results;
     }
 
-    public PeptideSequence getPeptideSequence(PeptideSearchResult peptide, List<NucleotideSequence> sequenceParts)
+    public static PeptideSequence getPeptideSequence(PeptideSearchResult peptide, List<NucleotideSequence> sequenceParts)
     {
         StringBuilder nucleotideSequence = new StringBuilder();
         StringBuilder cigar = new StringBuilder();
@@ -212,9 +213,10 @@ public class Samifier {
             {
                 if (cigar.length() > 0)
                 {
-                    cigar.append(part.getStop()-part.getStart()+1);
+                    cigar.append(part.getStopIndex()-part.getStartIndex()+1);
                     cigar.append("N");
                 }
+                continue;
             }
 
             int sequenceSize = part.getSequence().length();
@@ -227,7 +229,7 @@ public class Samifier {
 
             if ((peptideStart + remaining) < sequenceSize)
             {
-                nucleotideSequence.append(part.getSequence().substring(peptideStart, remaining+1));
+                nucleotideSequence.append(part.getSequence().substring(peptideStart, peptideStart+remaining+1));
                 cigar.append(remaining);
                 cigar.append("M");
             }
@@ -244,8 +246,10 @@ public class Samifier {
         return new PeptideSequence(nucleotideSequence.toString(), cigar.toString());
     }
 
-    public void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output)
+    public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output)
+        throws FileNotFoundException, IOException
     {
+        List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
         for (PeptideSearchResult result : peptideSearchResults)
         {
             String oln = proteinOLNMap.get(result.getProteinName());
@@ -265,7 +269,27 @@ public class Samifier {
             List<NucleotideSequence> sequenceParts = extractSequenceParts(chromosomeFile, gene.getLocations());
 
             PeptideSequence peptide = getPeptideSequence(result, sequenceParts);
+
+            String proteinName = result.getProteinName();
+            int peptideStart = (result.getPeptideStart()-1)*3 + gene.getStart();
+
+            samEntries.add(new SAMEntry(result.getId(), gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
         }
+
+        String prevChromosome = null;
+        Collections.sort(samEntries, new SAMEntryComparator());
+        for (SAMEntry samEntry : samEntries)
+        {
+            String chromosome = samEntry.getRname();
+            if (! chromosome.equals(prevChromosome))
+            {
+                samEntry.setRnext("=");
+                prevChromosome = chromosome;
+            }
+            output.write(samEntry.toString());
+            output.write(System.getProperty("line.separator"));
+        }
+        output.close();
     }
 
     private static List<PeptideSearchResult> getProteinsFromQueryLine(String line, Map<String,String> proteinOLN)
@@ -378,7 +402,28 @@ public class Samifier {
         return parts;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
+        try {
+            File searchResultsFile = new File(args[0]);
+            File genomeFile = new File(args[1]);
+            File mapFile = new File(args[2]);
+            File chromosomeDir = new File(args[3]);
+            File outfile = new File(args[4]);
+
+            Genome genome = Genome.parse(genomeFile);
+            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
+            List<PeptideSearchResult> peptideSearchResults = Samifier.parseMascotPeptideSearchResults(searchResultsFile, map);
+
+            FileWriter sam = new FileWriter(outfile);
+
+            Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam);
+        }
+        catch (Exception e)
+        {
+            System.err.println(e);
+            e.printStackTrace();
+        }
     }
 }
 
