@@ -61,8 +61,14 @@
       <!-- Create the distribution directory -->
       <mkdir dir="${dist}/lib"/>
 
-      <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-      <jar jarfile="${dist}/lib/${app.name}-${DSTAMP}.jar" basedir="${build.dir}"/>
+      <jar destfile="${dist}/${app.name}.jar"
+        basedir="${build.classes.dir}"
+        excludes="**/Test.class" >
+          <manifest>
+            <attribute name="Main-Class"
+                value="au.org.intersect.samifier.Samifier"/>
+          </manifest>
+      </jar>
     </target>
 
     <target name="clean"
