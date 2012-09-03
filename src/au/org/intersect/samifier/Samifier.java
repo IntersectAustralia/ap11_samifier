@@ -144,7 +144,7 @@ public class Samifier {
                 // ordered_locus_name accession_id protein_name id
                 // Tab delimited
                 String[] parts = line.split("\\s+");
-                if (parts.length < 4)
+                if (parts.length < 3)
                 {
                     throw new ProteinToOLNMappingFileParsingException("Line "+lineNumber+" not in expected format, should be: ordered_locus_name accession_id protein_name id");
                 }
@@ -229,17 +229,21 @@ public class Samifier {
 
             if ((peptideStart + remaining) < sequenceSize)
             {
-                nucleotideSequence.append(part.getSequence().substring(peptideStart, peptideStart+remaining+1));
+                nucleotideSequence.append(part.getSequence().substring(peptideStart, peptideStart+remaining));
                 cigar.append(remaining);
                 cigar.append("M");
+                break;
             }
-            else
+
+            nucleotideSequence.append(part.getSequence().substring(peptideStart, sequenceSize));
+            cigar.append(sequenceSize-peptideStart);
+            cigar.append("M");
+            remaining -= (sequenceSize - peptideStart);
+            peptideStart = 0;
+
+            if (remaining <= 0)
             {
-                nucleotideSequence.append(part.getSequence().substring(peptideStart, sequenceSize));
-                cigar.append(sequenceSize-peptideStart);
-                cigar.append("M");
-                remaining -= (sequenceSize - peptideStart);
-                peptideStart = 0;
+                break;
             }
         }
 
@@ -273,7 +277,7 @@ public class Samifier {
             String proteinName = result.getProteinName();
             int peptideStart = (result.getPeptideStart()-1)*3 + gene.getStart();
 
-            samEntries.add(new SAMEntry(result.getId(), gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
+            samEntries.add(new SAMEntry(proteinName+"."+result.getId(), gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
         }
 
         String prevChromosome = null;
@@ -370,7 +374,8 @@ public class Samifier {
                     readCursor += line.length();
                 }
 
-                int readStart = (startIndex % line.length()) - 1;
+                // GFF (Genome) files use 1-based indices
+                int readStart = (startIndex - 1) % line.length();
                 int readStop  = line.length(); 
 
                 // Read in the nucleotide sequence
@@ -384,8 +389,8 @@ public class Samifier {
                 }
 
                 // Get the last piece
-                readStop = stopIndex % line.length();
-                sequence.append(line.substring(readStart, readStop));
+                readStop = (stopIndex - 1) % line.length();
+                sequence.append(line.substring(readStart, readStop + 1));
 
                 parts.add(new NucleotideSequence(sequence.toString(), GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
             }
@@ -412,7 +417,7 @@ public class Samifier {
             File outfile = new File(args[4]);
 
             Genome genome = Genome.parse(genomeFile);
-            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
+            Map<String,String> map = parseProteinToOLNMappingFile(mapFile);
             List<PeptideSearchResult> peptideSearchResults = Samifier.parseMascotPeptideSearchResults(searchResultsFile, map);
 
             FileWriter sam = new FileWriter(outfile);

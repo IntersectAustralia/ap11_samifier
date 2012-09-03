@@ -7,10 +7,12 @@ import static org.hamcrest.CoreMatchers.*;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.StringWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  * * Tests {@link Samifier}
@@ -73,7 +75,7 @@ public final class SamifierBuildingUnitTest
     }
 
     @Test
-    public void testGetPeptideSequence()
+    public void testGetPeptideSequenceCrossingAnIntron()
     {
         PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 3, 4);
         List<NucleotideSequence> sequenceParts = new ArrayList<NucleotideSequence>();
@@ -94,6 +96,25 @@ public final class SamifierBuildingUnitTest
     }
 
     @Test
+    public void testGetPeptideSequenceWithinCodingSequence()
+    {
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 3, 6);
+        List<NucleotideSequence> sequenceParts = new ArrayList<NucleotideSequence>();
+        sequenceParts.add(new NucleotideSequence("ACCCTCCATTACCCTGCCTCCACTCGTTACCCTGTCCCATTCAACCATACCACTCCGAAC", GeneSequence.CODING_SEQUENCE, 121, 180));
+        PeptideSequence p = null;
+        try {
+            p = Samifier.getPeptideSequence(peptideSearchResult, sequenceParts);
+        }
+        catch(Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+        assertEquals("Peptide extracted should be CATTACCCTGCC", "CATTACCCTGCC", p.getNucleotideSequence());
+        assertEquals("Peptide cigar string should be 12M", "12M", p.getCigarString());
+    }
+
+    @Test
     public void testCreateSAM()
     {
         try {
@@ -107,10 +128,14 @@ public final class SamifierBuildingUnitTest
             List<PeptideSearchResult> peptideSearchResults = Samifier.parseMascotPeptideSearchResults(mascotFile, map);
             File chromosomeDir = new File(getClass().getResource("/chrI.fa").getFile()).getParentFile();
 
-            StringWriter sam = new StringWriter();
-
+            File samFile = File.createTempFile("out", "sam");
+            samFile.deleteOnExit();
+            FileWriter sam = new FileWriter(samFile);
             Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam);
-            System.out.println(sam.toString());
+
+            List<String> expectedLines = FileUtils.readLines(new File(getClass().getResource("/expected.sam").getFile()));
+            List<String> gotLines = FileUtils.readLines(samFile);
+            assertEquals("Should generate the expected SAM file", expectedLines, gotLines);
         }
         catch(Exception e)
         {

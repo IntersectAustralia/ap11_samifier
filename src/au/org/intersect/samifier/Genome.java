@@ -41,7 +41,8 @@ public class Genome
                 String[] parts = line.split("\\s+");
                 if (parts.length < 9)
                 {
-                    throw new GenomeFileParsingException("Line "+lineNumber+": not in expected format");
+                    //throw new GenomeFileParsingException("Line "+lineNumber+": not in expected format");
+                    continue;
                 }
                 String type = parts[2];
                 if (type == null)
