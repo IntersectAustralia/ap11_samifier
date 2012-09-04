@@ -121,16 +121,7 @@ public class Samifier {
         }}
     );
 
-    private Genome genome;
-    private Map<String,String> proteinOLNMap;
-
     private Samifier(){}
-
-    public Samifier(Genome genome, Map<String,String> proteinOLNMap)
-    {
-        this.genome = genome;
-        //this.proteinOLNMap = proteinOLNMap
-    }
 
     public static Map<String,String> parseProteinToOLNMappingFile(File f)
         throws IOException, FileNotFoundException, ProteinToOLNMappingFileParsingException
@@ -213,17 +204,20 @@ public class Samifier {
         StringBuilder nucleotideSequence = new StringBuilder();
         StringBuilder cigar = new StringBuilder();
 
-        int peptideStart = (peptide.getPeptideStart() - 1) * 3;
-        int peptideStop  = peptide.getPeptideStop() * 3 - 1;
-        int remaining = peptideStop - peptideStart + 1;
+        int startCursor = (peptide.getPeptideStart() - 1) * 3;
+        int stopIndex   = peptide.getPeptideStop() * 3 - 1;
+        int remaining   = stopIndex  - startCursor + 1;
+        int peptideStartIndex = 0;
 
         for (NucleotideSequence part : sequenceParts)
         {
             if (GeneSequence.INTRON.equals(part.getType()))
             {
+                int size = part.getStopIndex()-part.getStartIndex()+1;
+                peptideStartIndex += size;
                 if (cigar.length() > 0)
                 {
-                    cigar.append(part.getStopIndex()-part.getStartIndex()+1);
+                    cigar.append(size);
                     cigar.append("N");
                 }
                 continue;
@@ -231,25 +225,31 @@ public class Samifier {
 
             int sequenceSize = part.getSequence().length();
 
-            if (peptideStart >= sequenceSize)
+            if (startCursor >= sequenceSize)
             {
-                peptideStart -= sequenceSize;
+                startCursor -= sequenceSize;
+                peptideStartIndex += sequenceSize;
                 continue;
             }
 
-            if ((peptideStart + remaining) < sequenceSize)
+            if (startCursor > 0)
             {
-                nucleotideSequence.append(part.getSequence().substring(peptideStart, peptideStart+remaining));
+                peptideStartIndex += startCursor;
+            }
+
+            if ((startCursor + remaining) < sequenceSize)
+            {
+                nucleotideSequence.append(part.getSequence().substring(startCursor, startCursor+remaining));
                 cigar.append(remaining);
                 cigar.append("M");
                 break;
             }
 
-            nucleotideSequence.append(part.getSequence().substring(peptideStart, sequenceSize));
-            cigar.append(sequenceSize-peptideStart);
+            nucleotideSequence.append(part.getSequence().substring(startCursor, sequenceSize));
+            cigar.append(sequenceSize-startCursor);
             cigar.append("M");
-            remaining -= (sequenceSize - peptideStart);
-            peptideStart = 0;
+            remaining -= (sequenceSize - startCursor);
+            startCursor = 0;
 
             if (remaining <= 0)
             {
@@ -257,7 +257,7 @@ public class Samifier {
             }
         }
 
-        return new PeptideSequence(nucleotideSequence.toString(), cigar.toString());
+        return new PeptideSequence(nucleotideSequence.toString(), cigar.toString(), peptideStartIndex);
     }
 
     public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output)
@@ -266,7 +266,8 @@ public class Samifier {
         List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
         for (PeptideSearchResult result : peptideSearchResults)
         {
-            String oln = proteinOLNMap.get(result.getProteinName());
+            String proteinName = result.getProteinName();
+            String oln = proteinOLNMap.get(proteinName);
             GeneInfo gene = genome.getGene(oln);
             if (gene == null)
             {
@@ -284,8 +285,8 @@ public class Samifier {
 
             PeptideSequence peptide = getPeptideSequence(result, sequenceParts);
 
-            String proteinName = result.getProteinName();
-            int peptideStart = (result.getPeptideStart()-1)*3 + gene.getStart();
+            //int peptideStart = (result.getPeptideStart()-1)*3 + gene.getStart();
+            int peptideStart = peptide.getStartIndex() + gene.getStart();
 
             samEntries.add(new SAMEntry(proteinName+"."+result.getId(), gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
         }
