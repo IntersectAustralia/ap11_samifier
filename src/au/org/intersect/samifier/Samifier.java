@@ -17,6 +17,16 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.io.Writer;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.ParseException;
+
 public class Samifier {
     // Initialised with double brace initialisation
     // See: http://www.c2.com/cgi/wiki?DoubleBraceInitialization
@@ -409,12 +419,46 @@ public class Samifier {
 
     public static void main(String[] args)
     {
+        Option resultsFile = OptionBuilder.withArgName("searchResultsFile")
+                                          .hasArg()
+                                          .withDescription("Mascot search results file in txt format")
+                                          .isRequired()
+                                          .create("r");
+        Option mappingFile = OptionBuilder.withArgName("mappingFile")
+                                          .hasArg()
+                                          .withDescription("File mapping protein identifier to ordered locus name")
+                                          .isRequired()
+                                          .create("m");
+        Option genomeFileOpt = OptionBuilder.withArgName("genomeFile")
+                                          .hasArg()
+                                          .withDescription("Genome file in gff format")
+                                          .isRequired()
+                                          .create("g");
+        Option chrDirOpt  = OptionBuilder.withArgName("chromosomeDir")
+                                          .hasArg()
+                                          .withDescription("Directory containing the chromosome files in FASTA format for the given genome")
+                                          .isRequired()
+                                          .create("c");
+        Option outputFile = OptionBuilder.withArgName("outputFile")
+                                          .hasArg()
+                                          .withDescription("Filename to write the SAM format file to")
+                                          .isRequired()
+                                          .create("o");
+        Options options = new Options();
+        options.addOption(resultsFile);
+        options.addOption(mappingFile);
+        options.addOption(genomeFileOpt);
+        options.addOption(chrDirOpt);
+        options.addOption(outputFile);
+
+        CommandLineParser parser = new GnuParser();
         try {
-            File searchResultsFile = new File(args[0]);
-            File genomeFile = new File(args[1]);
-            File mapFile = new File(args[2]);
-            File chromosomeDir = new File(args[3]);
-            File outfile = new File(args[4]);
+            CommandLine line = parser.parse( options, args );
+            File searchResultsFile = new File(line.getOptionValue("r"));
+            File genomeFile = new File(line.getOptionValue("g"));
+            File mapFile = new File(line.getOptionValue("m"));
+            File chromosomeDir = new File(line.getOptionValue("c"));
+            File outfile = new File(line.getOptionValue("o"));
 
             Genome genome = Genome.parse(genomeFile);
             Map<String,String> map = parseProteinToOLNMappingFile(mapFile);
@@ -423,6 +467,11 @@ public class Samifier {
             FileWriter sam = new FileWriter(outfile);
 
             Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam);
+        }
+        catch (ParseException pe)
+        {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("samifier", options, true);
         }
         catch (Exception e)
         {
