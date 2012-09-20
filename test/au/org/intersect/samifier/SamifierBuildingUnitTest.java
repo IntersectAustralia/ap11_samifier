@@ -6,6 +6,9 @@ import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Test;
 
+import org.jmock.Mockery;
+import org.jmock.Expectations;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -28,9 +31,10 @@ public final class SamifierBuildingUnitTest
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 71, 79, "+"));
         locations.add(new GeneSequence(GeneSequence.INTRON, 80, 141, "+"));
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 142, 213, "+"));
+        GeneInfo gene = new GeneInfo("chrI", 1, 250, GeneInfo.FORWARD, locations);
         List<NucleotideSequence> parts = null;
         try {
-            parts = Samifier.extractSequenceParts(chromosomeFile, locations);
+            parts = Samifier.extractSequenceParts(chromosomeFile, gene);
         }
         catch(Exception e)
         {
@@ -55,9 +59,10 @@ public final class SamifierBuildingUnitTest
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 1, 9, "+"));
         locations.add(new GeneSequence(GeneSequence.INTRON, 10, 11, "+"));
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 12, 14, "+"));
+        GeneInfo gene = new GeneInfo("chrI", 1, 250, GeneInfo.FORWARD, locations);
         List<NucleotideSequence> parts = null;
         try {
-            parts = Samifier.extractSequenceParts(chromosomeFile, locations);
+            parts = Samifier.extractSequenceParts(chromosomeFile, gene);
         }
         catch(Exception e)
         {
@@ -75,43 +80,74 @@ public final class SamifierBuildingUnitTest
     }
 
     @Test
-    public void testGetPeptideSequenceCrossingAnIntron()
+    public void testGetPeptideSequenceCrossingAnIntronForward()
     {
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 3, 4);
-        List<NucleotideSequence> sequenceParts = new ArrayList<NucleotideSequence>();
-        sequenceParts.add(new NucleotideSequence("CCACACCAC", GeneSequence.CODING_SEQUENCE, 1, 9));
-        sequenceParts.add(new NucleotideSequence(null, GeneSequence.INTRON, 10, 11));
-        sequenceParts.add(new NucleotideSequence("CCA", GeneSequence.CODING_SEQUENCE, 12, 14));
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 33, 36);
+
+        List<GeneSequence> locations = new ArrayList<GeneSequence>();
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.FORWARD));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.FORWARD));
+        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.FORWARD));
+        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.FORWARD, locations);
         PeptideSequence p = null;
         try {
-            p = Samifier.getPeptideSequence(peptideSearchResult, sequenceParts);
+            p = Samifier.getPeptideSequence(peptideSearchResult, chromosomeFile, gene);
         }
         catch(Exception e)
         {
             fail("Unexpected exception: " + e.getMessage());
             e.printStackTrace();
         }
-        assertEquals("Peptide extracted should be CACCCA", "CACCCA", p.getNucleotideSequence());
-        assertEquals("Peptide cigar string should be 3M2N3M", "3M2N3M", p.getCigarString());
+        assertEquals("Peptide extracted should be CAAGCTGAAATT", "CAAGCTGAAATT", p.getNucleotideSequence());
+        assertEquals("Peptide cigar string should be 6M113N6M", "6M113N6M", p.getCigarString());
     }
 
     @Test
     public void testGetPeptideSequenceWithinCodingSequence()
     {
         PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 3, 6);
-        List<NucleotideSequence> sequenceParts = new ArrayList<NucleotideSequence>();
-        sequenceParts.add(new NucleotideSequence("ACCCTCCATTACCCTGCCTCCACTCGTTACCCTGTCCCATTCAACCATACCACTCCGAAC", GeneSequence.CODING_SEQUENCE, 121, 180));
+        List<GeneSequence> locations = new ArrayList<GeneSequence>();
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.FORWARD));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.FORWARD));
+        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.FORWARD));
+        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.FORWARD, locations);
         PeptideSequence p = null;
         try {
-            p = Samifier.getPeptideSequence(peptideSearchResult, sequenceParts);
+            p = Samifier.getPeptideSequence(peptideSearchResult, chromosomeFile, gene);
         }
         catch(Exception e)
         {
             fail("Unexpected exception: " + e.getMessage());
             e.printStackTrace();
         }
-        assertEquals("Peptide extracted should be CATTACCCTGCC", "CATTACCCTGCC", p.getNucleotideSequence());
+        assertEquals("Peptide extracted should be TCATCTACTCCC", "TCATCTACTCCC", p.getNucleotideSequence());
         assertEquals("Peptide cigar string should be 12M", "12M", p.getCigarString());
+    }
+
+    @Test
+    public void testGetPeptideSequenceCrossingAnIntronReverse()
+    {
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 81, 85);
+
+        List<GeneSequence> locations = new ArrayList<GeneSequence>();
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.REVERSE));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.REVERSE));
+        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.REVERSE));
+        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.REVERSE, locations);
+        PeptideSequence p = null;
+        try {
+            p = Samifier.getPeptideSequence(peptideSearchResult, chromosomeFile, gene);
+        }
+        catch(Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+        assertEquals("Peptide extracted should be GCTGAAATTGATGAT", "GCTGAAATTGATGAT", p.getNucleotideSequence());
+        assertEquals("Peptide cigar string should be 3M113N12M", "3M113N12M", p.getCigarString());
     }
 
     @Test

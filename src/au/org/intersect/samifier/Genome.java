@@ -106,11 +106,11 @@ public class Genome
         String type = parts[2];
         String orderedLocusName = extractOrderedLocusName(parts[8]);
         int start = Integer.parseInt(parts[3]);
+        int stop = Integer.parseInt(parts[4]);
         String direction = parts[6];
         GeneInfo gene;
         if (genome.hasGene(orderedLocusName))
         {
-            int stop = Integer.parseInt(parts[4]);
             gene = genome.getGene(orderedLocusName);
             if (gene == null)
             {
@@ -122,7 +122,7 @@ public class Genome
         }
         else
         {
-            gene = new GeneInfo(chromosome, start, direction);
+            gene = new GeneInfo(chromosome, start, stop, direction);
             genome.addGene(orderedLocusName, gene);
         }
     }

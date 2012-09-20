@@ -27,99 +27,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.ParseException;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Samifier {
-    // Initialised with double brace initialisation
-    // See: http://www.c2.com/cgi/wiki?DoubleBraceInitialization
-    public static final Map<String, String> CODONS = Collections.unmodifiableMap(
-        new HashMap<String, String>() {{
-            put("ATT", "I");
-            put("ATT", "I");
-            put("ATC", "I");
-            put("ATA", "I");
 
-            put("CTT", "L");
-            put("CTC", "L");
-            put("CTA", "L");
-            put("CTG", "L");
-            put("TTA", "L");
-            put("TTG", "L");
-
-            put("GTT", "V");
-            put("GTC", "V");
-            put("GTA", "V");
-            put("GTG", "V");
-
-            put("TTT", "F");
-            put("TTC", "F");
-
-            put("ATG", "M"); // Also the start codon
-
-            put("TGT", "C");
-            put("TGC", "C");
-
-            put("GCT", "A");
-            put("GCC", "A");
-            put("GCA", "A");
-            put("GCG", "A");
-
-            put("CCT", "P");
-            put("CCC", "P");
-            put("CCA", "P");
-            put("CCG", "P");
-
-            put("ACT", "T");
-            put("ACC", "T");
-            put("ACA", "T");
-            put("ACG", "T");
-
-            put("TCT", "S");
-            put("TCC", "S");
-            put("TCA", "S");
-            put("TCG", "S");
-            put("AGT", "S");
-            put("AGC", "S");
-
-            put("TAT", "Y");
-            put("TAC", "Y");
-
-            put("TGG", "W");
-
-            put("CAA", "Q");
-            put("CAG", "Q");
-
-            put("AAT", "N");
-            put("AAC", "N");
-
-            put("CAT", "H");
-            put("CAC", "H");
-
-            put("GAA", "E");
-            put("GAG", "E");
-
-            put("GAT", "D");
-            put("GAC", "D");
-
-            put("AAA", "K");
-            put("AAG", "K");
-
-            put("CGT", "R");
-            put("CGC", "R");
-            put("CGA", "R");
-            put("CGG", "R");
-            put("AGA", "R");
-            put("AGG", "R");
-        }}
-    );
-
-    public static final String START_CODON = "ATG";
-
-    public static final Set<String> STOP_CODONS = Collections.unmodifiableSet(
-        new HashSet<String>() {{
-            add("TAA");
-            add("TAG");
-            add("TGA");
-        }}
-    );
+    public static final int SAM_REVERSE_FLAG = 0x10;
+    public static final int BASES_PER_CODON = 3;
 
     private Samifier(){}
 
@@ -131,7 +44,7 @@ public class Samifier {
         BufferedReader reader = null;
         try{
             reader = new BufferedReader(new FileReader(f));
-            
+ 
             // Skip header line
             String line = reader.readLine();
             int lineNumber = 1;
@@ -199,65 +112,116 @@ public class Samifier {
         return results;
     }
 
-    public static PeptideSequence getPeptideSequence(PeptideSearchResult peptide, List<NucleotideSequence> sequenceParts)
+    public static PeptideSequence getPeptideSequence(PeptideSearchResult peptide, File chromosomeFile, GeneInfo gene)
+        throws FileNotFoundException, IOException
     {
+        List<NucleotideSequence> sequenceParts = extractSequenceParts(chromosomeFile, gene);
         StringBuilder nucleotideSequence = new StringBuilder();
         StringBuilder cigar = new StringBuilder();
 
-        int startCursor = (peptide.getPeptideStart() - 1) * 3;
-        int stopIndex   = peptide.getPeptideStop() * 3 - 1;
-        int remaining   = stopIndex  - startCursor + 1;
-        int peptideStartIndex = 0;
+        // Coordinates for the peptide are 1-based, so substract 1 so it
+        // can be used with a 0-based string slice.
+        int relativeStart = (peptide.getPeptideStart() - 1) * BASES_PER_CODON;
+        int relativeStop  = peptide.getPeptideStop() * BASES_PER_CODON - 1;
 
+        int absoluteStartIndex = 0;
+        int absoluteStopIndex = 0;
+        int readCursor = 0;
+        String direction = gene.getDirection();
+
+        /*
+         * The chromosome nucleotide sequence contains everything- exons and
+         * introns. The peptide positions we are given exclude the introns.
+         *
+         * Hence, we walk through each sequence part (describe in the genome
+         * file), skipping past introns and just counting through exons.
+         */
         for (NucleotideSequence part : sequenceParts)
         {
+            // Skip introns, but mark them in the cigar string
             if (GeneSequence.INTRON.equals(part.getType()))
             {
+                /*
+                   We don't start cigar strings with introns.
+                   A non-empty cigar string means we've already got part
+                   of the peptide's sequence, and this intron is in the middle.
+                */
                 int size = part.getStopIndex()-part.getStartIndex()+1;
-                peptideStartIndex += size;
                 if (cigar.length() > 0)
                 {
-                    cigar.append(size);
-                    cigar.append("N");
+                    updateCigar(cigar, size, GeneSequence.INTRON, direction);
+                    absoluteStopIndex += size;
+                }
+                else
+                {
+                    // This intron is before our absolute start position
+                    absoluteStartIndex += size;
+                    absoluteStopIndex += size;
                 }
                 continue;
             }
 
             int sequenceSize = part.getSequence().length();
+            int substringStart = 0;
+            int substringEnd   = sequenceSize;
 
-            if (startCursor >= sequenceSize)
+            // If the desired start position is not in this coding sequence,
+            // move our cursor past it
+            if (relativeStart > (readCursor + sequenceSize - 1))
             {
-                startCursor -= sequenceSize;
-                peptideStartIndex += sequenceSize;
+                readCursor += sequenceSize;
+                absoluteStartIndex += sequenceSize;
+                absoluteStopIndex += sequenceSize;
                 continue;
             }
 
-            if (startCursor > 0)
+            // After skipping through, the next part should have the starting
+            // position within it. Update the absoluteStartIndex for the last
+            // time.
+            if (readCursor < relativeStart)
             {
-                peptideStartIndex += startCursor;
+                substringStart = relativeStart - readCursor;
+                absoluteStartIndex += substringStart;
+                absoluteStopIndex += substringStart;
             }
 
-            if ((startCursor + remaining) < sequenceSize)
+            // If this part contains the stop position, then this is the last
+            // part to process.
+            if ((readCursor + sequenceSize) > relativeStop)
             {
-                nucleotideSequence.append(part.getSequence().substring(startCursor, startCursor+remaining));
-                cigar.append(remaining);
-                cigar.append("M");
+                substringEnd = relativeStop - readCursor + 1;
+                nucleotideSequence.append(part.getSequence().substring(substringStart, substringEnd));
+                int partSize = substringEnd - substringStart;
+                absoluteStopIndex += partSize;
+                updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE, direction);
                 break;
             }
 
-            nucleotideSequence.append(part.getSequence().substring(startCursor, sequenceSize));
-            cigar.append(sequenceSize-startCursor);
-            cigar.append("M");
-            remaining -= (sequenceSize - startCursor);
-            startCursor = 0;
-
-            if (remaining <= 0)
-            {
-                break;
-            }
+            nucleotideSequence.append(part.getSequence().substring(substringStart, substringEnd));
+            int partSize = substringEnd - substringStart;
+            absoluteStopIndex += partSize;
+            updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE, direction);
+            readCursor = substringEnd;
         }
 
-        return new PeptideSequence(nucleotideSequence.toString(), cigar.toString(), peptideStartIndex);
+        String peptideSequence = GeneInfo.REVERSE.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
+        int startIndex = GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
+        return new PeptideSequence(peptideSequence, cigar.toString(), startIndex);
+    }
+
+    private static void updateCigar(StringBuilder cigar, int size, String type, String direction)
+    {
+        String marker = GeneSequence.INTRON.equals(type) ? "N" : "M";
+        if (GeneInfo.REVERSE.equals(direction))
+        {
+            cigar.insert(0, marker);
+            cigar.insert(0, size);
+        }
+        else
+        {
+            cigar.append(size);
+            cigar.append(marker);
+        }
     }
 
     public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output)
@@ -268,27 +232,27 @@ public class Samifier {
         {
             String proteinName = result.getProteinName();
             String oln = proteinOLNMap.get(proteinName);
+
             GeneInfo gene = genome.getGene(oln);
             if (gene == null)
             {
                 // TODO: log to error file
                 continue;
             }
-            // TODO: handle directionality in a future release
-            if (!"+".equals(gene.getDirection()))
-            {
-                continue;
-            }
  
             File chromosomeFile = new File(chromosomeDirectory, gene.getChromosome() + ".fa");
-            List<NucleotideSequence> sequenceParts = extractSequenceParts(chromosomeFile, gene.getLocations());
 
-            PeptideSequence peptide = getPeptideSequence(result, sequenceParts);
+            PeptideSequence peptide = getPeptideSequence(result, chromosomeFile, gene);
 
-            //int peptideStart = (result.getPeptideStart()-1)*3 + gene.getStart();
             int peptideStart = peptide.getStartIndex() + gene.getStart();
 
-            samEntries.add(new SAMEntry(proteinName+"."+result.getId(), gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
+            SAMEntry sam = new SAMEntry(proteinName+"."+result.getId(), gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence());
+            if (GeneInfo.REVERSE.equals(gene.getDirection()))
+            {
+                sam.setFlag(sam.getFlag()|SAM_REVERSE_FLAG);
+            }
+
+            samEntries.add(sam);
         }
 
         String prevChromosome = null;
@@ -311,24 +275,30 @@ public class Samifier {
         throws IOException
     {
         List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
+        // Expected format:
         // q21_p1=0,705.406113,-0.000065,4,EFGILK,18,00000000,25.95,0000000001000002010,0,0;"KPYK1_YEAST":0:469:474:1,"RL31B_YEAST":0:78:86:1
         Pattern linePattern = Pattern.compile("^(q\\d+_p\\d+)=([^;]+);(.+)$");
         Pattern proteinPartPattern = Pattern.compile("^\"([^\"]+)\":\\d\\:(\\d+)\\:(\\d+)\\:\\d$");
         Matcher lineMatcher = linePattern.matcher(line);
+
         if (lineMatcher.matches())
         {
             String id = lineMatcher.group(1);
             String peptidePart = lineMatcher.group(2);
             String proteinsPart = lineMatcher.group(3);
-            //0,705.406113,-0.000065,4,EFGILK,18,00000000,25.95,0000000001000002010,0,0
+
+            // Expected format:
+            // 0,705.406113,-0.000065,4,EFGILK,18,00000000,25.95,0000000001000002010,0,0
             String[] peptideParts = peptidePart.split(",");
             String peptide = peptideParts[4];
 
-            //"KPYK1_YEAST":0:469:474:1,"RL31B_YEAST":0:78:86:1, ...
+            // Expected format:
+            // "KPYK1_YEAST":0:469:474:1,"RL31B_YEAST":0:78:86:1, ...
             String[] proteins = proteinsPart.split(",");
             for (String proteinPart : proteins)
             {
-                //"KPYK1_YEAST":0:469:474:1
+                // Expected format:
+                // "KPYK1_YEAST":0:469:474:1
                 Matcher proteinPartMatcher = proteinPartPattern.matcher(proteinPart);
                 if (proteinPartMatcher.matches())
                 {
@@ -347,14 +317,15 @@ public class Samifier {
         return results;
     }
 
-    public static List<NucleotideSequence> extractSequenceParts(File chromosomeFile, List<GeneSequence> locations)
+    public static List<NucleotideSequence> extractSequenceParts(File chromosomeFile, GeneInfo gene)
         throws FileNotFoundException, IOException
     {
-
         if (!chromosomeFile.exists())
         {
             throw new FileNotFoundException(chromosomeFile.getAbsolutePath() + " not found");
         }
+
+        String direction = gene.getDirection();
 
         List<NucleotideSequence> parts = new ArrayList<NucleotideSequence>();
         BufferedReader reader = null;
@@ -364,6 +335,7 @@ public class Samifier {
             String line = reader.readLine();
  
             int readCursor = 0;
+            List<GeneSequence> locations = gene.getLocations();
             for (GeneSequence location : locations)
             {
                 int startIndex = location.getStart();
@@ -403,7 +375,8 @@ public class Samifier {
                 readStop = (stopIndex - 1) % line.length();
                 sequence.append(line.substring(readStart, readStop + 1));
 
-                parts.add(new NucleotideSequence(sequence.toString(), GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
+                String sequenceString = GeneInfo.REVERSE.equals(direction) ? sequence.reverse().toString() : sequence.toString();
+                parts.add(new NucleotideSequence(sequenceString, GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
             }
 
         }
@@ -413,6 +386,11 @@ public class Samifier {
             {
                 reader.close();
             }
+        }
+
+        if (GeneInfo.REVERSE.equals(direction))
+        {
+            Collections.reverse(parts);
         }
 
         return parts;

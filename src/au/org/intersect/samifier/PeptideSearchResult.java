@@ -41,4 +41,14 @@ public class PeptideSearchResult
     {
         return peptideStop;
     }
+
+    public String toString()
+    {
+        return "id    = " + id + System.getProperty("line.separator")
+             + "name  = " + proteinName + System.getProperty("line.separator")
+             + "start = " + peptideStart + System.getProperty("line.separator")
+             + "stop  = " + peptideStop + System.getProperty("line.separator")
+             + "sequence = " + System.getProperty("line.separator")
+             + peptideSequence;
+    }
 }

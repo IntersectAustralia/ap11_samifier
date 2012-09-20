@@ -29,11 +29,13 @@ public final class SamifierParsingUnitTest
             fail("Unexpected exception: " + e.getMessage());
             e.printStackTrace();
         }
-        assertEquals("Map has 2 entries", 2, map.size());
+        assertEquals("Map has 3 entries", 3, map.size());
         assertTrue("Map has key KPYK1_YEAST", map.containsKey("KPYK1_YEAST"));
         assertTrue("Map has key RL31A_YEAST", map.containsKey("RL31A_YEAST"));
+        assertTrue("Map has key RL36B_YEAST", map.containsKey("RL36B_YEAST"));
         assertEquals("KPYK1_YEAST maps to YAL038W", "YAL038W", map.get("KPYK1_YEAST"));
         assertEquals("RL31A_YEAST maps to YDL075W", "YDL075W", map.get("RL31A_YEAST"));
+        assertEquals("RL36B_YEAST maps to YPL249C-A", "YPL249C-A", map.get("RL36B_YEAST"));
     }
 
     @Test
@@ -52,7 +54,7 @@ public final class SamifierParsingUnitTest
             fail("Unexpected exception: " + e.getMessage());
             e.printStackTrace();
         }
-        assertEquals("Parser should find six ", 6, list.size());
+        assertEquals("Parser should find seven ", 7, list.size());
     }
 
 }

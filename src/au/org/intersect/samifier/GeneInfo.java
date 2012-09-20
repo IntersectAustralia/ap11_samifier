@@ -8,8 +8,12 @@ public class GeneInfo
 {
     private String chromosome;
     private int start;
+    private int stop;
     private String direction;
     private List<GeneSequence> locations;
+
+    public static final String FORWARD = "+";
+    public static final String REVERSE = "-";
 
     public GeneInfo()
     {
@@ -17,16 +21,17 @@ public class GeneInfo
         locations = new ArrayList<GeneSequence>();
     }
 
-    public GeneInfo(String chromosome, int start, String direction)
+    public GeneInfo(String chromosome, int start, int stop, String direction)
     {
         //this(chromosome, start, direction, new TreeSet(new GeneSequenceComparator()));
-        this(chromosome, start, direction, new ArrayList<GeneSequence>());
+        this(chromosome, start, stop, direction, new ArrayList<GeneSequence>());
     }
 
-    public GeneInfo(String chromosome, int start, String direction, List<GeneSequence> locations)
+    public GeneInfo(String chromosome, int start, int stop, String direction, List<GeneSequence> locations)
     {
         setChromosome(chromosome);
         setStart(start);
+        setStop(stop);
         setDirection(direction);
         this.locations = locations;
     }
@@ -49,6 +54,16 @@ public class GeneInfo
     public int getStart()
     {
         return start;
+    }
+
+    public void setStop(int stop)
+    {
+        this.stop = stop;
+    }
+
+    public int getStop()
+    {
+        return stop;
     }
 
     public void setDirection(String direction)

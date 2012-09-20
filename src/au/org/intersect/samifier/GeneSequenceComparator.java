@@ -6,17 +6,7 @@ public class GeneSequenceComparator implements Comparator<GeneSequence>
 {
     public int compare(GeneSequence a, GeneSequence b)
     {
-        if (a.getStart() > b.getStart())
-        {
-            return 1;
-        }
-        else if (a.getStart() < b.getStart())
-        {
-            return -1;
-        }
-        return 0;
+        return a.getStart() - b.getStart();
     }
-
 }
-
 

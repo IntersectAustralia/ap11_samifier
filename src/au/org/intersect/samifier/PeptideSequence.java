@@ -27,4 +27,11 @@ public class PeptideSequence
     {
         return startIndex;
     }
+
+    public String toString()
+    {
+        return "startIndex = " + startIndex + ", "
+             + "nucleotideSequence = " + nucleotideSequence + ", "
+             + "cigarString = " + cigarString;
+    }
 }

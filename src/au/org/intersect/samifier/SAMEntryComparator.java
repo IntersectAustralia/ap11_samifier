@@ -21,15 +21,7 @@ public class SAMEntryComparator implements Comparator<SAMEntry>
 
     private int comparePos(SAMEntry a, SAMEntry b)
     {
-        if (a.getPos() > b.getPos())
-        {
-            return 1;
-        }
-        else if (a.getPos() < b.getPos())
-        {
-            return -1;
-        }
-        return 0;
+        return a.getPos() - b.getPos();
     }
 }
 
