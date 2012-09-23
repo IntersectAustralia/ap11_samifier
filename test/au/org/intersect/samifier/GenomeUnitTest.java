@@ -28,9 +28,10 @@ public final class GenomeUnitTest
         throws Exception
     {
       Genome genome = Genome.parse(genomeFile);
-      assertEquals("Genome has 2 genes", 2, genome.getGenes().size());
+      assertEquals("Genome has 3 genes", 3, genome.getGenes().size());
       assertTrue("Genome has gene YAL038W", genome.hasGene("YAL038W"));
       assertTrue("Genome has gene YAL038W", genome.hasGene("YDL075W"));
+      assertTrue("Genome has gene YPL249C-A", genome.hasGene("YPL249C-A"));
     }
 
     @Test
