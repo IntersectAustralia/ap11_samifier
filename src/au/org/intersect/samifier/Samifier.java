@@ -78,6 +78,30 @@ public class Samifier {
     public static List<PeptideSearchResult> parseMascotPeptideSearchResults(File resultsFile, Map<String,String> proteinOLN)
         throws IOException, FileNotFoundException
     {
+
+        BufferedReader headerReader = new BufferedReader(new FileReader(resultsFile));
+        String firstLine = headerReader.readLine();
+        headerReader.close();
+        // Detect mzidentML format or text format
+        if (firstLine.startsWith("<?xml\\s"))
+        {
+            return parseMascotPeptideSearchResultsMzidentMLFormat(resultsFile, proteinOLN);
+        }
+        else
+        {
+            return parseMascotPeptideSearchResultsDATFormat(resultsFile, proteinOLN);
+        }
+    }
+
+    public static List<PeptideSearchResult> parseMascotPeptideSearchResultsMzidentMLFormat(File resultsFile, Map<String,String> proteinOLN)
+        throws IOException, FileNotFoundException
+    {
+        return null;
+    }
+
+    public static List<PeptideSearchResult> parseMascotPeptideSearchResultsDATFormat(File resultsFile, Map<String,String> proteinOLN)
+        throws IOException, FileNotFoundException
+    {
         BufferedReader reader = null;
         boolean peptidesSectionStarted = false;
         List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
