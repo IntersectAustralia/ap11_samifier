@@ -6,9 +6,6 @@ import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Test;
 
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
