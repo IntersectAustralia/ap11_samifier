@@ -4,5 +4,7 @@
 *.war
 *.ear
 
+*.swp
+
 build/
 dist/
