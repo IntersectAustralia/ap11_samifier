@@ -1,6 +1,5 @@
 package au.org.intersect.samifier;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class GeneSequence
