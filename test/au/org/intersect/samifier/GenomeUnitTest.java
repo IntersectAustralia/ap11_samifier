@@ -20,7 +20,7 @@ public final class GenomeUnitTest
     @Before
     public void oneTimeSetup()
     {
-      genomeFile = new File(getClass().getResource("/test_genome.gff").getFile());
+      genomeFile = new File("test/resources/test_genome.gff");
     }
 
     @Test

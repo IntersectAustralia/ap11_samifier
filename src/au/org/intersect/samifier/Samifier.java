@@ -1,12 +1,6 @@
 package au.org.intersect.samifier;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.BufferedReader;
@@ -28,6 +22,21 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jdom2.Document;
+import org.jdom2.input.DOMBuilder;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 public class Samifier {
 
@@ -76,31 +85,106 @@ public class Samifier {
     }
 
     public static List<PeptideSearchResult> parseMascotPeptideSearchResults(File resultsFile, Map<String,String> proteinOLN)
-        throws IOException, FileNotFoundException
-    {
+            throws MascotParsingException {
 
-        BufferedReader headerReader = new BufferedReader(new FileReader(resultsFile));
-        String firstLine = headerReader.readLine();
-        headerReader.close();
-        // Detect mzidentML format or text format
-        if (firstLine.startsWith("<?xml\\s"))
+        try
         {
-            return parseMascotPeptideSearchResultsMzidentMLFormat(resultsFile, proteinOLN);
+            BufferedReader headerReader = new BufferedReader(new FileReader(resultsFile));
+            String firstLine = headerReader.readLine();
+            headerReader.close();
+            // Detect mzidentML format or text format
+            if (firstLine.startsWith("<?xml "))
+            {
+                return parseMascotPeptideSearchResultsMzidentMLFormat(resultsFile, proteinOLN);
+            }
+            else
+            {
+                return parseMascotPeptideSearchResultsDATFormat(resultsFile, proteinOLN);
+            }
         }
-        else
+        catch (IOException e)
         {
-            return parseMascotPeptideSearchResultsDATFormat(resultsFile, proteinOLN);
+            throw new MascotParsingException(e);
         }
     }
 
     public static List<PeptideSearchResult> parseMascotPeptideSearchResultsMzidentMLFormat(File resultsFile, Map<String,String> proteinOLN)
-        throws IOException, FileNotFoundException
+        throws MascotParsingException
     {
-        return null;
+        List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
+
+        try
+        {
+            XPathFactory factory = XPathFactory.newInstance();
+            XPath xPath = factory.newXPath();
+
+            xPath.setNamespaceContext(new NamespaceContext() {
+                public String getNamespaceURI(String prefix) {
+                    if (prefix == null) throw new NullPointerException("Null prefix");
+                    else if ("mzidentml".equals(prefix)) return "http://psidev.info/psi/pi/mzIdentML/1.0";
+                    return XMLConstants.NULL_NS_URI;
+                }
+                public String getPrefix(String uri) {
+                    throw new UnsupportedOperationException();
+                }
+
+                public Iterator getPrefixes(String uri) {
+                    throw new UnsupportedOperationException();
+                }
+            });
+
+
+            String xPathStr = "//mzidentml:Peptide";
+            InputSource iS = new InputSource(new FileReader(resultsFile));
+            Node root = (Node) xPath.evaluate("/", iS, XPathConstants.NODE);
+
+            QName nodesetType = XPathConstants.NODESET;
+            QName nodeType = XPathConstants.NODE;
+
+            NodeList peptideList = (NodeList)xPath.evaluate(xPathStr, root, nodesetType);
+            for (int peptideIndex = 0 ; peptideIndex < peptideList.getLength(); peptideIndex++)
+            {
+                Node peptideNode = peptideList.item(peptideIndex);
+                String peptideId = peptideNode.getAttributes().getNamedItem("id").getNodeValue();
+                String peptideSequenceXpath = "./mzidentml:peptideSequence";
+                Node peptideSequenceNode = (Node)xPath.evaluate(peptideSequenceXpath, peptideNode, nodeType);
+                String peptideSequence = peptideSequenceNode.getTextContent();
+
+                String peptideInfoXpath = "//mzidentml:SpectrumIdentificationItem[@Peptide_ref='" + peptideId + "']";
+                Node peptideInfo = (Node)xPath.evaluate(peptideInfoXpath, root, nodeType);
+
+                String peptideEvidenceXpath = "./mzidentml:PeptideEvidence";
+
+                NodeList peptideEvidenceList = (NodeList)xPath.evaluate(peptideEvidenceXpath, peptideInfo, nodesetType);
+                for (int peptideEvidenceIndex = 0; peptideEvidenceIndex < peptideEvidenceList.getLength(); peptideEvidenceIndex++)
+                {
+                    Node peptideEvidence = peptideEvidenceList.item(peptideEvidenceIndex);
+                    String id = peptideEvidence.getAttributes().getNamedItem("id").getNodeValue();
+                    String start = peptideEvidence.getAttributes().getNamedItem("start").getNodeValue();
+                    String stop = peptideEvidence.getAttributes().getNamedItem("end").getNodeValue();
+                    String dbSequenceRef = peptideEvidence.getAttributes().getNamedItem("DBSequence_Ref").getNodeValue();
+
+                    String dbSequenceXpath = "//mzidentml:DBSequence[@id='" + dbSequenceRef + "']";
+                    Node dbSequence = (Node)xPath.evaluate(dbSequenceXpath, root, nodeType);
+                    String protein = dbSequence.getAttributes().getNamedItem("accession").getNodeValue();
+                    if (proteinOLN.containsKey(protein))
+                    {
+                        results.add(new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop)));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new MascotParsingException(e);
+        }
+
+
+        return results;
     }
 
     public static List<PeptideSearchResult> parseMascotPeptideSearchResultsDATFormat(File resultsFile, Map<String,String> proteinOLN)
-        throws IOException, FileNotFoundException
+        throws MascotParsingException
     {
         BufferedReader reader = null;
         boolean peptidesSectionStarted = false;
@@ -126,11 +210,22 @@ public class Samifier {
                 }
             }
         }
+        catch (Exception e)
+        {
+            throw new MascotParsingException(e);
+        }
         finally
         {
-            if (reader != null)
+            try
             {
-                reader.close();
+                if (reader != null)
+                {
+                    reader.close();
+                }
+            }
+            catch (IOException e)
+            {
+                throw new MascotParsingException(e);
             }
         }
         return results;
@@ -314,7 +409,7 @@ public class Samifier {
             // Expected format:
             // 0,705.406113,-0.000065,4,EFGILK,18,00000000,25.95,0000000001000002010,0,0
             String[] peptideParts = peptidePart.split(",");
-            String peptide = peptideParts[4];
+            String peptideSequence = peptideParts[4];
 
             // Expected format:
             // "KPYK1_YEAST":0:469:474:1,"RL31B_YEAST":0:78:86:1, ...
@@ -334,7 +429,7 @@ public class Samifier {
                     }
                     int start = Integer.parseInt(proteinPartMatcher.group(2));
                     int stop  = Integer.parseInt(proteinPartMatcher.group(3));
-                    results.add(new PeptideSearchResult(id, peptide, protein, start, stop));
+                    results.add(new PeptideSearchResult(id, peptideSequence, protein, start, stop));
                 }
             }
         }

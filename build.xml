@@ -24,7 +24,6 @@
       <path refid="build.classpath" />
       <dirset dir="${build.classes.dir}" />
       <dirset dir="${build.classes-test.dir}" />
-      <dirset dir="${test.dir}/resources" />
     </path>
 
     <target name="init">

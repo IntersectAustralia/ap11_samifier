@@ -19,7 +19,7 @@ public final class SamifierParsingUnitTest
     @Test
     public void testParsingProteinToOLNMappingFile() 
     {
-        File f = new File(getClass().getResource("/test_accession.txt").getFile());
+        File f = new File("test/resources/test_accession.txt");
         Map<String,String> map = null;
         try {
             map = Samifier.parseProteinToOLNMappingFile(f);
@@ -39,11 +39,11 @@ public final class SamifierParsingUnitTest
     }
 
     @Test
-    public void testParsingMascotPeptideSearchResults()
+    public void testParsingMascotPeptideSearchResultsDatFormat()
     {
-        File mascotFile = new File(getClass().getResource("/test_mascot_search_results.txt").getFile());
+        File mascotFile = new File("test/resources/test_mascot_search_results.txt");
 
-        File mapFile = new File(getClass().getResource("/test_accession.txt").getFile());
+        File mapFile = new File("test/resources/test_accession.txt");
         List<PeptideSearchResult> list = null;
         try {
             Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
@@ -54,7 +54,25 @@ public final class SamifierParsingUnitTest
             fail("Unexpected exception: " + e.getMessage());
             e.printStackTrace();
         }
-        assertEquals("Parser should find seven ", 7, list.size());
+       assertEquals("Parser should find seven ", 7, list.size());
     }
 
+    @Test
+    public void testParsingMascotPeptideSearchResultsMzidentMLFormat()
+    {
+        File mascotFile = new File("test/resources/test_mascot_search_results.mzid");
+
+        File mapFile = new File("test/resources/test_accession.txt");
+        List<PeptideSearchResult> list = null;
+        try {
+            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
+            list = Samifier.parseMascotPeptideSearchResults(mascotFile, map);
+        }
+        catch(Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+            e.getCause().printStackTrace();
+        }
+        assertEquals("Parser should find seven ", 7, list.size());
+    }
 }

@@ -23,7 +23,7 @@ public final class SamifierBuildingUnitTest
     @Test
     public void testExtractSequenceParts()
     {
-        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        File chromosomeFile = new File("test/resources/chrI.fa");
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 71, 79, "+"));
         locations.add(new GeneSequence(GeneSequence.INTRON, 80, 141, "+"));
@@ -51,7 +51,7 @@ public final class SamifierBuildingUnitTest
     @Test
     public void testExtractSequencePartsForShortSequences()
     {
-        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        File chromosomeFile = new File("test/resources/chrI.fa");
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 1, 9, "+"));
         locations.add(new GeneSequence(GeneSequence.INTRON, 10, 11, "+"));
@@ -85,7 +85,7 @@ public final class SamifierBuildingUnitTest
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.FORWARD));
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.FORWARD));
         locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.FORWARD));
-        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        File chromosomeFile = new File("test/resources/chrI.fa");
         GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.FORWARD, locations);
         PeptideSequence p = null;
         try {
@@ -108,7 +108,7 @@ public final class SamifierBuildingUnitTest
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.FORWARD));
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.FORWARD));
         locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.FORWARD));
-        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        File chromosomeFile = new File("test/resources/chrI.fa");
         GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.FORWARD, locations);
         PeptideSequence p = null;
         try {
@@ -132,7 +132,7 @@ public final class SamifierBuildingUnitTest
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.REVERSE));
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.REVERSE));
         locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.REVERSE));
-        File chromosomeFile = new File(getClass().getResource("/chrI.fa").getFile());
+        File chromosomeFile = new File("test/resources/chrI.fa");
         GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.REVERSE, locations);
         PeptideSequence p = null;
         try {
@@ -151,22 +151,22 @@ public final class SamifierBuildingUnitTest
     public void testCreateSAM()
     {
         try {
-            File mascotFile = new File(getClass().getResource("/test_mascot_search_results.txt").getFile());
-            File mapFile = new File(getClass().getResource("/test_accession.txt").getFile());
-            File genomeFile = new File(getClass().getResource("/test_genome.gff").getFile());
+            File mascotFile = new File("test/resources/test_mascot_search_results.txt");
+            File mapFile = new File("test/resources/test_accession.txt");
+            File genomeFile = new File("test/resources/test_genome.gff");
 
 
             Genome genome = Genome.parse(genomeFile);
             Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
             List<PeptideSearchResult> peptideSearchResults = Samifier.parseMascotPeptideSearchResults(mascotFile, map);
-            File chromosomeDir = new File(getClass().getResource("/chrI.fa").getFile()).getParentFile();
+            File chromosomeDir = new File("test/resources/");
 
             File samFile = File.createTempFile("out", "sam");
             samFile.deleteOnExit();
             FileWriter sam = new FileWriter(samFile);
             Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam);
 
-            List<String> expectedLines = FileUtils.readLines(new File(getClass().getResource("/expected.sam").getFile()));
+            List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected.sam"));
             List<String> gotLines = FileUtils.readLines(samFile);
             assertEquals("Should generate the expected SAM file", expectedLines, gotLines);
         }
