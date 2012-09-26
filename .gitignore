@@ -5,6 +5,8 @@
 *.ear
 
 *.swp
+.idea/
+*.iml
 
 build/
 dist/
