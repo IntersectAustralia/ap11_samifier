@@ -81,11 +81,12 @@ public class ResultsAnalyser
         {
             output.write(peptideSearchResult.getProteinName() + SEPARATOR);
             output.write( map.get(peptideSearchResult.getProteinName()) + SEPARATOR);
-            // TODO: output.write(gene_id + SEPARATOR);
-            output.write(peptideSearchResult.getConfidenceScore() + SEPARATOR);
-            output.write(peptideSearchResult.getPeptideStart() + SEPARATOR);
-            output.write(peptideSearchResult.getPeptideStop() + SEPARATOR);
-            output.write(peptideSearchResult.getSequenceLength()  + SEPARATOR);
+            // This one is the "Gene ID" and is to be confirmed
+            output.write( map.get(peptideSearchResult.getProteinName()) + SEPARATOR);
+            output.write(peptideSearchResult.getConfidenceScore().toString() + SEPARATOR);
+            output.write(Integer.toString(peptideSearchResult.getPeptideStart()) + SEPARATOR);
+            output.write(Integer.toString(peptideSearchResult.getPeptideStop()) + SEPARATOR);
+            output.write(Integer.toString(peptideSearchResult.getSequenceLength()));
 
             output.write(System.getProperty("line.separator"));
         }

@@ -34,8 +34,8 @@ public class ResultAnalyserUnitTest
             Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
             List<PeptideSearchResult> peptideSearchResults = Samifier.parseMascotPeptideSearchResults(mascotFile, map);
 
-            File resultAnalysisFile = new File("out", "txt");
-            //resultAnalysisFile.deleteOnExit();
+            File resultAnalysisFile = File.createTempFile("out", "txt");
+            resultAnalysisFile.deleteOnExit();
             FileWriter raf = new FileWriter(resultAnalysisFile);
             ResultsAnalyser.createResultAnalysis(genome, map, peptideSearchResults, raf);
 
