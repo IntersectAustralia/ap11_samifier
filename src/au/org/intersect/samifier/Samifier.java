@@ -12,6 +12,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,8 +133,13 @@ public class Samifier {
                 Node peptideInfo = (Node)xPath.evaluate(peptideInfoXpath, root, nodeType);
 
                 String peptideEvidenceXpath = "./mzidentml:PeptideEvidence";
+                String confidenceScoreXpath = "//mzidentml:cvParam[@name='mascot:score']";
 
                 NodeList peptideEvidenceList = (NodeList)xPath.evaluate(peptideEvidenceXpath, peptideInfo, nodesetType);
+                Node confidenceScoreNode = (Node)xPath.evaluate(confidenceScoreXpath, peptideInfo, nodeType);
+                String confidenceScoreStr = confidenceScoreNode.getAttributes().getNamedItem("value").getNodeValue();
+                BigDecimal confidenceScore = new BigDecimal(confidenceScoreStr);
+
                 for (int peptideEvidenceIndex = 0; peptideEvidenceIndex < peptideEvidenceList.getLength(); peptideEvidenceIndex++)
                 {
                     Node peptideEvidence = peptideEvidenceList.item(peptideEvidenceIndex);
@@ -147,7 +153,7 @@ public class Samifier {
                     String protein = dbSequence.getAttributes().getNamedItem("accession").getNodeValue();
                     if (proteinOLN.containsKey(protein))
                     {
-                        results.add(new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop)));
+                        results.add(new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop), confidenceScore));
                     }
                 }
             }
@@ -389,6 +395,7 @@ public class Samifier {
             // 0,705.406113,-0.000065,4,EFGILK,18,00000000,25.95,0000000001000002010,0,0
             String[] peptideParts = peptidePart.split(",");
             String peptideSequence = peptideParts[4];
+            BigDecimal confidenceScore = new BigDecimal(peptideParts[7]);
 
             // Expected format:
             // "KPYK1_YEAST":0:469:474:1,"RL31B_YEAST":0:78:86:1, ...
@@ -408,7 +415,7 @@ public class Samifier {
                     }
                     int start = Integer.parseInt(proteinPartMatcher.group(2));
                     int stop  = Integer.parseInt(proteinPartMatcher.group(3));
-                    results.add(new PeptideSearchResult(id, peptideSequence, protein, start, stop));
+                    results.add(new PeptideSearchResult(id, peptideSequence, protein, start, stop, confidenceScore));
                 }
             }
         }

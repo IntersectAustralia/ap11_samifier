@@ -1,0 +1,7 @@
+KPYK1_YEAST     YAL038W 25.95   469     474     6       
+KPYK1_YEAST     YAL038W 40.45   62      68      7       
+KPYK1_YEAST     YAL038W 37.51   460     466     7       
+RL36B_YEAST     YPL249C-A       35.86   5       13      9       
+RL31A_YEAST     YDL075W 40.09   78      86      9       
+RL31A_YEAST     YDL075W 52.75   11      19      9       
+RL31A_YEAST     YDL075W 20.69   80      102     23      

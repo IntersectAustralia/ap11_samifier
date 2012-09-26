@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.apache.commons.io.FileUtils;
  * */
 public final class SamifierBuildingUnitTest
 {
+    private static BigDecimal dummyBigDecimal = null;
 
     @Test
     public void testExtractSequenceParts()
@@ -79,7 +81,7 @@ public final class SamifierBuildingUnitTest
     @Test
     public void testGetPeptideSequenceCrossingAnIntronForward()
     {
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 33, 36);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 33, 36, dummyBigDecimal);
 
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.FORWARD));
@@ -103,7 +105,7 @@ public final class SamifierBuildingUnitTest
     @Test
     public void testGetPeptideSequenceWithinCodingSequence()
     {
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 3, 6);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 3, 6, dummyBigDecimal);
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.FORWARD));
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.FORWARD));
@@ -126,7 +128,7 @@ public final class SamifierBuildingUnitTest
     @Test
     public void testGetPeptideSequenceCrossingAnIntronReverse()
     {
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 81, 85);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 81, 85, dummyBigDecimal);
 
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.REVERSE));

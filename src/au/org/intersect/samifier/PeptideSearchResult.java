@@ -1,5 +1,7 @@
 package au.org.intersect.samifier;
 
+import java.math.BigDecimal;
+
 public class PeptideSearchResult
 {
     private String id;
@@ -7,14 +9,16 @@ public class PeptideSearchResult
     private String proteinName;
     private int peptideStart;
     private int peptideStop;
+    private BigDecimal confidenceScore;
 
-    public PeptideSearchResult(String id, String peptideSequence, String proteinName, int peptideStart, int peptideStop)
+    public PeptideSearchResult(String id, String peptideSequence, String proteinName, int peptideStart, int peptideStop, BigDecimal confidenceScore)
     {
         this.id              = id;
         this.peptideSequence = peptideSequence;
         this.proteinName     = proteinName;
         this.peptideStart    = peptideStart;
         this.peptideStop     = peptideStop;
+        this.confidenceScore = confidenceScore;
     }
 
     public String getId()
@@ -42,12 +46,22 @@ public class PeptideSearchResult
         return peptideStop;
     }
 
+    public int getSequenceLength()
+    {
+        return peptideSequence.length();
+    }
+
+    public BigDecimal getConfidenceScore() {
+        return confidenceScore;
+    }
+
     public String toString()
     {
         return "id    = " + id + System.getProperty("line.separator")
              + "name  = " + proteinName + System.getProperty("line.separator")
              + "start = " + peptideStart + System.getProperty("line.separator")
              + "stop  = " + peptideStop + System.getProperty("line.separator")
+             + "score = " + confidenceScore + System.getProperty("line.separator")
              + "sequence = " + System.getProperty("line.separator")
              + peptideSequence;
     }
