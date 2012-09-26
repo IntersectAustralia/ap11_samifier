@@ -336,7 +336,8 @@ public class Samifier {
                 // TODO: log to error file
                 continue;
             }
- 
+
+            // TODO: find the different chormosome file extensions 
             File chromosomeFile = new File(chromosomeDirectory, gene.getChromosome() + ".fa");
 
             PeptideSequence peptide = getPeptideSequence(result, chromosomeFile, gene);
