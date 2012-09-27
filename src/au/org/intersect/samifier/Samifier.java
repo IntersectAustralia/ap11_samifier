@@ -17,11 +17,15 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.PatternLayout;
 
 public class Samifier {
 
-    private static final Logger LOG = Logger.getLogger(Samifier.class);
+    private static Logger LOG = Logger.getLogger(Samifier.class);
 
     public static final int SAM_REVERSE_FLAG = 0x10;
     public static final int BASES_PER_CODON = 3;
@@ -155,10 +159,12 @@ public class Samifier {
                     String dbSequenceXpath = "//mzidentml:DBSequence[@id='" + dbSequenceRef + "']";
                     Node dbSequence = (Node)xPath.evaluate(dbSequenceXpath, root, nodeType);
                     String protein = dbSequence.getAttributes().getNamedItem("accession").getNodeValue();
-                    if (proteinOLN.containsKey(protein))
+                    if (!proteinOLN.containsKey(protein))
                     {
-                        results.add(new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop), confidenceScore));
+                        LOG.info(protein + " not found in given accession mapping file");
+                        continue;
                     }
+                    results.add(new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop), confidenceScore));
                 }
             }
         }
@@ -344,7 +350,7 @@ public class Samifier {
             GeneInfo gene = genome.getGene(oln);
             if (gene == null)
             {
-                // TODO: log to error file
+                LOG.info(oln + " not found in the supplied genome file");
                 continue;
             }
 
@@ -415,7 +421,7 @@ public class Samifier {
                     String protein = proteinPartMatcher.group(1);
                     if (!proteinOLN.containsKey(protein))
                     {
-                        // TODO: report to errors file
+                        LOG.info(protein + " not found in given accession mapping file");
                         continue;
                     }
                     int start = Integer.parseInt(proteinPartMatcher.group(2));
@@ -528,6 +534,10 @@ public class Samifier {
                                           .withDescription("Directory containing the chromosome files in FASTA format for the given genome")
                                           .isRequired()
                                           .create("c");
+        Option logFile = OptionBuilder.withArgName("logFile")
+                                          .hasArg()
+                                          .withDescription("Filename to write the log into")
+                                          .create("l");
         Option outputFile = OptionBuilder.withArgName("outputFile")
                                           .hasArg()
                                           .withDescription("Filename to write the SAM format file to")
@@ -538,6 +548,7 @@ public class Samifier {
         options.addOption(mappingFile);
         options.addOption(genomeFileOpt);
         options.addOption(chrDirOpt);
+        options.addOption(logFile);
         options.addOption(outputFile);
 
         CommandLineParser parser = new GnuParser();
@@ -548,6 +559,21 @@ public class Samifier {
             File mapFile = new File(line.getOptionValue("m"));
             File chromosomeDir = new File(line.getOptionValue("c"));
             File outfile = new File(line.getOptionValue("o"));
+            String logFileName = line.getOptionValue("l");
+
+            if (logFileName != null)
+            {
+                Logger.getRootLogger().removeAppender("stdout");
+                FileAppender fa = new FileAppender();
+                fa.setName("FileLogger");
+                fa.setFile(logFileName);
+                fa.setLayout(new PatternLayout("%d %-5p %c - %m%n"));
+                fa.setThreshold(Level.DEBUG);
+                fa.setAppend(true);
+                fa.activateOptions();
+                Logger.getRootLogger().addAppender(fa);
+
+            }
 
             Genome genome = Genome.parse(genomeFile);
             Map<String,String> map = parseProteinToOLNMappingFile(mapFile);
