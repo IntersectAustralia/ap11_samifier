@@ -515,7 +515,7 @@ public class Samifier {
     public static void main(String[] args)
     {
         Option resultsFile = OptionBuilder.withArgName("searchResultsFile")
-                                          .hasArg()
+                                          .hasArgs()
                                           .withDescription("Mascot search results file in txt format")
                                           .isRequired()
                                           .create("r");
@@ -554,7 +554,7 @@ public class Samifier {
         CommandLineParser parser = new GnuParser();
         try {
             CommandLine line = parser.parse( options, args );
-            File searchResultsFile = new File(line.getOptionValue("r"));
+            String[] searchResultsPaths = line.getOptionValues("r");
             File genomeFile = new File(line.getOptionValue("g"));
             File mapFile = new File(line.getOptionValue("m"));
             File chromosomeDir = new File(line.getOptionValue("c"));
@@ -577,7 +577,23 @@ public class Samifier {
 
             Genome genome = Genome.parse(genomeFile);
             Map<String,String> map = parseProteinToOLNMappingFile(mapFile);
-            List<PeptideSearchResult> peptideSearchResults = Samifier.parseMascotPeptideSearchResults(searchResultsFile, map);
+            List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
+            List<File> searchResultFiles = new ArrayList<File>();
+            for (String searchResultsPath : searchResultsPaths)
+            {
+                File searchResultFile = new File(searchResultsPath);
+                if (!searchResultFile.exists())
+                {
+                    System.err.println(searchResultFile + " does not exist");
+                    System.exit(1);
+                }
+                searchResultFiles.add(searchResultFile);
+            }
+            for (File searchResultFile : searchResultFiles)
+            {
+                LOG.debug("Processing: " + searchResultFile.getAbsolutePath());
+                peptideSearchResults.addAll(Samifier.parseMascotPeptideSearchResults(searchResultFile, map));
+            }
 
             FileWriter sam = new FileWriter(outfile);
 
