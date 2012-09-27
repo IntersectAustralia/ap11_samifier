@@ -1,6 +1,8 @@
 package au.org.intersect.samifier;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggerFactory;
 import org.junit.Test;
 
 import java.io.File;
@@ -20,6 +22,7 @@ import static org.junit.Assert.fail;
  */
 public class ResultAnalyserUnitTest
 {
+    private static final Logger LOG = Logger.getLogger(ResultsAnalyser.class);
     @Test
     public void testCreateResultsAnalyses()
     {

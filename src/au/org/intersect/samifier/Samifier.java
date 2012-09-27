@@ -17,7 +17,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 public class Samifier {
+
+    private static final Logger LOG = Logger.getLogger(Samifier.class);
 
     public static final int SAM_REVERSE_FLAG = 0x10;
     public static final int BASES_PER_CODON = 3;
@@ -330,6 +334,7 @@ public class Samifier {
     public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output)
         throws FileNotFoundException, IOException
     {
+        LOG.debug("creating sam file");
         List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
         for (PeptideSearchResult result : peptideSearchResults)
         {
