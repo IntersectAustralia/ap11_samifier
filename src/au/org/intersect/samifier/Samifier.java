@@ -318,8 +318,20 @@ public class Samifier {
         }
 
         String peptideSequence = GeneInfo.REVERSE.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
+        // When direction is reverse, 
+        //  5           17
+        // |####----#####|
+        //   ^        S
+        //   6        15
+        //   absoluteStopIndex = 11, from 17 to 6
+        //   absoluteStartIndex = 2, from 17 to 15
+        //   startIndex  = (17-5 = 12) - 11 + 1 = 2 (because it is 1 based)
+        //   stopIndex  = (17-5 = 12) - 2 + 1 = 11 (because it is 1 based)
         int startIndex = GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
-        return new PeptideSequence(peptideSequence, cigar.toString(), startIndex);
+        int stopIndex = GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStartIndex + 1) : absoluteStopIndex;
+        int bedStartIndex = gene.getStart() + startIndex - 1; // BED files are zero based (6 in the example)
+        int bedStopIndex  = gene.getStart() + stopIndex - 1; // BED files are zero based (15 in the example)
+        return new PeptideSequence(peptideSequence, cigar.toString(), startIndex, bedStartIndex, bedStopIndex);
     }
 
     private static void updateCigar(StringBuilder cigar, int size, String type, String direction)
@@ -337,7 +349,19 @@ public class Samifier {
         }
     }
 
-    public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output)
+    public static String createBEDLine(PeptideSequence peptide, String chromosome, String name)
+    {
+        StringBuilder output = new StringBuilder();
+        output.append(chromosome).append("\t");
+        output.append(peptide.getBedStartIndex()).append("\t");
+        output.append(peptide.getBedStopIndex()).append("\t");
+        output.append(name);
+        output.append(System.getProperty("line.separator"));
+
+        return output.toString();
+    }
+
+    public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output, Writer bedWriter)
         throws FileNotFoundException, IOException
     {
         LOG.debug("creating sam file");
@@ -358,10 +382,16 @@ public class Samifier {
             File chromosomeFile = new File(chromosomeDirectory, gene.getChromosome() + ".fa");
 
             PeptideSequence peptide = getPeptideSequence(result, chromosomeFile, gene);
+            String resultName = proteinName+"."+result.getId();
 
             int peptideStart = peptide.getStartIndex() + gene.getStart();
 
-            SAMEntry sam = new SAMEntry(proteinName+"."+result.getId(), gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence());
+            if (bedWriter != null)
+            {
+                bedWriter.write(createBEDLine(peptide, gene.getChromosome(), resultName));
+            }
+
+            SAMEntry sam = new SAMEntry(resultName, gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence());
             if (GeneInfo.REVERSE.equals(gene.getDirection()))
             {
                 sam.setFlag(sam.getFlag()|SAM_REVERSE_FLAG);
@@ -382,6 +412,11 @@ public class Samifier {
             }
             output.write(samEntry.toString());
             output.write(System.getProperty("line.separator"));
+        }
+
+        if (bedWriter != null)
+        {
+            bedWriter.close();
         }
         output.close();
     }
@@ -543,6 +578,11 @@ public class Samifier {
                                           .withDescription("Filename to write the SAM format file to")
                                           .isRequired()
                                           .create("o");
+        Option bedFile = OptionBuilder.withArgName("bedFile")
+                                          .hasArg()
+                                          .withDescription("Filename to write IGV regions of interest (BED) file to")
+                                          .isRequired()
+                                          .create("b");
         Options options = new Options();
         options.addOption(resultsFile);
         options.addOption(mappingFile);
@@ -550,6 +590,7 @@ public class Samifier {
         options.addOption(chrDirOpt);
         options.addOption(logFile);
         options.addOption(outputFile);
+        options.addOption(bedFile);
 
         CommandLineParser parser = new GnuParser();
         try {
@@ -560,6 +601,7 @@ public class Samifier {
             File chromosomeDir = new File(line.getOptionValue("c"));
             File outfile = new File(line.getOptionValue("o"));
             String logFileName = line.getOptionValue("l");
+            String bedfilePath = line.getOptionValue("b");
 
             if (logFileName != null)
             {
@@ -595,9 +637,13 @@ public class Samifier {
                 peptideSearchResults.addAll(Samifier.parseMascotPeptideSearchResults(searchResultFile, map));
             }
 
+            FileWriter bedWriter = null;
+            if (bedfilePath != null)
+            {
+                bedWriter = new FileWriter(bedfilePath);
+            }
             FileWriter sam = new FileWriter(outfile);
-
-            Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam);
+            Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam, bedWriter);
         }
         catch (ParseException pe)
         {
