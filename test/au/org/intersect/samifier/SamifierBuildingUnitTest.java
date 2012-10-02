@@ -166,7 +166,7 @@ public final class SamifierBuildingUnitTest
             File samFile = File.createTempFile("out", "sam");
             samFile.deleteOnExit();
             FileWriter sam = new FileWriter(samFile);
-            Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam);
+            Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam, null);
 
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected.sam"));
             List<String> gotLines = FileUtils.readLines(samFile);
