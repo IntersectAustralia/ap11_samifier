@@ -76,6 +76,18 @@ public class GeneInfo
         return direction;
     }
 
+    public int getDirectionFlag()
+    {
+        if (GeneInfo.REVERSE.equals(getDirection()))
+        {
+            return Samifier.SAM_REVERSE_FLAG;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     public void addLocation(GeneSequence location)
     {
         locations.add(location);

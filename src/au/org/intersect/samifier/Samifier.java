@@ -378,8 +378,7 @@ public class Samifier {
                 continue;
             }
 
-            // TODO: find the different chormosome file extensions 
-            File chromosomeFile = new File(chromosomeDirectory, gene.getChromosome() + ".fa");
+            File chromosomeFile = getChromosomeFile(chromosomeDirectory, gene);
 
             PeptideSequence peptide = getPeptideSequence(result, chromosomeFile, gene);
             String resultName = proteinName+"."+result.getId();
@@ -391,13 +390,7 @@ public class Samifier {
                 bedWriter.write(createBEDLine(peptide, gene.getChromosome(), resultName));
             }
 
-            SAMEntry sam = new SAMEntry(resultName, gene.getChromosome(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence());
-            if (GeneInfo.REVERSE.equals(gene.getDirection()))
-            {
-                sam.setFlag(sam.getFlag()|SAM_REVERSE_FLAG);
-            }
-
-            samEntries.add(sam);
+            samEntries.add(new SAMEntry(resultName, gene, peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
         }
 
         String prevChromosome = null;
@@ -411,7 +404,6 @@ public class Samifier {
                 prevChromosome = chromosome;
             }
             output.write(samEntry.toString());
-            output.write(System.getProperty("line.separator"));
         }
 
         if (bedWriter != null)
@@ -419,6 +411,11 @@ public class Samifier {
             bedWriter.close();
         }
         output.close();
+    }
+
+    private static File getChromosomeFile(File chromosomeDirectory, GeneInfo gene) {
+        // TODO: find the different chrormosome file extensions
+        return new File(chromosomeDirectory, gene.getChromosome() + ".fa");
     }
 
     private static List<PeptideSearchResult> getProteinsFromQueryLine(String line, Map<String,String> proteinOLN)
@@ -618,6 +615,7 @@ public class Samifier {
             }
 
             Genome genome = Genome.parse(genomeFile);
+
             Map<String,String> map = parseProteinToOLNMappingFile(mapFile);
             List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
             List<File> searchResultFiles = new ArrayList<File>();
