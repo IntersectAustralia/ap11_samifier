@@ -374,7 +374,8 @@ public class Samifier {
             GeneInfo gene = genome.getGene(oln);
             if (gene == null)
             {
-                LOG.info(oln + " not found in the supplied genome file");
+                LOG.info("Protein ID found in accession file, but locus not found in genome file");
+                LOG.info("ERR_GFF: " + proteinName + " " + oln);
                 continue;
             }
 
@@ -453,7 +454,8 @@ public class Samifier {
                     String protein = proteinPartMatcher.group(1);
                     if (!proteinOLN.containsKey(protein))
                     {
-                        LOG.info(protein + " not found in given accession mapping file");
+                        LOG.info("Protein ID not found in accession file");
+                        LOG.info("ERR_ACC: " + protein);
                         continue;
                     }
                     int start = Integer.parseInt(proteinPartMatcher.group(2));
@@ -569,7 +571,7 @@ public class Samifier {
         Option logFile = OptionBuilder.withArgName("logFile")
                                           .hasArg()
                                           .withDescription("Filename to write the log into")
-                                          .create("l");
+                                          .create("r");
         Option outputFile = OptionBuilder.withArgName("outputFile")
                                           .hasArg()
                                           .withDescription("Filename to write the SAM format file to")
@@ -597,7 +599,7 @@ public class Samifier {
             File mapFile = new File(line.getOptionValue("m"));
             File chromosomeDir = new File(line.getOptionValue("c"));
             File outfile = new File(line.getOptionValue("o"));
-            String logFileName = line.getOptionValue("l");
+            String logFileName = line.getOptionValue("r");
             String bedfilePath = line.getOptionValue("b");
 
             if (logFileName != null)
