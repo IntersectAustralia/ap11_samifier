@@ -4,6 +4,8 @@ package au.org.intersect.samifier;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
+import au.org.intersect.samifier.mascot.PeptideSearchResultsParser;
+import au.org.intersect.samifier.mascot.PeptideSearchResultsParserImpl;
 import org.junit.Test;
 
 import java.io.File;
@@ -160,7 +162,9 @@ public final class SamifierBuildingUnitTest
 
             Genome genome = Genome.parse(genomeFile);
             Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
-            List<PeptideSearchResult> peptideSearchResults = Samifier.parseMascotPeptideSearchResults(mascotFile, map);
+            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(map);
+
+            List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(mascotFile);
             File chromosomeDir = new File("test/resources/");
 
             File samFile = File.createTempFile("out", "sam");

@@ -1,5 +1,7 @@
 package au.org.intersect.samifier;
 
+import au.org.intersect.samifier.mascot.PeptideSearchResultsParser;
+import au.org.intersect.samifier.mascot.PeptideSearchResultsParserImpl;
 import org.apache.commons.cli.*;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -69,160 +71,6 @@ public class Samifier {
             }
         }
         return proteinOLN;
-    }
-
-    public static List<PeptideSearchResult> parseMascotPeptideSearchResults(File resultsFile, Map<String,String> proteinOLN)
-            throws MascotParsingException {
-
-        try
-        {
-            BufferedReader headerReader = new BufferedReader(new FileReader(resultsFile));
-            String firstLine = headerReader.readLine();
-            headerReader.close();
-            // Detect mzidentML format or text format
-            if (firstLine.startsWith("<?xml "))
-            {
-                return parseMascotPeptideSearchResultsMzidentMLFormat(resultsFile, proteinOLN);
-            }
-            else
-            {
-                return parseMascotPeptideSearchResultsDATFormat(resultsFile, proteinOLN);
-            }
-        }
-        catch (IOException e)
-        {
-            throw new MascotParsingException(e);
-        }
-    }
-
-    public static List<PeptideSearchResult> parseMascotPeptideSearchResultsMzidentMLFormat(File resultsFile, Map<String,String> proteinOLN)
-        throws MascotParsingException
-    {
-        List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
-
-        try
-        {
-            XPathFactory factory = XPathFactory.newInstance();
-            XPath xPath = factory.newXPath();
-
-            xPath.setNamespaceContext(new NamespaceContext() {
-                public String getNamespaceURI(String prefix) {
-                    if (prefix == null) throw new NullPointerException("Null prefix");
-                    else if ("mzidentml".equals(prefix)) return "http://psidev.info/psi/pi/mzIdentML/1.0";
-                    return XMLConstants.NULL_NS_URI;
-                }
-                public String getPrefix(String uri) {
-                    throw new UnsupportedOperationException();
-                }
-
-                public Iterator getPrefixes(String uri) {
-                    throw new UnsupportedOperationException();
-                }
-            });
-
-
-            String xPathStr = "//mzidentml:Peptide";
-            InputSource iS = new InputSource(new FileReader(resultsFile));
-            Node root = (Node) xPath.evaluate("/", iS, XPathConstants.NODE);
-
-            QName nodesetType = XPathConstants.NODESET;
-            QName nodeType = XPathConstants.NODE;
-
-            NodeList peptideList = (NodeList)xPath.evaluate(xPathStr, root, nodesetType);
-            for (int peptideIndex = 0 ; peptideIndex < peptideList.getLength(); peptideIndex++)
-            {
-                Node peptideNode = peptideList.item(peptideIndex);
-                String peptideId = peptideNode.getAttributes().getNamedItem("id").getNodeValue();
-                String peptideSequenceXpath = "./mzidentml:peptideSequence";
-                Node peptideSequenceNode = (Node)xPath.evaluate(peptideSequenceXpath, peptideNode, nodeType);
-                String peptideSequence = peptideSequenceNode.getTextContent();
-
-                String peptideInfoXpath = "//mzidentml:SpectrumIdentificationItem[@Peptide_ref='" + peptideId + "']";
-                Node peptideInfo = (Node)xPath.evaluate(peptideInfoXpath, root, nodeType);
-
-                String peptideEvidenceXpath = "./mzidentml:PeptideEvidence";
-                String confidenceScoreXpath = "//mzidentml:cvParam[@name='mascot:score']";
-
-                NodeList peptideEvidenceList = (NodeList)xPath.evaluate(peptideEvidenceXpath, peptideInfo, nodesetType);
-                Node confidenceScoreNode = (Node)xPath.evaluate(confidenceScoreXpath, peptideInfo, nodeType);
-                String confidenceScoreStr = confidenceScoreNode.getAttributes().getNamedItem("value").getNodeValue();
-                BigDecimal confidenceScore = new BigDecimal(confidenceScoreStr);
-
-                for (int peptideEvidenceIndex = 0; peptideEvidenceIndex < peptideEvidenceList.getLength(); peptideEvidenceIndex++)
-                {
-                    Node peptideEvidence = peptideEvidenceList.item(peptideEvidenceIndex);
-                    String id = peptideEvidence.getAttributes().getNamedItem("id").getNodeValue();
-                    String start = peptideEvidence.getAttributes().getNamedItem("start").getNodeValue();
-                    String stop = peptideEvidence.getAttributes().getNamedItem("end").getNodeValue();
-                    String dbSequenceRef = peptideEvidence.getAttributes().getNamedItem("DBSequence_Ref").getNodeValue();
-
-                    String dbSequenceXpath = "//mzidentml:DBSequence[@id='" + dbSequenceRef + "']";
-                    Node dbSequence = (Node)xPath.evaluate(dbSequenceXpath, root, nodeType);
-                    String protein = dbSequence.getAttributes().getNamedItem("accession").getNodeValue();
-                    if (!proteinOLN.containsKey(protein))
-                    {
-                        LOG.info(protein + " not found in given accession mapping file");
-                        continue;
-                    }
-                    results.add(new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop), confidenceScore));
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new MascotParsingException(e);
-        }
-
-
-        return results;
-    }
-
-    public static List<PeptideSearchResult> parseMascotPeptideSearchResultsDATFormat(File resultsFile, Map<String,String> proteinOLN)
-        throws MascotParsingException
-    {
-        BufferedReader reader = null;
-        boolean peptidesSectionStarted = false;
-        List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
-        try {
-            reader = new BufferedReader(new FileReader(resultsFile));
-            String line;
-            int lineNumber = 0;
-            while ((line = reader.readLine()) != null)
-            {
-                lineNumber++;
-                if (peptidesSectionStarted)
-                {
-                    if (line.startsWith("--"))
-                    {
-                        break;
-                    }
-                    results.addAll(getProteinsFromQueryLine(line, proteinOLN));
-                }
-                else if (line.startsWith("Content-Type: application/x-Mascot; name=\"peptides\""))
-                {
-                    peptidesSectionStarted = true;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new MascotParsingException(e);
-        }
-        finally
-        {
-            try
-            {
-                if (reader != null)
-                {
-                    reader.close();
-                }
-            }
-            catch (IOException e)
-            {
-                throw new MascotParsingException(e);
-            }
-        }
-        return results;
     }
 
     public static PeptideSequence getPeptideSequence(PeptideSearchResult peptide, File chromosomeFile, GeneInfo gene)
@@ -619,6 +467,8 @@ public class Samifier {
             Genome genome = Genome.parse(genomeFile);
 
             Map<String,String> map = parseProteinToOLNMappingFile(mapFile);
+            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(map);
+
             List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
             List<File> searchResultFiles = new ArrayList<File>();
             for (String searchResultsPath : searchResultsPaths)
@@ -634,7 +484,7 @@ public class Samifier {
             for (File searchResultFile : searchResultFiles)
             {
                 LOG.debug("Processing: " + searchResultFile.getAbsolutePath());
-                peptideSearchResults.addAll(Samifier.parseMascotPeptideSearchResults(searchResultFile, map));
+                peptideSearchResults.addAll(peptideSearchResultsParser.parseResults(searchResultFile));
             }
 
             FileWriter bedWriter = null;

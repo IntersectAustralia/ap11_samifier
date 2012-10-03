@@ -1,5 +1,8 @@
 package au.org.intersect.samifier;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.math.BigDecimal;
 
 public class PeptideSearchResult
@@ -19,6 +22,39 @@ public class PeptideSearchResult
         this.peptideStart    = peptideStart;
         this.peptideStop     = peptideStop;
         this.confidenceScore = confidenceScore;
+    }
+
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37).
+                append(id).
+                append(peptideSequence).
+                append(proteinName).
+                append(peptideStart).
+                append(peptideStop).
+                append(confidenceScore).
+                toHashCode();
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof PeptideSearchResult == false)
+        {
+            return false;
+        }
+        if (this == obj)
+        {
+            return true;
+        }
+        PeptideSearchResult rhs = (PeptideSearchResult) obj;
+        return new EqualsBuilder()
+                .append(id, rhs.id)
+                .append(peptideSequence, rhs.peptideSequence)
+                .append(proteinName, rhs.proteinName)
+                .append(peptideStart, rhs.peptideStart)
+                .append(peptideStop, rhs.peptideStop)
+                .append(confidenceScore, rhs.confidenceScore)
+                .isEquals();
     }
 
     public String getId()

@@ -3,6 +3,8 @@ package au.org.intersect.samifier;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
+import au.org.intersect.samifier.mascot.PeptideSearchResultsParser;
+import au.org.intersect.samifier.mascot.PeptideSearchResultsParserImpl;
 import org.junit.Test;
 
 import java.io.File;
@@ -38,41 +40,4 @@ public final class SamifierParsingUnitTest
         assertEquals("RL36B_YEAST maps to YPL249C-A", "YPL249C-A", map.get("RL36B_YEAST"));
     }
 
-    @Test
-    public void testParsingMascotPeptideSearchResultsDatFormat()
-    {
-        File mascotFile = new File("test/resources/test_mascot_search_results.txt");
-
-        File mapFile = new File("test/resources/test_accession.txt");
-        List<PeptideSearchResult> list = null;
-        try {
-            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
-            list = Samifier.parseMascotPeptideSearchResults(mascotFile, map);
-        }
-        catch(Exception e)
-        {
-            fail("Unexpected exception: " + e.getMessage());
-            e.printStackTrace();
-        }
-       assertEquals("Parser should find seven ", 7, list.size());
-    }
-
-    @Test
-    public void testParsingMascotPeptideSearchResultsMzidentMLFormat()
-    {
-        File mascotFile = new File("test/resources/test_mascot_search_results.mzid");
-
-        File mapFile = new File("test/resources/test_accession.txt");
-        List<PeptideSearchResult> list = null;
-        try {
-            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
-            list = Samifier.parseMascotPeptideSearchResults(mascotFile, map);
-        }
-        catch(Exception e)
-        {
-            fail("Unexpected exception: " + e.getMessage());
-            e.getCause().printStackTrace();
-        }
-        assertEquals("Parser should find seven ", 7, list.size());
-    }
 }
