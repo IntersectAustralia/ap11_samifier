@@ -2,6 +2,8 @@ package au.org.intersect.samifier;
 
 import au.org.intersect.samifier.mascot.PeptideSearchResultsParser;
 import au.org.intersect.samifier.mascot.PeptideSearchResultsParserImpl;
+import au.org.intersect.samifier.mascot.PeptideSequenceGenerator;
+import au.org.intersect.samifier.mascot.PeptideSequenceGeneratorImpl;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -19,6 +21,13 @@ import java.util.Map;
  */
 public class ResultsAnalyser
 {
+    private Genome genome;
+    private Map<String, String> proteinToOLNMap;
+    private List<PeptideSearchResult> peptideSearchResults;
+    private File outputFile;
+    private File chromosomeDir;
+    private PeptideSequenceGenerator sequenceGenerator;
+
     public static void main(String ... args)
     {
         Option resultsFile = OptionBuilder.withArgName("searchResultsFile")
@@ -41,11 +50,18 @@ public class ResultsAnalyser
                 .withDescription("Filename to write the SAM format file to")
                 .isRequired()
                 .create("o");
+        Option chrDirOpt  = OptionBuilder.withArgName("chromosomeDir")
+                .hasArg()
+                .withDescription("Directory containing the chromosome files in FASTA format for the given genome")
+                .isRequired()
+                .create("c");
+
         Options options = new Options();
         options.addOption(resultsFile);
         options.addOption(mappingFile);
         options.addOption(genomeFileOpt);
         options.addOption(outputFile);
+        options.addOption(chrDirOpt);
 
         CommandLineParser parser = new GnuParser();
         try {
@@ -54,16 +70,10 @@ public class ResultsAnalyser
             File genomeFile = new File(line.getOptionValue("g"));
             File mapFile = new File(line.getOptionValue("m"));
             File outfile = new File(line.getOptionValue("o"));
+            File chromosomeDir = new File(line.getOptionValue("c"));
 
-            Genome genome = Genome.parse(genomeFile);
-            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
-            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(map);
-
-            List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsFile);
-
-            FileWriter resultAnalysis = new FileWriter(outfile);
-
-            ResultsAnalyser.createResultAnalysis(genome, map, peptideSearchResults, resultAnalysis);
+            ResultsAnalyser analyser = new ResultsAnalyser(searchResultsFile, genomeFile, mapFile, outfile, chromosomeDir);
+            analyser.createResultAnalysis();
         }
         catch (ParseException pe)
         {
@@ -78,20 +88,27 @@ public class ResultsAnalyser
 
     }
 
-    protected static void createResultAnalysis(Genome genome, Map<String,String> map, List<PeptideSearchResult> peptideSearchResults, FileWriter output) throws IOException {
-        final String SEPARATOR = "\t";
+    protected ResultsAnalyser(File searchResultsFile, File genomeFile, File mapFile, File outputFile, File chromosomeDir) throws Exception
+    {
+        this.genome = Genome.parse(genomeFile);
+        this.proteinToOLNMap = Samifier.parseProteinToOLNMappingFile(mapFile);
+        PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
+        this.peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsFile);
+        this.outputFile = outputFile;
+        this.chromosomeDir = chromosomeDir;
+        sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
+
+    }
+
+    protected void createResultAnalysis() throws Exception
+    {
+        FileWriter output = new FileWriter(outputFile);
 
         for (PeptideSearchResult peptideSearchResult : peptideSearchResults)
         {
-            output.write(peptideSearchResult.getProteinName() + SEPARATOR);
-            output.write( map.get(peptideSearchResult.getProteinName()) + SEPARATOR);
-            // This one is the "Gene ID" and is to be confirmed
-            output.write( map.get(peptideSearchResult.getProteinName()) + SEPARATOR);
-            output.write(peptideSearchResult.getConfidenceScore().toString() + SEPARATOR);
-            output.write(Integer.toString(peptideSearchResult.getPeptideStart()) + SEPARATOR);
-            output.write(Integer.toString(peptideSearchResult.getPeptideStop()) + SEPARATOR);
-            output.write(Integer.toString(peptideSearchResult.getSequenceLength()));
-
+            PeptideSequence peptideSequence = sequenceGenerator.getPeptideSequence(peptideSearchResult);
+            ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(peptideSearchResult, proteinToOLNMap, genome, peptideSequence);
+            output.write(outputter.toString());
             output.write(System.getProperty("line.separator"));
         }
         output.close();
