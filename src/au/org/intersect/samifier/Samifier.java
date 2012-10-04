@@ -571,7 +571,7 @@ public class Samifier {
         Option logFile = OptionBuilder.withArgName("logFile")
                                           .hasArg()
                                           .withDescription("Filename to write the log into")
-                                          .create("r");
+                                          .create("l");
         Option outputFile = OptionBuilder.withArgName("outputFile")
                                           .hasArg()
                                           .withDescription("Filename to write the SAM format file to")
@@ -599,7 +599,7 @@ public class Samifier {
             File mapFile = new File(line.getOptionValue("m"));
             File chromosomeDir = new File(line.getOptionValue("c"));
             File outfile = new File(line.getOptionValue("o"));
-            String logFileName = line.getOptionValue("r");
+            String logFileName = line.getOptionValue("l");
             String bedfilePath = line.getOptionValue("b");
 
             if (logFileName != null)
