@@ -33,6 +33,22 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
     }
 
     @Override
+    public List<PeptideSequence> getPeptideSequences(List<PeptideSearchResult> peptideSearchResults) throws PeptideSequenceGeneratorException
+    {
+        List<PeptideSequence> peptideSequenceList = new ArrayList<PeptideSequence>();
+        for (PeptideSearchResult searchResult : peptideSearchResults)
+        {
+            PeptideSequence sequence = getPeptideSequence(searchResult);
+            if (sequence != null)
+            {
+                peptideSequenceList.add(sequence);
+            }
+        }
+        return peptideSequenceList;
+    }
+
+
+    @Override
     public PeptideSequence getPeptideSequence(PeptideSearchResult peptideSearchResult) throws PeptideSequenceGeneratorException
     {
         String proteinName = peptideSearchResult.getProteinName();

@@ -71,13 +71,13 @@ public class Samifier {
         return proteinOLN;
     }
 
-    public static String createBEDLine(PeptideSequence peptide, String chromosome, String name)
+    public static String createBEDLine(PeptideSequence peptide, String proteinName)
     {
         StringBuilder output = new StringBuilder();
-        output.append(chromosome).append("\t");
-        output.append(peptide.getBedStartIndex()).append("\t");
-        output.append(peptide.getBedStopIndex()).append("\t");
-        output.append(name);
+        output.append(peptide.getGeneInfo().getChromosome()).append("\t");
+        output.append(peptide.getGeneInfo().getStart()).append("\t");
+        output.append(peptide.getGeneInfo().getStop()).append("\t");
+        output.append(proteinName);
         output.append(System.getProperty("line.separator"));
 
         return output.toString();
@@ -90,6 +90,7 @@ public class Samifier {
         LOG.debug("creating sam file");
         List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
         PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinOLNMap, chromosomeDirectory);
+        Set<String> foundProteins = new HashSet<String>();
 
         for (PeptideSearchResult result : peptideSearchResults)
         {
@@ -103,9 +104,10 @@ public class Samifier {
             String resultName = proteinName+"."+result.getId();
             int peptideStart = peptide.getStartIndex() + peptide.getGeneInfo().getStart();
 
-            if (bedWriter != null)
+            if (bedWriter != null && !foundProteins.contains(proteinName))
             {
-                bedWriter.write(createBEDLine(peptide, peptide.getGeneInfo().getChromosome(), resultName));
+                foundProteins.add(proteinName);
+                bedWriter.write(createBEDLine(peptide, proteinName));
             }
 
             samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
@@ -169,8 +171,9 @@ public class Samifier {
                                           .create("c");
         Option logFile = OptionBuilder.withArgName("logFile")
                                           .hasArg()
+                                          .isRequired(false)
                                           .withDescription("Filename to write the log into")
-                                          .create("r");
+                                          .create("l");
         Option outputFile = OptionBuilder.withArgName("outputFile")
                                           .hasArg()
                                           .withDescription("Filename to write the SAM format file to")
@@ -178,8 +181,8 @@ public class Samifier {
                                           .create("o");
         Option bedFile = OptionBuilder.withArgName("bedFile")
                                           .hasArg()
+                                          .isRequired(false)
                                           .withDescription("Filename to write IGV regions of interest (BED) file to")
-                                          .isRequired()
                                           .create("b");
         Options options = new Options();
         options.addOption(resultsFile);
@@ -198,7 +201,7 @@ public class Samifier {
             File mapFile = new File(line.getOptionValue("m"));
             File chromosomeDir = new File(line.getOptionValue("c"));
             File outfile = new File(line.getOptionValue("o"));
-            String logFileName = line.getOptionValue("r");
+            String logFileName = line.getOptionValue("l");
             String bedfilePath = line.getOptionValue("b");
 
             if (logFileName != null)

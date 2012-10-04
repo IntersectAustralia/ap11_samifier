@@ -3,6 +3,8 @@ package au.org.intersect.samifier.mascot;
 import au.org.intersect.samifier.PeptideSearchResult;
 import au.org.intersect.samifier.PeptideSequence;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: diego
@@ -13,4 +15,7 @@ import au.org.intersect.samifier.PeptideSequence;
 public interface PeptideSequenceGenerator
 {
     public PeptideSequence getPeptideSequence(PeptideSearchResult peptideSearchResult) throws PeptideSequenceGeneratorException;
+
+    public List<PeptideSequence> getPeptideSequences(List<PeptideSearchResult> peptideSearchResults) throws PeptideSequenceGeneratorException;
+
 }

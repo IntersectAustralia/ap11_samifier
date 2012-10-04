@@ -19,10 +19,14 @@ public class BedFileGenerationUnitTest
     @Test
     public void testBedFileGeneration()
     {
-        PeptideSequence sequence = new PeptideSequence("ATGTTA", "6M", 100, 20, 26, null);
-        String actualBed = Samifier.createBEDLine(sequence, "chrI", "KPYK1_YEAST.q21_p1");
+        GeneInfo geneInfo = new GeneInfo();
+        geneInfo.setChromosome("chrI");
+        geneInfo.setStart(80000);
+        geneInfo.setStop(80100);
+        PeptideSequence sequence = new PeptideSequence("ATGTTA", "6M", 100, 20, 26, geneInfo);
+        String actualBed = Samifier.createBEDLine(sequence, "KPYK1_YEAST");
         String lineFeed = System.getProperty("line.separator");
-        String expectedBed = "chrI\t20\t26\tKPYK1_YEAST.q21_p1" + lineFeed;
+        String expectedBed = "chrI\t80000\t80100\tKPYK1_YEAST" + lineFeed;
         assertEquals("Should produce a valid BED format line",actualBed, expectedBed);
     }
 }
