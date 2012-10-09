@@ -1,7 +1,8 @@
 package au.org.intersect.samifier;
 
+import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
-import au.org.intersect.samifier.parser.PeptideSequenceGenerator;
+import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.parser.ProteinToOLNParser;
 import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import org.apache.commons.cli.*;
@@ -98,7 +99,7 @@ public class ResultsAnalyser
         this.peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsFile);
         this.outputFile = outputFile;
         this.chromosomeDir = chromosomeDir;
-        sequenceGenerator = new au.org.intersect.samifier.parser.PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
+        sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
 
     }
 

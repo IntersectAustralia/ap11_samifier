@@ -1,4 +1,4 @@
-package au.org.intersect.samifier;
+package au.org.intersect.samifier.parser;
 
 import static org.junit.Assert.*;
 
@@ -10,9 +10,9 @@ import java.io.File;
 import java.util.Map;
 
 /**
- * * Tests {@link Samifier}
+ * * Tests {@link au.org.intersect.samifier.Samifier}
  * */
-public final class SamifierParsingUnitTest
+public final class ProteinToOLNParserImplUnitTest
 {
 
     @Test

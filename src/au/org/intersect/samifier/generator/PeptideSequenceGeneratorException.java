@@ -1,4 +1,4 @@
-package au.org.intersect.samifier.parser;
+package au.org.intersect.samifier.generator;
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,4 +1,4 @@
-package au.org.intersect.samifier.parser;
+package au.org.intersect.samifier.generator;
 
 import au.org.intersect.samifier.PeptideSearchResult;
 import au.org.intersect.samifier.PeptideSequence;

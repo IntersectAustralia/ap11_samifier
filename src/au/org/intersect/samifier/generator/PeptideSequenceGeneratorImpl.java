@@ -1,4 +1,4 @@
-package au.org.intersect.samifier.parser;
+package au.org.intersect.samifier.generator;
 
 import au.org.intersect.samifier.*;
 import org.apache.log4j.Logger;

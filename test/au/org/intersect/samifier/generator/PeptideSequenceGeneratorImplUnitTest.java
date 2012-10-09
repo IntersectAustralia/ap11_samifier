@@ -1,6 +1,7 @@
-package au.org.intersect.samifier.parser;
+package au.org.intersect.samifier.generator;
 
 import au.org.intersect.samifier.*;
+import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
 import org.junit.Test;
 
 import java.io.File;

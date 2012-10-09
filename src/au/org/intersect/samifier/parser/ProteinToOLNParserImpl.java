@@ -1,7 +1,5 @@
 package au.org.intersect.samifier.parser;
 
-import au.org.intersect.samifier.ProteinToOLNMappingFileParsingException;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

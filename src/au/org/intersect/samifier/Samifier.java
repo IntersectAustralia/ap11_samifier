@@ -1,5 +1,8 @@
 package au.org.intersect.samifier;
 
+import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
+import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
+import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
 import au.org.intersect.samifier.parser.ProteinToOLNParser;
@@ -36,11 +39,11 @@ public class Samifier {
 
 
     public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output, Writer bedWriter)
-            throws au.org.intersect.samifier.parser.PeptideSequenceGeneratorException, IOException
+            throws PeptideSequenceGeneratorException, IOException
     {
         LOG.debug("creating sam file");
         List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
-        au.org.intersect.samifier.parser.PeptideSequenceGenerator sequenceGenerator = new au.org.intersect.samifier.parser.PeptideSequenceGeneratorImpl(genome, proteinOLNMap, chromosomeDirectory);
+        PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinOLNMap, chromosomeDirectory);
         Set<String> foundProteins = new HashSet<String>();
 
         for (PeptideSearchResult result : peptideSearchResults)
@@ -179,6 +182,7 @@ public class Samifier {
                 }
                 searchResultFiles.add(searchResultFile);
             }
+
             for (File searchResultFile : searchResultFiles)
             {
                 LOG.debug("Processing: " + searchResultFile.getAbsolutePath());

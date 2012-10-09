@@ -1,4 +1,4 @@
-package au.org.intersect.samifier;
+package au.org.intersect.samifier.parser;
 
 public class ProteinToOLNMappingFileParsingException
     extends Exception
