@@ -1,14 +1,11 @@
 package au.org.intersect.samifier;
 
-import au.org.intersect.samifier.mascot.PeptideSearchResultsParser;
-import au.org.intersect.samifier.mascot.PeptideSearchResultsParserImpl;
-import au.org.intersect.samifier.mascot.PeptideSequenceGenerator;
-import au.org.intersect.samifier.mascot.PeptideSequenceGeneratorImpl;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
+import au.org.intersect.samifier.parser.PeptideSequenceGenerator;
 import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -92,11 +89,11 @@ public class ResultsAnalyser
     {
         this.genome = Genome.parse(genomeFile);
         this.proteinToOLNMap = Samifier.parseProteinToOLNMappingFile(mapFile);
-        PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
+        PeptideSearchResultsParser peptideSearchResultsParser = new au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl(proteinToOLNMap);
         this.peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsFile);
         this.outputFile = outputFile;
         this.chromosomeDir = chromosomeDir;
-        sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
+        sequenceGenerator = new au.org.intersect.samifier.parser.PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
 
     }
 

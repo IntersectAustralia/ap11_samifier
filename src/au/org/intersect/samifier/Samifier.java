@@ -1,24 +1,10 @@
 package au.org.intersect.samifier;
 
-import au.org.intersect.samifier.mascot.*;
 import org.apache.commons.cli.*;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 import java.io.*;
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
@@ -85,11 +71,11 @@ public class Samifier {
 
 
     public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output, Writer bedWriter)
-            throws PeptideSequenceGeneratorException, IOException
+            throws au.org.intersect.samifier.parser.PeptideSequenceGeneratorException, IOException
     {
         LOG.debug("creating sam file");
         List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
-        PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinOLNMap, chromosomeDirectory);
+        au.org.intersect.samifier.parser.PeptideSequenceGenerator sequenceGenerator = new au.org.intersect.samifier.parser.PeptideSequenceGeneratorImpl(genome, proteinOLNMap, chromosomeDirectory);
         Set<String> foundProteins = new HashSet<String>();
 
         for (PeptideSearchResult result : peptideSearchResults)
@@ -212,7 +198,7 @@ public class Samifier {
             Genome genome = Genome.parse(genomeFile);
 
             Map<String,String> map = parseProteinToOLNMappingFile(mapFile);
-            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(map);
+            au.org.intersect.samifier.parser.PeptideSearchResultsParser peptideSearchResultsParser = new au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl(map);
 
             List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
             List<File> searchResultFiles = new ArrayList<File>();

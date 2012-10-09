@@ -1,4 +1,4 @@
-package au.org.intersect.samifier.mascot;
+package au.org.intersect.samifier.parser;
 
 import au.org.intersect.samifier.*;
 import org.apache.log4j.Logger;

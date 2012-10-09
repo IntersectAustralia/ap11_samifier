@@ -324,7 +324,7 @@
           </SpectrumIdentificationItem>
           <SpectrumIdentificationItem id="SII_11_4"  calculatedMassToCharge="351.7108665" chargeState="2" experimentalMassToCharge="351.7108" Peptide_ref="peptide_11_4" rank="1" passThreshold="false">
             <PeptideEvidence id="PE_11_4_RL36B_YEAST_0_5_13" start="5" end="13" pre="K" post="E" missedCleavages="0" isDecoy="false" DBSequence_Ref="DBSeq_1_RL36B_YEAST" />
-            <cvParam accession="MS:1001171" name="mascot:score" cvRef="PSI-MS" value="37.51"/>
+            <cvParam accession="MS:1001171" name="mascot:score" cvRef="PSI-MS" value="35.86"/>
             <cvParam accession="MS:1001172" name="mascot:expectation value" cvRef="PSI-MS" value="1.00054280502499" />
             <cvParam accession="MS:1001363" name="peptide unique to one protein" cvRef="PSI-MS" />
           </SpectrumIdentificationItem>

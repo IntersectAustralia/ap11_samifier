@@ -1,14 +1,12 @@
 package au.org.intersect.samifier;
 
-import au.org.intersect.samifier.mascot.PeptideSearchResultsParser;
-import au.org.intersect.samifier.mascot.PeptideSearchResultsParserImpl;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +41,7 @@ public class ResultAnalyserUnitTest
 
             List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(mascotFile);
 
+            //File resultAnalysisFile = new File("out", "txt");
             File resultAnalysisFile = File.createTempFile("out", "txt");
             resultAnalysisFile.deleteOnExit();
 

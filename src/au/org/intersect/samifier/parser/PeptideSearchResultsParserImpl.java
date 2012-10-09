@@ -1,4 +1,4 @@
-package au.org.intersect.samifier.mascot;
+package au.org.intersect.samifier.parser;
 
 import au.org.intersect.samifier.MascotParsingException;
 import au.org.intersect.samifier.PeptideSearchResult;
@@ -162,7 +162,7 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
                 Node peptideInfo = (Node)xPath.evaluate(peptideInfoXpath, root, nodeType);
 
                 String peptideEvidenceXpath = "./mzidentml:PeptideEvidence";
-                String confidenceScoreXpath = "//mzidentml:cvParam[@name='mascot:score']";
+                String confidenceScoreXpath = "./mzidentml:cvParam[@name='mascot:score']";
 
                 NodeList peptideEvidenceList = (NodeList)xPath.evaluate(peptideEvidenceXpath, peptideInfo, nodesetType);
                 Node confidenceScoreNode = (Node)xPath.evaluate(confidenceScoreXpath, peptideInfo, nodeType);

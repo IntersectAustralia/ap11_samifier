@@ -1,4 +1,4 @@
-package au.org.intersect.samifier.mascot;
+package au.org.intersect.samifier.parser;
 
 import au.org.intersect.samifier.PeptideSearchResult;
 import au.org.intersect.samifier.Samifier;
@@ -64,12 +64,12 @@ public class PeptideSearchResultsParserImplUnitTest
             assertEquals("Parser should find seven ", 7, list.size());
 
             assertTrue(list.contains(new PeptideSearchResult("PE_11_1_KPYK1_YEAST_0_469_474", "EFGILK", "KPYK1_YEAST", 469, 474 , new BigDecimal("25.95"))));
-            assertTrue(list.contains(new PeptideSearchResult("PE_11_2_KPYK1_YEAST_0_62_68", "SVIDNAR", "KPYK1_YEAST", 62, 68 , new BigDecimal("25.95"))));
-            assertTrue(list.contains(new PeptideSearchResult("PE_11_3_KPYK1_YEAST_0_460_466", "INFGIEK", "KPYK1_YEAST", 460, 466 , new BigDecimal("25.95"))));
-            assertTrue(list.contains(new PeptideSearchResult("PE_11_4_RL36B_YEAST_0_5_13", "TGIAIGLNK", "RL36B_YEAST", 5, 13 , new BigDecimal("25.95"))));
-            assertTrue(list.contains(new PeptideSearchResult("PE_14_1_RL31A_YEAST_0_78_86", "KRNEEEDAK", "RL31A_YEAST", 78, 86 , new BigDecimal("25.95"))));
-            assertTrue(list.contains(new PeptideSearchResult("PE_14_3_RL31A_YEAST_0_11_19", "EYTINLHKR", "RL31A_YEAST", 11, 19 , new BigDecimal("25.95"))));
-            assertTrue(list.contains(new PeptideSearchResult("PE_14_11_RL31A_YEAST_0_80_102", "NEEEDAKNPLFSYVEPVLVASAK", "RL31A_YEAST", 80, 102 , new BigDecimal("25.95"))));
+            assertTrue(list.contains(new PeptideSearchResult("PE_11_2_KPYK1_YEAST_0_62_68", "SVIDNAR", "KPYK1_YEAST", 62, 68 , new BigDecimal("40.45"))));
+            assertTrue(list.contains(new PeptideSearchResult("PE_11_3_KPYK1_YEAST_0_460_466", "INFGIEK", "KPYK1_YEAST", 460, 466 , new BigDecimal("37.51"))));
+            assertTrue(list.contains(new PeptideSearchResult("PE_11_4_RL36B_YEAST_0_5_13", "TGIAIGLNK", "RL36B_YEAST", 5, 13 , new BigDecimal("35.86"))));
+            assertTrue(list.contains(new PeptideSearchResult("PE_14_1_RL31A_YEAST_0_78_86", "KRNEEEDAK", "RL31A_YEAST", 78, 86 , new BigDecimal("40.09"))));
+            assertTrue(list.contains(new PeptideSearchResult("PE_14_3_RL31A_YEAST_0_11_19", "EYTINLHKR", "RL31A_YEAST", 11, 19 , new BigDecimal("52.75"))));
+            assertTrue(list.contains(new PeptideSearchResult("PE_14_11_RL31A_YEAST_0_80_102", "NEEEDAKNPLFSYVEPVLVASAK", "RL31A_YEAST", 80, 102 , new BigDecimal("20.69"))));
         }
         catch(Exception e)
         {

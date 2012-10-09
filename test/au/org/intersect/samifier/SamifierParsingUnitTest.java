@@ -1,15 +1,10 @@
 package au.org.intersect.samifier;
 
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
-import au.org.intersect.samifier.mascot.PeptideSearchResultsParser;
-import au.org.intersect.samifier.mascot.PeptideSearchResultsParserImpl;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
