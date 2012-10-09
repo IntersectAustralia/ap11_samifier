@@ -1,6 +1,5 @@
 package au.org.intersect.samifier.parser;
 
-import au.org.intersect.samifier.MascotParsingException;
 import au.org.intersect.samifier.PeptideSearchResult;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;

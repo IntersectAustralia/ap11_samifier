@@ -1,5 +1,9 @@
 package au.org.intersect.samifier;
 
+import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
+import au.org.intersect.samifier.parser.ProteinToOLNParser;
+import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -17,45 +21,6 @@ public class Samifier {
     public static final int SAM_REVERSE_FLAG = 0x10;
 
     private Samifier(){}
-
-    public static Map<String,String> parseProteinToOLNMappingFile(File f)
-        throws IOException, FileNotFoundException, ProteinToOLNMappingFileParsingException
-    {
-        Map<String,String> proteinOLN = new HashMap<String,String>();
-
-        BufferedReader reader = null;
-        try{
-            reader = new BufferedReader(new FileReader(f));
- 
-            // Skip header line
-            String line = reader.readLine();
-            int lineNumber = 1;
-            while ((line = reader.readLine()) != null)
-            {
-                lineNumber++;
-                if (line.matches("^#.*$"))
-                {
-                    continue;
-                }
-                // ordered_locus_name accession_id protein_name id
-                // Tab delimited
-                String[] parts = line.split("\\s+");
-                if (parts.length < 3)
-                {
-                    throw new ProteinToOLNMappingFileParsingException("Line "+lineNumber+" not in expected format, should be: ordered_locus_name accession_id protein_name id");
-                }
-                proteinOLN.put(parts[2], parts[0]);
-            }
-        }
-        finally
-        {
-            if (reader != null)
-            {
-                reader.close();
-            }
-        }
-        return proteinOLN;
-    }
 
     public static String createBEDLine(PeptideSequence peptide, String proteinName)
     {
@@ -197,8 +162,10 @@ public class Samifier {
 
             Genome genome = Genome.parse(genomeFile);
 
-            Map<String,String> map = parseProteinToOLNMappingFile(mapFile);
-            au.org.intersect.samifier.parser.PeptideSearchResultsParser peptideSearchResultsParser = new au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl(map);
+            ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
+            Map<String,String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
+
+            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
             List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
             List<File> searchResultFiles = new ArrayList<File>();
@@ -224,7 +191,7 @@ public class Samifier {
                 bedWriter = new FileWriter(bedfilePath);
             }
             FileWriter sam = new FileWriter(outfile);
-            Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam, bedWriter);
+            Samifier.createSAM(genome, proteinToOLNMap, peptideSearchResults, chromosomeDir, sam, bedWriter);
         }
         catch (ParseException pe)
         {

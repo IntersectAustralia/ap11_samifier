@@ -2,6 +2,8 @@ package au.org.intersect.samifier;
 
 import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
 import au.org.intersect.samifier.parser.PeptideSequenceGenerator;
+import au.org.intersect.samifier.parser.ProteinToOLNParser;
+import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -88,7 +90,10 @@ public class ResultsAnalyser
     protected ResultsAnalyser(File searchResultsFile, File genomeFile, File mapFile, File outputFile, File chromosomeDir) throws Exception
     {
         this.genome = Genome.parse(genomeFile);
-        this.proteinToOLNMap = Samifier.parseProteinToOLNMappingFile(mapFile);
+
+        ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
+        this.proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
+
         PeptideSearchResultsParser peptideSearchResultsParser = new au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl(proteinToOLNMap);
         this.peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsFile);
         this.outputFile = outputFile;

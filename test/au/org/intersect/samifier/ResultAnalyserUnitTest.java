@@ -2,6 +2,8 @@ package au.org.intersect.samifier;
 
 import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
+import au.org.intersect.samifier.parser.ProteinToOLNParser;
+import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -36,8 +38,10 @@ public class ResultAnalyserUnitTest
 
             Genome genome = Genome.parse(genomeFile);
 
-            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
-            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(map);
+            ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
+            Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
+
+            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
             List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(mascotFile);
 

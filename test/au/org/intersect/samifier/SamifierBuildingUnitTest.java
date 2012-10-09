@@ -3,6 +3,10 @@ package au.org.intersect.samifier;
 
 import static org.junit.Assert.*;
 
+import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
+import au.org.intersect.samifier.parser.ProteinToOLNParser;
+import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import org.junit.Test;
 
 import java.io.File;
@@ -28,8 +32,9 @@ public final class SamifierBuildingUnitTest
 
 
             Genome genome = Genome.parse(genomeFile);
-            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
-            au.org.intersect.samifier.parser.PeptideSearchResultsParser peptideSearchResultsParser = new au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl(map);
+            ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
+            Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
+            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
             List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(mascotFile);
             File chromosomeDir = new File("test/resources/");
@@ -37,7 +42,7 @@ public final class SamifierBuildingUnitTest
             File samFile = File.createTempFile("out", "sam");
             samFile.deleteOnExit();
             FileWriter sam = new FileWriter(samFile);
-            Samifier.createSAM(genome, map, peptideSearchResults, chromosomeDir, sam, null);
+            Samifier.createSAM(genome, proteinToOLNMap, peptideSearchResults, chromosomeDir, sam, null);
 
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected.sam"));
             List<String> gotLines = FileUtils.readLines(samFile);

@@ -29,8 +29,9 @@ public class PeptideSearchResultsParserImplUnitTest
 
         File mapFile = new File("test/resources/test_accession.txt");
         try {
-            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
-            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(map);
+            ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
+            Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
+            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
             List<PeptideSearchResult> list = peptideSearchResultsParser.parseResults(mascotFile);
             assertEquals("Parser should find seven ", 7, list.size());
@@ -57,8 +58,9 @@ public class PeptideSearchResultsParserImplUnitTest
 
         File mapFile = new File("test/resources/test_accession.txt");
         try {
-            Map<String,String> map = Samifier.parseProteinToOLNMappingFile(mapFile);
-            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(map);
+            ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
+            Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
+            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
             List<PeptideSearchResult> list = peptideSearchResultsParser.parseResults(mascotFile);
             assertEquals("Parser should find seven ", 7, list.size());
