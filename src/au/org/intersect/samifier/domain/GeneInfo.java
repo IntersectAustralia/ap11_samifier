@@ -97,7 +97,7 @@ public class GeneInfo
 
     public List<GeneSequence> getLocations()
     {
-        Collections.sort(locations, new au.org.intersect.samifier.domain.GeneSequenceComparator());
+        Collections.sort(locations, new GeneSequenceComparator());
         return locations;
     }
 

@@ -15,7 +15,7 @@ public class Genome
         genes = new HashMap<String, GeneInfo>();
     }
 
-    public void addGene(String orderedLocusName, au.org.intersect.samifier.domain.GeneInfo gene)
+    public void addGene(String orderedLocusName, GeneInfo gene)
     {
         genes.put(orderedLocusName, gene);
     }

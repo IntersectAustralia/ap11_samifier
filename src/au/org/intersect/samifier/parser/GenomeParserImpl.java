@@ -1,12 +1,11 @@
 package au.org.intersect.samifier.parser;
 
+
 import au.org.intersect.samifier.domain.GeneInfo;
+import au.org.intersect.samifier.domain.GeneSequence;
 import au.org.intersect.samifier.domain.Genome;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +59,7 @@ public class GenomeParserImpl implements GenomeParser
                 {
                     continue;
                 }
-                Matcher typeMatcher = au.org.intersect.samifier.domain.GeneSequence.SEQUENCE_RE.matcher(type);
+                Matcher typeMatcher = GeneSequence.SEQUENCE_RE.matcher(type);
                 if (typeMatcher.matches())
                 {
                     processSequence(parts, genome);
@@ -85,7 +84,7 @@ public class GenomeParserImpl implements GenomeParser
         int start = Integer.parseInt(parts[3]);
         int stop = Integer.parseInt(parts[4]);
         String direction = parts[6];
-        au.org.intersect.samifier.domain.GeneInfo gene;
+        GeneInfo gene;
         if (genome.hasGene(orderedLocusName))
         {
             gene = genome.getGene(orderedLocusName);
@@ -94,7 +93,7 @@ public class GenomeParserImpl implements GenomeParser
                 System.err.println(orderedLocusName + " not found in genome object");
                 return;
             }
-            au.org.intersect.samifier.domain.GeneSequence seq = new au.org.intersect.samifier.domain.GeneSequence(type, start, stop, direction);
+            GeneSequence seq = new GeneSequence(type, start, stop, direction);
             gene.addLocation(seq);
         }
         else
