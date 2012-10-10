@@ -12,6 +12,13 @@ import java.util.regex.Pattern;
 public class GenomeParserImpl implements GenomeParser
 {
 
+    public static final int CHROMOSOME_PART = 0;
+    public static final int TYPE_PART = 2;
+    public static final int ATTRIBUTES_PART = 8;
+    public static final int START_PART = 3;
+    public static final int STOP_PART = 4;
+    public static final int STRAND_PART = 6;
+
     public GenomeParserImpl()
     {
 
@@ -78,12 +85,12 @@ public class GenomeParserImpl implements GenomeParser
 
     private void processSequence(String[] parts, Genome genome)
     {
-        String chromosome = parts[0];
-        String type = parts[2];
-        String orderedLocusName = extractOrderedLocusName(parts[8]);
-        int start = Integer.parseInt(parts[3]);
-        int stop = Integer.parseInt(parts[4]);
-        String direction = parts[6];
+        String chromosome = parts[CHROMOSOME_PART];
+        String type = parts[TYPE_PART];
+        String orderedLocusName = extractOrderedLocusName(parts[ATTRIBUTES_PART]);
+        int start = Integer.parseInt(parts[START_PART]);
+        int stop = Integer.parseInt(parts[STOP_PART]);
+        String direction = parts[STRAND_PART];
         GeneInfo gene;
         if (genome.hasGene(orderedLocusName))
         {
