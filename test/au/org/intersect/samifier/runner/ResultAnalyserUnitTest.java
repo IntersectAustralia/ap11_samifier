@@ -1,5 +1,8 @@
-package au.org.intersect.samifier;
+package au.org.intersect.samifier.runner;
 
+import au.org.intersect.samifier.Genome;
+import au.org.intersect.samifier.PeptideSearchResult;
+import au.org.intersect.samifier.ResultsAnalyser;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
 import au.org.intersect.samifier.parser.ProteinToOLNParser;
@@ -35,23 +38,13 @@ public class ResultAnalyserUnitTest
             File genomeFile = new File("test/resources/test_genome.gff");
             File chromosomeDir = new File("test/resources/");
 
-
-            Genome genome = Genome.parse(genomeFile);
-
-            ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
-            Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
-
-            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
-
-            List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(mascotFile);
-
             //File resultAnalysisFile = new File("out", "txt");
             File resultAnalysisFile = File.createTempFile("out", "txt");
             resultAnalysisFile.deleteOnExit();
 
-            ResultsAnalyser analyser = new ResultsAnalyser(mascotFile, genomeFile, mapFile, resultAnalysisFile, chromosomeDir);
+            ResultAnalyserRunner analyser = new ResultAnalyserRunner(mascotFile, genomeFile, mapFile, resultAnalysisFile, chromosomeDir);
 
-            analyser.createResultAnalysis();
+            analyser.run();
 
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected_results_analysis.txt"));
             List<String> gotLines = FileUtils.readLines(resultAnalysisFile);

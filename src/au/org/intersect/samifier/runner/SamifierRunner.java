@@ -27,30 +27,23 @@ public class SamifierRunner {
     private File mapFile;
     private File chromosomeDir;
     private File outfile;
-    private String logFileName;
     private String bedfilePath;
 
     private Genome genome;
     private Map<String,String> proteinToOLNMap;
 
-    public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String logFileName,String bedfilePath)
+    public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath)
     {
         this.searchResultsPaths = searchResultsPaths;
         this.genomeFile = genomeFile;
         this.mapFile = mapFile;
         this.chromosomeDir = chromosomeDir;
         this.outfile = outfile;
-        this.logFileName = logFileName;
         this.bedfilePath = bedfilePath;
     }
 
     public void run() throws Exception
     {
-        if (logFileName != null)
-        {
-            setFileLogger(logFileName);
-        }
-
         genome = Genome.parse(genomeFile);
 
         ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
@@ -138,17 +131,5 @@ public class SamifierRunner {
         output.close();
     }
 
-    private void setFileLogger(String logFileName)
-    {
-        Logger.getRootLogger().removeAppender("stdout");
-        FileAppender fa = new FileAppender();
-        fa.setName("FileLogger");
-        fa.setFile(logFileName);
-        fa.setLayout(new PatternLayout("%d %-5p %c - %m%n"));
-        fa.setThreshold(Level.DEBUG);
-        fa.setAppend(true);
-        fa.activateOptions();
-        Logger.getRootLogger().addAppender(fa);
-    }
 }
 

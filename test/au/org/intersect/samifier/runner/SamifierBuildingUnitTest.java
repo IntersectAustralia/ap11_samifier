@@ -26,7 +26,7 @@ public final class SamifierBuildingUnitTest
             File chromosomeDir = new File("test/resources/");
             File samFile = File.createTempFile("out", "sam");
 
-            SamifierRunner runner = new SamifierRunner(mascotFiles, genomeFile, mapFile, chromosomeDir, samFile, null, null);
+            SamifierRunner runner = new SamifierRunner(mascotFiles, genomeFile, mapFile, chromosomeDir, samFile, null);
             runner.run();
 
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected.sam"));

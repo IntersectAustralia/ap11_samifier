@@ -3,7 +3,11 @@ package au.org.intersect.samifier;
 import au.org.intersect.samifier.runner.SamifierRunner;
 import org.apache.commons.cli.*;
 import java.io.*;
+
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 public class Samifier
 {
@@ -69,7 +73,12 @@ public class Samifier
             String logFileName = line.getOptionValue("l");
             String bedfilePath = line.getOptionValue("b");
 
-            SamifierRunner samifier = new SamifierRunner(searchResultsPaths, genomeFile, mapFile, chromosomeDir, outfile, logFileName, bedfilePath);
+            if (logFileName != null)
+            {
+                setFileLogger(logFileName);
+            }
+
+            SamifierRunner samifier = new SamifierRunner(searchResultsPaths, genomeFile, mapFile, chromosomeDir, outfile, bedfilePath);
             samifier.run();
 
         }
@@ -86,6 +95,20 @@ public class Samifier
             System.exit(1);
         }
     }
+
+    private static void setFileLogger(String logFileName)
+    {
+        Logger.getRootLogger().removeAppender("stdout");
+        FileAppender fa = new FileAppender();
+        fa.setName("FileLogger");
+        fa.setFile(logFileName);
+        fa.setLayout(new PatternLayout("%d %-5p %c - %m%n"));
+        fa.setThreshold(Level.DEBUG);
+        fa.setAppend(true);
+        fa.activateOptions();
+        Logger.getRootLogger().addAppender(fa);
+    }
+
 
 }
 

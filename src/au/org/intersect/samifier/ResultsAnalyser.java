@@ -1,18 +1,9 @@
 package au.org.intersect.samifier;
 
-import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
-import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
-import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
-import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
-import au.org.intersect.samifier.parser.ProteinToOLNParser;
-import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
-import au.org.intersect.samifier.outputter.ResultsAnalyserOutputter;
+import au.org.intersect.samifier.runner.ResultAnalyserRunner;
 import org.apache.commons.cli.*;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -73,8 +64,8 @@ public class ResultsAnalyser
             File outfile = new File(line.getOptionValue("o"));
             File chromosomeDir = new File(line.getOptionValue("c"));
 
-            ResultsAnalyser analyser = new ResultsAnalyser(searchResultsFile, genomeFile, mapFile, outfile, chromosomeDir);
-            analyser.createResultAnalysis();
+            ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, mapFile, outfile, chromosomeDir);
+            analyser.run();
         }
         catch (ParseException pe)
         {
@@ -89,37 +80,5 @@ public class ResultsAnalyser
             System.exit(1);
         }
 
-    }
-
-    protected ResultsAnalyser(File searchResultsFile, File genomeFile, File proteinToOLNMapFile, File outputFile, File chromosomeDir) throws Exception
-    {
-        this.searchResultsFile = searchResultsFile;
-        this.genomeFile = genomeFile;
-        this.proteinToOLNMapFile = proteinToOLNMapFile;
-        this.outputFile = outputFile;
-        this.chromosomeDir = chromosomeDir;
-    }
-
-    protected void createResultAnalysis() throws Exception
-    {
-        Genome genome = Genome.parse(genomeFile);
-
-        ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
-        Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(proteinToOLNMapFile);
-
-        PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
-        List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsFile);
-        PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
-
-        FileWriter output = new FileWriter(outputFile);
-
-        for (PeptideSearchResult peptideSearchResult : peptideSearchResults)
-        {
-            PeptideSequence peptideSequence = sequenceGenerator.getPeptideSequence(peptideSearchResult);
-            ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(peptideSearchResult, proteinToOLNMap, genome, peptideSequence);
-            output.write(outputter.toString());
-            output.write(System.getProperty("line.separator"));
-        }
-        output.close();
     }
 }
