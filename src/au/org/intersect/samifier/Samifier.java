@@ -1,9 +1,9 @@
 package au.org.intersect.samifier;
 
+import au.org.intersect.samifier.runner.SamifierRunner;
 import org.apache.commons.cli.*;
 import java.io.*;
 import org.apache.log4j.Logger;
-import au.org.intersect.samifier.SamifierRunner;
 
 public class Samifier
 {

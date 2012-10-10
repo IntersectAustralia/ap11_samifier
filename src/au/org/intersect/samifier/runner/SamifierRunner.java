@@ -1,5 +1,6 @@
-package au.org.intersect.samifier;
+package au.org.intersect.samifier.runner;
 
+import au.org.intersect.samifier.*;
 import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;

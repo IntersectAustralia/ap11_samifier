@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import au.org.intersect.samifier.SamifierRunner;
 
 /**
  * * Tests {@link au.org.intersect.samifier.Samifier}
