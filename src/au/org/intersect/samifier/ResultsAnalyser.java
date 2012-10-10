@@ -80,11 +80,13 @@ public class ResultsAnalyser
         {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("result_analyser", options, true);
+            System.exit(1);
         }
         catch (Exception e)
         {
             System.err.println(e);
             e.printStackTrace();
+            System.exit(1);
         }
 
     }

@@ -1,95 +1,15 @@
 package au.org.intersect.samifier;
 
-import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
-import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
-import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
-import au.org.intersect.samifier.outputter.BedLineOutputter;
-import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
-import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
-import au.org.intersect.samifier.parser.ProteinToOLNParser;
-import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import org.apache.commons.cli.*;
-
 import java.io.*;
-import java.util.*;
-
 import org.apache.log4j.Logger;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.PatternLayout;
+import au.org.intersect.samifier.SamifierRunner;
 
-public class Samifier {
+public class Samifier
+{
 
     private static Logger LOG = Logger.getLogger(Samifier.class);
-
     public static final int SAM_REVERSE_FLAG = 0x10;
-
-    private Samifier(){}
-
-
-    public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output, Writer bedWriter)
-            throws PeptideSequenceGeneratorException, IOException
-    {
-        LOG.debug("creating sam file");
-        List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
-        PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinOLNMap, chromosomeDirectory);
-        Set<String> foundProteins = new HashSet<String>();
-
-        for (PeptideSearchResult result : peptideSearchResults)
-        {
-            PeptideSequence peptide = sequenceGenerator.getPeptideSequence(result);
-            if (peptide == null)
-            {
-                continue;
-            }
-
-            String proteinName = result.getProteinName();
-            String resultName = proteinName+"."+result.getId();
-            int peptideStart = peptide.getStartIndex() + peptide.getGeneInfo().getStart();
-
-            if (bedWriter != null && !foundProteins.contains(proteinName))
-            {
-                foundProteins.add(proteinName);
-                BedLineOutputter bedLineOutputter = new BedLineOutputter(peptide, proteinName);
-                bedWriter.write(bedLineOutputter.toString());
-            }
-
-            samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
-        }
-
-        String prevChromosome = null;
-        Collections.sort(samEntries, new SAMEntryComparator());
-        for (SAMEntry samEntry : samEntries)
-        {
-            String chromosome = samEntry.getRname();
-            if (! chromosome.equals(prevChromosome))
-            {
-                samEntry.setRnext("=");
-                prevChromosome = chromosome;
-            }
-            output.write(samEntry.toString());
-        }
-
-        if (bedWriter != null)
-        {
-            bedWriter.close();
-        }
-        output.close();
-    }
-
-    private static void setFileLogger(String logFileName)
-    {
-        Logger.getRootLogger().removeAppender("stdout");
-        FileAppender fa = new FileAppender();
-        fa.setName("FileLogger");
-        fa.setFile(logFileName);
-        fa.setLayout(new PatternLayout("%d %-5p %c - %m%n"));
-        fa.setThreshold(Level.DEBUG);
-        fa.setAppend(true);
-        fa.activateOptions();
-        Logger.getRootLogger().addAppender(fa);
-    }
-
 
     public static void main(String[] args)
     {
@@ -128,6 +48,7 @@ public class Samifier {
                                           .isRequired(false)
                                           .withDescription("Filename to write IGV regions of interest (BED) file to")
                                           .create("b");
+
         Options options = new Options();
         options.addOption(resultsFile);
         options.addOption(mappingFile);
@@ -148,54 +69,21 @@ public class Samifier {
             String logFileName = line.getOptionValue("l");
             String bedfilePath = line.getOptionValue("b");
 
-            if (logFileName != null)
-            {
-                setFileLogger(logFileName);
-            }
+            SamifierRunner samifier = new SamifierRunner(searchResultsPaths, genomeFile, mapFile, chromosomeDir, outfile, logFileName, bedfilePath);
+            samifier.run();
 
-            Genome genome = Genome.parse(genomeFile);
-
-            ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
-            Map<String,String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
-
-            PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
-
-            List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
-            List<File> searchResultFiles = new ArrayList<File>();
-            for (String searchResultsPath : searchResultsPaths)
-            {
-                File searchResultFile = new File(searchResultsPath);
-                if (!searchResultFile.exists())
-                {
-                    System.err.println(searchResultFile + " does not exist");
-                    System.exit(1);
-                }
-                searchResultFiles.add(searchResultFile);
-            }
-
-            for (File searchResultFile : searchResultFiles)
-            {
-                LOG.debug("Processing: " + searchResultFile.getAbsolutePath());
-                peptideSearchResults.addAll(peptideSearchResultsParser.parseResults(searchResultFile));
-            }
-
-            FileWriter bedWriter = null;
-            if (bedfilePath != null)
-            {
-                bedWriter = new FileWriter(bedfilePath);
-            }
-            FileWriter sam = new FileWriter(outfile);
-            Samifier.createSAM(genome, proteinToOLNMap, peptideSearchResults, chromosomeDir, sam, bedWriter);
         }
         catch (ParseException pe)
         {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("samifier", options, true);
+            System.exit(1);
         }
         catch (Exception e)
         {
             System.err.println(e);
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
