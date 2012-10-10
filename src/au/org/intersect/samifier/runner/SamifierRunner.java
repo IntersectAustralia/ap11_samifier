@@ -1,21 +1,16 @@
 package au.org.intersect.samifier.runner;
 
-import au.org.intersect.samifier.*;
+import au.org.intersect.samifier.domain.*;
 import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
-import au.org.intersect.samifier.outputter.BedLineOutputter;
 import au.org.intersect.samifier.parser.*;
-
-import org.apache.commons.cli.*;
 
 import java.io.*;
 import java.util.*;
 
+import au.org.intersect.samifier.parser.GenomeParserImpl;
 import org.apache.log4j.Logger;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.PatternLayout;
 
 public class SamifierRunner {
 
@@ -44,14 +39,15 @@ public class SamifierRunner {
 
     public void run() throws Exception
     {
-        genome = Genome.parse(genomeFile);
+        GenomeParserImpl genomeParser = new GenomeParserImpl();
+        genome = genomeParser.parseGenomeFile(genomeFile);
 
         ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
         proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
 
         PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
-        List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
+        List<au.org.intersect.samifier.domain.PeptideSearchResult> peptideSearchResults = new ArrayList<au.org.intersect.samifier.domain.PeptideSearchResult>();
         List<File> searchResultFiles = new ArrayList<File>();
         for (String searchResultsPath : searchResultsPaths)
         {
@@ -81,17 +77,17 @@ public class SamifierRunner {
     }
 
 
-    public void createSAM(List<PeptideSearchResult> peptideSearchResults, Writer output, Writer bedWriter)
+    public void createSAM(List<au.org.intersect.samifier.domain.PeptideSearchResult> peptideSearchResults, Writer output, Writer bedWriter)
             throws PeptideSequenceGeneratorException, IOException
     {
         LOG.debug("creating sam file");
-        List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
+        List<au.org.intersect.samifier.domain.SAMEntry> samEntries = new ArrayList<au.org.intersect.samifier.domain.SAMEntry>();
         PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
         Set<String> foundProteins = new HashSet<String>();
 
-        for (PeptideSearchResult result : peptideSearchResults)
+        for (au.org.intersect.samifier.domain.PeptideSearchResult result : peptideSearchResults)
         {
-            PeptideSequence peptide = sequenceGenerator.getPeptideSequence(result);
+            au.org.intersect.samifier.domain.PeptideSequence peptide = sequenceGenerator.getPeptideSequence(result);
             if (peptide == null)
             {
                 continue;
@@ -108,12 +104,12 @@ public class SamifierRunner {
                 bedWriter.write(bedLineOutputter.toString());
             }
 
-            samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
+            samEntries.add(new au.org.intersect.samifier.domain.SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
         }
 
         String prevChromosome = null;
-        Collections.sort(samEntries, new SAMEntryComparator());
-        for (SAMEntry samEntry : samEntries)
+        Collections.sort(samEntries, new au.org.intersect.samifier.domain.SAMEntryComparator());
+        for (au.org.intersect.samifier.domain.SAMEntry samEntry : samEntries)
         {
             String chromosome = samEntry.getRname();
             if (! chromosome.equals(prevChromosome))

@@ -1,19 +1,12 @@
 package au.org.intersect.samifier.runner;
 
-import au.org.intersect.samifier.Genome;
-import au.org.intersect.samifier.PeptideSearchResult;
 import au.org.intersect.samifier.ResultsAnalyser;
-import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
-import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
-import au.org.intersect.samifier.parser.ProteinToOLNParser;
-import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

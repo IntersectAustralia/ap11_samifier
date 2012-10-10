@@ -1,7 +1,7 @@
 package au.org.intersect.samifier.generator;
 
-import au.org.intersect.samifier.PeptideSearchResult;
-import au.org.intersect.samifier.PeptideSequence;
+import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.PeptideSequence;
 
 import java.util.List;
 

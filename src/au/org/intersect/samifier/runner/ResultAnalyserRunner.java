@@ -1,15 +1,13 @@
 package au.org.intersect.samifier.runner;
 
-import au.org.intersect.samifier.Genome;
-import au.org.intersect.samifier.PeptideSearchResult;
-import au.org.intersect.samifier.PeptideSequence;
+import au.org.intersect.samifier.domain.Genome;
+import au.org.intersect.samifier.parser.*;
+import au.org.intersect.samifier.parser.GenomeParserImpl;
+import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.PeptideSequence;
 import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
-import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
-import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
-import au.org.intersect.samifier.parser.ProteinToOLNParser;
-import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
-import au.org.intersect.samifier.outputter.ResultsAnalyserOutputter;
+import au.org.intersect.samifier.domain.ResultsAnalyserOutputter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -42,7 +40,8 @@ public class ResultAnalyserRunner
 
     public void run() throws Exception
     {
-        Genome genome = Genome.parse(genomeFile);
+        GenomeParserImpl genomeParser = new GenomeParserImpl();
+        Genome genome = genomeParser.parseGenomeFile(genomeFile);
 
         ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
         Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(proteinToOLNMapFile);

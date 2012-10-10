@@ -1,6 +1,7 @@
 package au.org.intersect.samifier.generator;
 
-import au.org.intersect.samifier.*;
+import au.org.intersect.samifier.domain.Genome;
+import au.org.intersect.samifier.parser.GenomeParserImpl;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -33,12 +34,12 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
     }
 
     @Override
-    public List<PeptideSequence> getPeptideSequences(List<PeptideSearchResult> peptideSearchResults) throws PeptideSequenceGeneratorException
+    public List<au.org.intersect.samifier.domain.PeptideSequence> getPeptideSequences(List<au.org.intersect.samifier.domain.PeptideSearchResult> peptideSearchResults) throws PeptideSequenceGeneratorException
     {
-        List<PeptideSequence> peptideSequenceList = new ArrayList<PeptideSequence>();
-        for (PeptideSearchResult searchResult : peptideSearchResults)
+        List<au.org.intersect.samifier.domain.PeptideSequence> peptideSequenceList = new ArrayList<au.org.intersect.samifier.domain.PeptideSequence>();
+        for (au.org.intersect.samifier.domain.PeptideSearchResult searchResult : peptideSearchResults)
         {
-            PeptideSequence sequence = getPeptideSequence(searchResult);
+            au.org.intersect.samifier.domain.PeptideSequence sequence = getPeptideSequence(searchResult);
             if (sequence != null)
             {
                 peptideSequenceList.add(sequence);
@@ -49,12 +50,12 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 
 
     @Override
-    public PeptideSequence getPeptideSequence(PeptideSearchResult peptideSearchResult) throws PeptideSequenceGeneratorException
+    public au.org.intersect.samifier.domain.PeptideSequence getPeptideSequence(au.org.intersect.samifier.domain.PeptideSearchResult peptideSearchResult) throws PeptideSequenceGeneratorException
     {
         String proteinName = peptideSearchResult.getProteinName();
         String oln = proteinOLNMap.get(proteinName);
 
-        GeneInfo gene = genome.getGene(oln);
+        au.org.intersect.samifier.domain.GeneInfo gene = genome.getGene(oln);
         if (gene == null)
         {
             LOG.info("Protein ID found in accession file, but locus not found in genome file");
@@ -67,10 +68,10 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
         return getPeptideSequenceFromChromosomeFile(peptideSearchResult, chromosomeFile, gene);
     }
 
-    public PeptideSequence getPeptideSequenceFromChromosomeFile(PeptideSearchResult peptide, File chromosomeFile, GeneInfo gene)
+    public au.org.intersect.samifier.domain.PeptideSequence getPeptideSequenceFromChromosomeFile(au.org.intersect.samifier.domain.PeptideSearchResult peptide, File chromosomeFile, au.org.intersect.samifier.domain.GeneInfo gene)
             throws PeptideSequenceGeneratorException
     {
-        List<NucleotideSequence> sequenceParts;
+        List<au.org.intersect.samifier.domain.NucleotideSequence> sequenceParts;
         try
         {
             sequenceParts = extractSequenceParts(chromosomeFile, gene);
@@ -104,10 +105,10 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
          * Hence, we walk through each sequence part (describe in the genome
          * file), skipping past introns and just counting through exons.
          */
-        for (NucleotideSequence part : sequenceParts)
+        for (au.org.intersect.samifier.domain.NucleotideSequence part : sequenceParts)
         {
             // Skip introns, but mark them in the cigar string
-            if (GeneSequence.INTRON.equals(part.getType()))
+            if (au.org.intersect.samifier.domain.GeneSequence.INTRON.equals(part.getType()))
             {
                 /*
                    We don't start cigar strings with introns.
@@ -117,7 +118,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
                 int size = part.getStopIndex()-part.getStartIndex()+1;
                 if (cigar.length() > 0)
                 {
-                    updateCigar(cigar, size, GeneSequence.INTRON, direction);
+                    updateCigar(cigar, size, au.org.intersect.samifier.domain.GeneSequence.INTRON, direction);
                     absoluteStopIndex += size;
                 }
                 else
@@ -161,18 +162,18 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
                 nucleotideSequence.append(part.getSequence().substring(substringStart, substringEnd));
                 int partSize = substringEnd - substringStart;
                 absoluteStopIndex += partSize;
-                updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE, direction);
+                updateCigar(cigar, partSize, au.org.intersect.samifier.domain.GeneSequence.CODING_SEQUENCE, direction);
                 break;
             }
 
             nucleotideSequence.append(part.getSequence().substring(substringStart, substringEnd));
             int partSize = substringEnd - substringStart;
             absoluteStopIndex += partSize;
-            updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE, direction);
+            updateCigar(cigar, partSize, au.org.intersect.samifier.domain.GeneSequence.CODING_SEQUENCE, direction);
             readCursor = substringEnd;
         }
 
-        String peptideSequence = GeneInfo.REVERSE.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
+        String peptideSequence = au.org.intersect.samifier.domain.GeneInfo.REVERSE.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
         // When direction is reverse,
         //  5           17
         // |####----#####|
@@ -182,17 +183,17 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
         //   absoluteStartIndex = 2, from 17 to 15
         //   startIndex  = (17-5 = 12) - 11 + 1 = 2 (because it is 1 based)
         //   stopIndex  = (17-5 = 12) - 2 + 1 = 11 (because it is 1 based)
-        int startIndex = GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
-        int stopIndex = GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStartIndex + 1) : absoluteStopIndex;
+        int startIndex = au.org.intersect.samifier.domain.GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
+        int stopIndex = au.org.intersect.samifier.domain.GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStartIndex + 1) : absoluteStopIndex;
         int bedStartIndex = gene.getStart() + startIndex - 1; // BED files are zero based (6 in the example)
         int bedStopIndex  = gene.getStart() + stopIndex - 1; // BED files are zero based (15 in the example)
-        return new PeptideSequence(peptideSequence, cigar.toString(), startIndex, bedStartIndex, bedStopIndex, gene);
+        return new au.org.intersect.samifier.domain.PeptideSequence(peptideSequence, cigar.toString(), startIndex, bedStartIndex, bedStopIndex, gene);
     }
 
     private void updateCigar(StringBuilder cigar, int size, String type, String direction)
     {
-        String marker = GeneSequence.INTRON.equals(type) ? "N" : "M";
-        if (GeneInfo.REVERSE.equals(direction))
+        String marker = au.org.intersect.samifier.domain.GeneSequence.INTRON.equals(type) ? "N" : "M";
+        if (au.org.intersect.samifier.domain.GeneInfo.REVERSE.equals(direction))
         {
             cigar.insert(0, marker);
             cigar.insert(0, size);
@@ -204,7 +205,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
         }
     }
 
-    protected List<NucleotideSequence> extractSequenceParts(File chromosomeFile, GeneInfo gene)
+    protected List<au.org.intersect.samifier.domain.NucleotideSequence> extractSequenceParts(File chromosomeFile, au.org.intersect.samifier.domain.GeneInfo gene)
             throws FileNotFoundException, IOException
     {
         if (!chromosomeFile.exists())
@@ -214,7 +215,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 
         String direction = gene.getDirection();
 
-        List<NucleotideSequence> parts = new ArrayList<NucleotideSequence>();
+        List<au.org.intersect.samifier.domain.NucleotideSequence> parts = new ArrayList<au.org.intersect.samifier.domain.NucleotideSequence>();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(chromosomeFile));
@@ -222,15 +223,15 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
             String line = reader.readLine();
 
             int readCursor = 0;
-            List<GeneSequence> locations = gene.getLocations();
-            for (GeneSequence location : locations)
+            List<au.org.intersect.samifier.domain.GeneSequence> locations = gene.getLocations();
+            for (au.org.intersect.samifier.domain.GeneSequence location : locations)
             {
                 int startIndex = location.getStart();
                 int stopIndex  = location.getStop();
 
-                if (GeneSequence.INTRON.equals(location.getSequenceType()))
+                if (au.org.intersect.samifier.domain.GeneSequence.INTRON.equals(location.getSequenceType()))
                 {
-                    parts.add(new NucleotideSequence(null, GeneSequence.INTRON, startIndex, stopIndex));
+                    parts.add(new au.org.intersect.samifier.domain.NucleotideSequence(null, au.org.intersect.samifier.domain.GeneSequence.INTRON, startIndex, stopIndex));
                     continue;
                 }
 
@@ -244,7 +245,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
                     readCursor += line.length();
                 }
 
-                // GFF (Genome) files use 1-based indices
+                // GFF (GenomeParserImpl) files use 1-based indices
                 int readStart = (startIndex - 1) % line.length();
                 int readStop  = line.length();
 
@@ -262,8 +263,8 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
                 readStop = (stopIndex - 1) % line.length();
                 sequence.append(line.substring(readStart, readStop + 1));
 
-                String sequenceString = GeneInfo.REVERSE.equals(direction) ? sequence.reverse().toString() : sequence.toString();
-                parts.add(new NucleotideSequence(sequenceString, GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
+                String sequenceString = au.org.intersect.samifier.domain.GeneInfo.REVERSE.equals(direction) ? sequence.reverse().toString() : sequence.toString();
+                parts.add(new au.org.intersect.samifier.domain.NucleotideSequence(sequenceString, au.org.intersect.samifier.domain.GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
             }
 
         }
@@ -275,7 +276,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
             }
         }
 
-        if (GeneInfo.REVERSE.equals(direction))
+        if (au.org.intersect.samifier.domain.GeneInfo.REVERSE.equals(direction))
         {
             Collections.reverse(parts);
         }
@@ -283,7 +284,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
         return parts;
     }
 
-    private File getChromosomeFile(GeneInfo gene) {
+    private File getChromosomeFile(au.org.intersect.samifier.domain.GeneInfo gene) {
         // TODO: find the different chrormosome file extensions
         return new File(chromosomeDirectory, gene.getChromosome() + ".fa");
     }

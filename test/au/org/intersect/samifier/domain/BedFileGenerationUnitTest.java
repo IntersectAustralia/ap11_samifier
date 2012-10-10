@@ -1,17 +1,9 @@
-package au.org.intersect.samifier.outputter;
+package au.org.intersect.samifier.domain;
 
 
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
-import au.org.intersect.samifier.GeneInfo;
-import au.org.intersect.samifier.PeptideSequence;
-import au.org.intersect.samifier.Samifier;
 import org.junit.Test;
-import org.junit.After;
-import org.junit.Before;
-
-import java.io.File;
 
 
 public class BedFileGenerationUnitTest

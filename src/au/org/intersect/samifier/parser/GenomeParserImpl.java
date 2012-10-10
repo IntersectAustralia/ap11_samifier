@@ -1,4 +1,7 @@
-package au.org.intersect.samifier;
+package au.org.intersect.samifier.parser;
+
+import au.org.intersect.samifier.domain.GeneInfo;
+import au.org.intersect.samifier.domain.Genome;
 
 import java.io.*;
 import java.util.HashMap;
@@ -7,24 +10,36 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Genome
+public class GenomeParserImpl implements GenomeParser
 {
-    private Map<String, GeneInfo> genes;
 
-    public Genome()
+    public GenomeParserImpl()
     {
-        genes = new HashMap<String, GeneInfo>();
+
     }
 
-    public static Genome parse(File genomeFile)
-        throws GenomeFileParsingException, FileNotFoundException, IOException
+    public Genome parseGenomeFile(File genomeFile)
+        throws GenomeFileParsingException
     {
+        try
+        {
+            return doParsing(genomeFile);
+        }
+        catch (IOException e)
+        {
+            throw new GenomeFileParsingException(e.getMessage());
+        }
+
+    }
+
+    private Genome doParsing(File genomeFile) throws IOException {
         Genome genome = new Genome();
+
         BufferedReader reader = null;
         int lineNumber = 0;
         try{
             reader = new BufferedReader(new FileReader(genomeFile));
-            
+
             String line;
             while ((line = reader.readLine()) != null)
             {
@@ -45,7 +60,7 @@ public class Genome
                 {
                     continue;
                 }
-                Matcher typeMatcher = GeneSequence.SEQUENCE_RE.matcher(type);
+                Matcher typeMatcher = au.org.intersect.samifier.domain.GeneSequence.SEQUENCE_RE.matcher(type);
                 if (typeMatcher.matches())
                 {
                     processSequence(parts, genome);
@@ -62,41 +77,7 @@ public class Genome
         return genome;
     }
 
-    public void addGene(String orderedLocusName, GeneInfo gene)
-    {
-        genes.put(orderedLocusName, gene);
-    }
-
-    public boolean hasGene(String orderedLocusName)
-    {
-        return genes.containsKey(orderedLocusName);
-    }
-
-    public GeneInfo getGene(String orderedLocusName)
-    {
-        return genes.get(orderedLocusName);
-    }
-
-    public Set<Map.Entry<String,GeneInfo>> getGenes()
-    {
-        return genes.entrySet();
-    }
-
-    public String toString()
-    {
-        StringBuffer out = new StringBuffer();
-        for (Map.Entry<String, GeneInfo> entry : genes.entrySet())
-        {
-            out.append(entry.getKey());
-            out.append(System.getProperty("line.separator"));
-            out.append("\t");
-            out.append(entry.getValue());
-            out.append(System.getProperty("line.separator"));
-        }
-        return out.toString();
-    }
-
-    private static void processSequence(String[] parts, Genome genome)
+    private void processSequence(String[] parts, Genome genome)
     {
         String chromosome = parts[0];
         String type = parts[2];
@@ -104,7 +85,7 @@ public class Genome
         int start = Integer.parseInt(parts[3]);
         int stop = Integer.parseInt(parts[4]);
         String direction = parts[6];
-        GeneInfo gene;
+        au.org.intersect.samifier.domain.GeneInfo gene;
         if (genome.hasGene(orderedLocusName))
         {
             gene = genome.getGene(orderedLocusName);
@@ -113,7 +94,7 @@ public class Genome
                 System.err.println(orderedLocusName + " not found in genome object");
                 return;
             }
-            GeneSequence seq = new GeneSequence(type, start, stop, direction);
+            au.org.intersect.samifier.domain.GeneSequence seq = new au.org.intersect.samifier.domain.GeneSequence(type, start, stop, direction);
             gene.addLocation(seq);
         }
         else
@@ -123,7 +104,7 @@ public class Genome
         }
     }
 
-    private static String extractOrderedLocusName(String attributes)
+    private String extractOrderedLocusName(String attributes)
     {
         Pattern olnPattern = Pattern.compile(".*Name=([^_;]+)[_;].*");
         Matcher m = olnPattern.matcher(attributes);

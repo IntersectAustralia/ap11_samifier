@@ -1,9 +1,6 @@
-package au.org.intersect.samifier.outputter;
+package au.org.intersect.samifier.domain;
 
-import au.org.intersect.samifier.GeneInfo;
-import au.org.intersect.samifier.Genome;
-import au.org.intersect.samifier.PeptideSearchResult;
-import au.org.intersect.samifier.PeptideSequence;
+import au.org.intersect.samifier.parser.GenomeParserImpl;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -39,7 +36,7 @@ public class ResultsAnalyserOutputterUnitTest
 
         PeptideSequence sequence = new PeptideSequence("", "24M238N3M", 63, 0, 0, null);
 
-        au.org.intersect.samifier.outputter.ResultsAnalyserOutputter outputter = new au.org.intersect.samifier.outputter.ResultsAnalyserOutputter(result, proteinToOLNMapping, genome, sequence);
+        au.org.intersect.samifier.domain.ResultsAnalyserOutputter outputter = new au.org.intersect.samifier.domain.ResultsAnalyserOutputter(result, proteinToOLNMapping, genome, sequence);
         String expected = "KPYK1_YEAST\tYAL038W\tYAL038W\t25.95\t469\t474\t6\tchrI\t75900\t76400\t+2\t2\t75963-75986:76225-76227";
 
         assertEquals(expected, outputter.toString());
@@ -62,7 +59,7 @@ public class ResultsAnalyserOutputterUnitTest
 
         PeptideSequence sequence = new PeptideSequence("", "23M", 0, 0, 0, null);
 
-        au.org.intersect.samifier.outputter.ResultsAnalyserOutputter outputter = new au.org.intersect.samifier.outputter.ResultsAnalyserOutputter(result, proteinToOLNMapping, genome, sequence);
+        au.org.intersect.samifier.domain.ResultsAnalyserOutputter outputter = new au.org.intersect.samifier.domain.ResultsAnalyserOutputter(result, proteinToOLNMapping, genome, sequence);
         String expected = "KPYK1_YEAST\tYAL038W\tYAL038W\t25.95\t469\t474\t6\tchrI\t900\t920\t+2\t1\t900-922";
 
         assertEquals(expected, outputter.toString());

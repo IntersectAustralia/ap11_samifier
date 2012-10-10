@@ -1,6 +1,4 @@
-package au.org.intersect.samifier.outputter;
-
-import au.org.intersect.samifier.PeptideSequence;
+package au.org.intersect.samifier.domain;
 
 /**
  * Created with IntelliJ IDEA.

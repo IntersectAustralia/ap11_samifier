@@ -34,7 +34,7 @@ public class ResultsAnalyser
                 .create("m");
         Option genomeFileOpt = OptionBuilder.withArgName("genomeFile")
                 .hasArg()
-                .withDescription("Genome file in gff format")
+                .withDescription("GenomeParserImpl file in gff format")
                 .isRequired()
                 .create("g");
         Option outputFile = OptionBuilder.withArgName("outputFile")

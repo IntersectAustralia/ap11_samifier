@@ -1,4 +1,6 @@
-package au.org.intersect.samifier;
+package au.org.intersect.samifier.domain;
+
+import au.org.intersect.samifier.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,7 +97,7 @@ public class GeneInfo
 
     public List<GeneSequence> getLocations()
     {
-        Collections.sort(locations, new GeneSequenceComparator());
+        Collections.sort(locations, new au.org.intersect.samifier.domain.GeneSequenceComparator());
         return locations;
     }
 
