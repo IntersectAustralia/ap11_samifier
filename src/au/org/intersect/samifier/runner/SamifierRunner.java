@@ -137,7 +137,7 @@ public class SamifierRunner {
         output.close();
     }
 
-    private static void setFileLogger(String logFileName)
+    private void setFileLogger(String logFileName)
     {
         Logger.getRootLogger().removeAppender("stdout");
         FileAppender fa = new FileAppender();
