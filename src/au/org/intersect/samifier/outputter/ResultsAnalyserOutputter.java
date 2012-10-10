@@ -1,4 +1,9 @@
-package au.org.intersect.samifier;
+package au.org.intersect.samifier.outputter;
+
+import au.org.intersect.samifier.GeneInfo;
+import au.org.intersect.samifier.Genome;
+import au.org.intersect.samifier.PeptideSearchResult;
+import au.org.intersect.samifier.PeptideSequence;
 
 import java.util.Map;
 

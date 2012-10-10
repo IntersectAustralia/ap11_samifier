@@ -3,6 +3,7 @@ package au.org.intersect.samifier;
 import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
+import au.org.intersect.samifier.outputter.BedLineOutputter;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
 import au.org.intersect.samifier.parser.ProteinToOLNParser;
@@ -24,18 +25,6 @@ public class Samifier {
     public static final int SAM_REVERSE_FLAG = 0x10;
 
     private Samifier(){}
-
-    public static String createBEDLine(PeptideSequence peptide, String proteinName)
-    {
-        StringBuilder output = new StringBuilder();
-        output.append(peptide.getGeneInfo().getChromosome()).append("\t");
-        output.append(peptide.getGeneInfo().getStart()).append("\t");
-        output.append(peptide.getGeneInfo().getStop()).append("\t");
-        output.append(proteinName);
-        output.append(System.getProperty("line.separator"));
-
-        return output.toString();
-    }
 
 
     public static void createSAM(Genome genome, Map<String, String> proteinOLNMap, List<PeptideSearchResult> peptideSearchResults, File chromosomeDirectory, Writer output, Writer bedWriter)
@@ -61,7 +50,8 @@ public class Samifier {
             if (bedWriter != null && !foundProteins.contains(proteinName))
             {
                 foundProteins.add(proteinName);
-                bedWriter.write(createBEDLine(peptide, proteinName));
+                BedLineOutputter bedLineOutputter = new BedLineOutputter(peptide, proteinName);
+                bedWriter.write(bedLineOutputter.toString());
             }
 
             samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
