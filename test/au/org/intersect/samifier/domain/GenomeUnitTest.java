@@ -40,7 +40,7 @@ public final class GenomeUnitTest
         //GeneInfo gene = new GeneInfo()
         GenomeParserImpl genomeParser = new GenomeParserImpl();
         Genome genome = genomeParser.parseGenomeFile(genomeFile);
-        assertThat("GenomeParserImpl returns GeneInfo object for known genes", genome.getGene("YAL038W"), instanceOf(au.org.intersect.samifier.domain.GeneInfo.class));
+        assertThat("GenomeParserImpl returns GeneInfo object for known genes", genome.getGene("YAL038W"), instanceOf(GeneInfo.class));
         assertNull("GenomeParserImpl returns null for unknown genes", genome.getGene("UNKNOWN"));
     }
 }
