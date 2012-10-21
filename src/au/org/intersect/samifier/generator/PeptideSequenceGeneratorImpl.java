@@ -9,13 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 4/10/12
- * Time: 1:05 PM
- * To change this template use File | Settings | File Templates.
- */
 public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 {
     private static Logger LOG = Logger.getLogger(PeptideSequenceGeneratorImpl.class);

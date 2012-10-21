@@ -12,13 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 3/10/12
- * Time: 1:42 PM
- * To change this template use File | Settings | File Templates.
- */
 public class PeptideSearchResultsParserImplUnitTest
 {
     @Test

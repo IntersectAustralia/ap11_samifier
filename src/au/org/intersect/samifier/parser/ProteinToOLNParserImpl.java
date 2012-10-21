@@ -7,13 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 10/10/12
- * Time: 8:31 AM
- * To change this template use File | Settings | File Templates.
- */
 public class ProteinToOLNParserImpl implements ProteinToOLNParser
 {
     @Override

@@ -13,13 +13,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 4/10/12
- * Time: 1:27 PM
- * To change this template use File | Settings | File Templates.
- */
 public class PeptideSequenceGeneratorImplUnitTest
 {
     private static BigDecimal dummyBigDecimal = null;

@@ -11,13 +11,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 26/09/12
- * Time: 3:30 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ResultAnalyserUnitTest
 {
     private static final Logger LOG = Logger.getLogger(ResultsAnalyser.class);

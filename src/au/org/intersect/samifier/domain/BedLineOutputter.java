@@ -1,12 +1,5 @@
 package au.org.intersect.samifier.domain;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 10/10/12
- * Time: 9:56 AM
- * To change this template use File | Settings | File Templates.
- */
 public class BedLineOutputter
 {
     private String chromosomeName;

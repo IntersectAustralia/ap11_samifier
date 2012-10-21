@@ -5,13 +5,6 @@ import org.apache.commons.cli.*;
 
 import java.io.File;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 26/09/12
- * Time: 2:17 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ResultsAnalyser
 {
     private File searchResultsFile;

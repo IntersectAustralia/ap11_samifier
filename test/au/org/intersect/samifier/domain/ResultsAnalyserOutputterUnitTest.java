@@ -10,13 +10,6 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 4/10/12
- * Time: 9:17 AM
- * To change this template use File | Settings | File Templates.
- */
 public class ResultsAnalyserOutputterUnitTest
 {
     @Test

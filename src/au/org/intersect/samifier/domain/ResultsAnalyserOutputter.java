@@ -4,13 +4,6 @@ import au.org.intersect.samifier.parser.GenomeParserImpl;
 
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 4/10/12
- * Time: 9:10 AM
- * To change this template use File | Settings | File Templates.
- */
 public class ResultsAnalyserOutputter
 {
     private static final String SEPARATOR = "\t";

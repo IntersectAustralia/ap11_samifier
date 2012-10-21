@@ -24,13 +24,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 3/10/12
- * Time: 1:17 PM
- * To change this template use File | Settings | File Templates.
- */
 public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParser
 {
 

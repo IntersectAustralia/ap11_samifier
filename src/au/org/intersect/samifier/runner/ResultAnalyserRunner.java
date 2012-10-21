@@ -14,13 +14,6 @@ import java.io.FileWriter;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA.
- * User: diego
- * Date: 26/09/12
- * Time: 2:17 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ResultAnalyserRunner
 {
     private File searchResultsFile;
