@@ -1,13 +1,12 @@
 package au.org.intersect.samifier.runner;
 
 import au.org.intersect.samifier.domain.Genome;
-import au.org.intersect.samifier.parser.*;
-import au.org.intersect.samifier.parser.GenomeParserImpl;
 import au.org.intersect.samifier.domain.PeptideSearchResult;
 import au.org.intersect.samifier.domain.PeptideSequence;
+import au.org.intersect.samifier.domain.ResultsAnalyserOutputter;
 import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
-import au.org.intersect.samifier.domain.ResultsAnalyserOutputter;
+import au.org.intersect.samifier.parser.*;
 
 import java.io.File;
 import java.io.FileWriter;

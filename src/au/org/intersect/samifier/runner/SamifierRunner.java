@@ -5,12 +5,13 @@ import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
 import au.org.intersect.samifier.parser.*;
-
-import java.io.*;
-import java.util.*;
-
-import au.org.intersect.samifier.parser.GenomeParserImpl;
 import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.*;
 
 public class SamifierRunner {
 

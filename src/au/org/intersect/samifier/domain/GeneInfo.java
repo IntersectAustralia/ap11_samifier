@@ -1,6 +1,6 @@
 package au.org.intersect.samifier.domain;
 
-import au.org.intersect.samifier.*;
+import au.org.intersect.samifier.Samifier;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -2,12 +2,12 @@ package au.org.intersect.samifier;
 
 import au.org.intersect.samifier.runner.SamifierRunner;
 import org.apache.commons.cli.*;
-import java.io.*;
-
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+
+import java.io.File;
 
 public class Samifier
 {

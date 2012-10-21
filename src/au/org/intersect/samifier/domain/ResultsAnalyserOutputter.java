@@ -1,7 +1,5 @@
 package au.org.intersect.samifier.domain;
 
-import au.org.intersect.samifier.parser.GenomeParserImpl;
-
 import java.util.Map;
 
 public class ResultsAnalyserOutputter
