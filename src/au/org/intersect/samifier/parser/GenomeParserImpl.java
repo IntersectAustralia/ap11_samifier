@@ -22,6 +22,9 @@ public class GenomeParserImpl implements GenomeParser
     public static final int STOP_PART = 4;
     public static final int STRAND_PART = 6;
 
+    private String genomeFileName;
+    private int lineNumber = 0;
+
     public GenomeParserImpl()
     {
 
@@ -32,6 +35,7 @@ public class GenomeParserImpl implements GenomeParser
     {
         try
         {
+            genomeFileName = genomeFile.getAbsolutePath();
             return doParsing(genomeFile);
         }
         catch (IOException e)
@@ -41,11 +45,10 @@ public class GenomeParserImpl implements GenomeParser
 
     }
 
-    private Genome doParsing(File genomeFile) throws IOException {
+    private Genome doParsing(File genomeFile) throws IOException, GenomeFileParsingException {
         Genome genome = new Genome();
 
         BufferedReader reader = null;
-        int lineNumber = 0;
         try{
             reader = new BufferedReader(new FileReader(genomeFile));
 
@@ -86,13 +89,25 @@ public class GenomeParserImpl implements GenomeParser
         return genome;
     }
 
-    private void processSequence(String[] parts, Genome genome)
-    {
+    private void processSequence(String[] parts, Genome genome) throws GenomeFileParsingException {
         String chromosome = parts[CHROMOSOME_PART];
         String type = parts[TYPE_PART];
         String orderedLocusName = extractOrderedLocusName(parts[ATTRIBUTES_PART]);
         int start = Integer.parseInt(parts[START_PART]);
         int stop = Integer.parseInt(parts[STOP_PART]);
+
+        if (start > stop)
+        {
+            StringBuffer errorMessage = new StringBuffer();
+            errorMessage.append("Error in the genome file: " + genomeFileName);
+            errorMessage.append(" line " + lineNumber);
+            errorMessage.append(". Ordered Locus Name: " + orderedLocusName);
+            errorMessage.append(". Start position: " + start);
+            errorMessage.append(". Stop position: " + stop);
+            errorMessage.append(".\nStart position later than end position");
+            throw new GenomeFileParsingException(errorMessage.toString());
+        }
+
         String direction = parts[STRAND_PART];
         GeneInfo gene;
         if (genome.hasGene(orderedLocusName))
