@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 import java.io.File;
+import java.math.BigDecimal;
 
 public class Samifier
 {
@@ -52,6 +53,12 @@ public class Samifier
                                           .isRequired(false)
                                           .withDescription("Filename to write IGV regions of interest (BED) file to")
                                           .create("b");
+        Option score = OptionBuilder.withArgName("Confidence Score thresold")
+                                          .hasArg()
+                                          .withType(Number.class)
+                                          .isRequired(false)
+                                          .withDescription("Minimum confidence score for peptides to be included")
+                                          .create("s");
 
         Options options = new Options();
         options.addOption(resultsFile);
@@ -61,6 +68,7 @@ public class Samifier
         options.addOption(logFile);
         options.addOption(outputFile);
         options.addOption(bedFile);
+        options.addOption(score);
 
         CommandLineParser parser = new GnuParser();
         try {
@@ -72,13 +80,19 @@ public class Samifier
             File outfile = new File(line.getOptionValue("o"));
             String logFileName = line.getOptionValue("l");
             String bedfilePath = line.getOptionValue("b");
+            String confidenceScoreOption = line.getOptionValue("s");
+            BigDecimal confidenScore = null;
+            if (confidenceScoreOption != null)
+            {
+                confidenScore = new BigDecimal(confidenceScoreOption);
+            }
 
             if (logFileName != null)
             {
                 setFileLogger(logFileName);
             }
 
-            SamifierRunner samifier = new SamifierRunner(searchResultsPaths, genomeFile, mapFile, chromosomeDir, outfile, bedfilePath);
+            SamifierRunner samifier = new SamifierRunner(searchResultsPaths, genomeFile, mapFile, chromosomeDir, outfile, bedfilePath, confidenScore);
             samifier.run();
 
         }

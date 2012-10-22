@@ -1,6 +1,8 @@
 package au.org.intersect.samifier.runner;
 
 import au.org.intersect.samifier.domain.*;
+import au.org.intersect.samifier.filter.ConfidenceScoreFilter;
+import au.org.intersect.samifier.filter.PeptideSearchResultFilter;
 import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
@@ -11,6 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.util.*;
 
 public class SamifierRunner {
@@ -24,11 +27,13 @@ public class SamifierRunner {
     private File chromosomeDir;
     private File outfile;
     private String bedfilePath;
+    private BigDecimal confidenceScore;
 
     private Genome genome;
     private Map<String,String> proteinToOLNMap;
 
-    public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath)
+
+    public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath, BigDecimal confidenceScore)
     {
         this.searchResultsPaths = searchResultsPaths;
         this.genomeFile = genomeFile;
@@ -36,6 +41,7 @@ public class SamifierRunner {
         this.chromosomeDir = chromosomeDir;
         this.outfile = outfile;
         this.bedfilePath = bedfilePath;
+        this.confidenceScore = confidenceScore;
     }
 
     public void run() throws Exception
@@ -86,8 +92,19 @@ public class SamifierRunner {
         PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
         Set<String> foundProteins = new HashSet<String>();
 
+        PeptideSearchResultFilter peptideFilter = null;
+        if (confidenceScore != null)
+        {
+            peptideFilter = new ConfidenceScoreFilter(confidenceScore);
+        }
+
         for (PeptideSearchResult result : peptideSearchResults)
         {
+            if (peptideFilter != null && !peptideFilter.accepts(result))
+            {
+                continue;
+            }
+
             PeptideSequence peptide = sequenceGenerator.getPeptideSequence(result);
             if (peptide == null)
             {
