@@ -37,6 +37,31 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
     }
 
     @Override
+    public List<PeptideSearchResult> parseResults(String[] searchResultsPaths) throws MascotParsingException
+    {
+        List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
+        List<File> searchResultFiles = new ArrayList<File>();
+        for (String searchResultsPath : searchResultsPaths)
+        {
+            File searchResultFile = new File(searchResultsPath);
+            if (!searchResultFile.exists())
+            {
+                System.err.println(searchResultFile + " does not exist");
+                System.exit(1);
+            }
+            searchResultFiles.add(searchResultFile);
+        }
+
+        for (File searchResultFile : searchResultFiles)
+        {
+            LOG.debug("Processing: " + searchResultFile.getAbsolutePath());
+            peptideSearchResults.addAll(parseResults(searchResultFile));
+        }
+        return peptideSearchResults;
+    }
+
+
+    @Override
     public List<PeptideSearchResult> parseResults(File searchResultFile) throws MascotParsingException
     {
         try
