@@ -15,24 +15,16 @@ public class ReverseProtein
             .isRequired()
             .create("r");
 
-        Option mappingFile = OptionBuilder.withArgName("mappingFile")
-                .hasArg()
-                .withDescription("File mapping protein identifier to ordered locus name")
-                .isRequired()
-                .create("m");
-
         Options options = new Options();
         options.addOption(resultsFile);
-        options.addOption(mappingFile);
 
         CommandLineParser parser = new GnuParser();
         try
         {
             CommandLine line = parser.parse( options, args );
             String[] searchResultsPaths = line.getOptionValues("r");
-            File mapFile = new File(line.getOptionValue("m"));
 
-            ReverseProteinRunner reverseProteinRunner = new ReverseProteinRunner(searchResultsPaths, mapFile);
+            ReverseProteinRunner reverseProteinRunner = new ReverseProteinRunner(searchResultsPaths);
             reverseProteinRunner.run();
         }
         catch (ParseException pe)

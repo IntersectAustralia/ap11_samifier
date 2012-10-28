@@ -9,7 +9,8 @@ public class EqualProteinOLNMap implements ProteinToOLNMap
     }
 
     @Override
-    public String getOLN(String protein) {
+    public String getOLN(String protein)
+    {
         return protein;
     }
 }
