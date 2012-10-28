@@ -30,7 +30,7 @@ public class SamifierRunner {
     private BigDecimal confidenceScore;
 
     private Genome genome;
-    private Map<String,String> proteinToOLNMap;
+    private ProteinToOLNMap proteinToOLNMap;
 
 
     public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath, BigDecimal confidenceScore)

@@ -20,12 +20,12 @@ public class ResultsAnalyserOutputter
     private String exons;
     private String exonString;
 
-    public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult, Map<String, String> proteinToOLNMap, Genome genome, PeptideSequence peptideSequence)
+    public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult, ProteinToOLNMap proteinToOLNMap, Genome genome, PeptideSequence peptideSequence)
     {
         this.proteinId = peptideSearchResult.getProteinName();
-        this.locusName = proteinToOLNMap.get(peptideSearchResult.getProteinName());
+        this.locusName = proteinToOLNMap.getOLN(peptideSearchResult.getProteinName());
         // This one needs to be confirmed
-        this.geneId = proteinToOLNMap.get(peptideSearchResult.getProteinName());
+        this.geneId = proteinToOLNMap.getOLN(peptideSearchResult.getProteinName());
         this.score = peptideSearchResult.getConfidenceScore().toString();
         this.startPosition = Integer.toString(peptideSearchResult.getPeptideStart());
         this.stopPosition = Integer.toString(peptideSearchResult.getPeptideStop());

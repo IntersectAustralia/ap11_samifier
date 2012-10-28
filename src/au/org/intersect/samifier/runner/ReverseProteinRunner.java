@@ -1,6 +1,7 @@
 package au.org.intersect.samifier.runner;
 
 import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.ProteinToOLNMap;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
 import au.org.intersect.samifier.parser.ProteinToOLNParser;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class ReverseProteinRunner
 {
     private String[] searchResultsPaths;
-    private Map<String,String> proteinToOLNMap;
+    private ProteinToOLNMap proteinToOLNMap;
     private File mapFile;
 
     public ReverseProteinRunner(String[] searchResultsPaths, File mapFile)

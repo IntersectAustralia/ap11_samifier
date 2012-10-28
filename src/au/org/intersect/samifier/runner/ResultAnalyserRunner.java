@@ -1,9 +1,6 @@
 package au.org.intersect.samifier.runner;
 
-import au.org.intersect.samifier.domain.Genome;
-import au.org.intersect.samifier.domain.PeptideSearchResult;
-import au.org.intersect.samifier.domain.PeptideSequence;
-import au.org.intersect.samifier.domain.ResultsAnalyserOutputter;
+import au.org.intersect.samifier.domain.*;
 import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
 import au.org.intersect.samifier.parser.*;
@@ -36,7 +33,7 @@ public class ResultAnalyserRunner
         Genome genome = genomeParser.parseGenomeFile(genomeFile);
 
         ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
-        Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(proteinToOLNMapFile);
+        ProteinToOLNMap proteinToOLNMap = proteinToOLNParser.parseMappingFile(proteinToOLNMapFile);
 
         PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
         List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsFile);
