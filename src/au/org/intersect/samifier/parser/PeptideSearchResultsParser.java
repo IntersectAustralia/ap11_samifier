@@ -8,4 +8,7 @@ import java.util.List;
 public interface PeptideSearchResultsParser
 {
     List<PeptideSearchResult> parseResults(File searchResultFile) throws MascotParsingException;
+
+    List<PeptideSearchResult> parseResults(String[] searchResultFiles) throws MascotParsingException;
+
 }

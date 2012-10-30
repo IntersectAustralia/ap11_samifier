@@ -1,6 +1,7 @@
 package au.org.intersect.samifier.parser;
 
 import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.ProteinToOLNMap;
 import org.junit.Test;
 
 import java.io.File;
@@ -22,7 +23,7 @@ public class PeptideSearchResultsParserImplUnitTest
         File mapFile = new File("test/resources/test_accession.txt");
         try {
             ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
-            Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
+            ProteinToOLNMap proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
             PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
             List<PeptideSearchResult> list = peptideSearchResultsParser.parseResults(mascotFile);
@@ -51,7 +52,7 @@ public class PeptideSearchResultsParserImplUnitTest
         File mapFile = new File("test/resources/test_accession.txt");
         try {
             ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
-            Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
+            ProteinToOLNMap proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
             PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
             List<PeptideSearchResult> list = peptideSearchResultsParser.parseResults(mascotFile);

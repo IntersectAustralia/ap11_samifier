@@ -15,10 +15,10 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
     public static final int BASES_PER_CODON = 3;
 
     private Genome genome;
-    private Map<String, String> proteinOLNMap;
+    private ProteinToOLNMap proteinOLNMap;
     private File chromosomeDirectory;
 
-    public PeptideSequenceGeneratorImpl(Genome genome, Map<String, String> proteinOLNMap, File chromosomeDirectory)
+    public PeptideSequenceGeneratorImpl(Genome genome, ProteinToOLNMap proteinOLNMap, File chromosomeDirectory)
     {
         this.genome = genome;
         this.proteinOLNMap = proteinOLNMap;
@@ -45,7 +45,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
     public PeptideSequence getPeptideSequence(PeptideSearchResult peptideSearchResult) throws PeptideSequenceGeneratorException
     {
         String proteinName = peptideSearchResult.getProteinName();
-        String oln = proteinOLNMap.get(proteinName);
+        String oln = proteinOLNMap.getOLN(proteinName);
 
         GeneInfo gene = genome.getGene(oln);
         if (gene == null)

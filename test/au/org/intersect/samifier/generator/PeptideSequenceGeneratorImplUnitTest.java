@@ -90,8 +90,8 @@ public class PeptideSequenceGeneratorImplUnitTest
         Genome genome = new Genome();
         genome.addGene("olnDummy", gene);
 
-        Map<String, String> proteinOLNMap = new HashMap<String, String>();
-        proteinOLNMap.put("DummyProtein", "olnDummy");
+        FileBasedProteinToOLNMap proteinOLNMap = new FileBasedProteinToOLNMap();
+        proteinOLNMap.addMapping("DummyProtein", "olnDummy");
 
         PeptideSequence p = null;
         try {
@@ -121,8 +121,8 @@ public class PeptideSequenceGeneratorImplUnitTest
         Genome genome = new Genome();
         genome.addGene("olnDummy", gene);
 
-        Map<String, String> proteinOLNMap = new HashMap<String, String>();
-        proteinOLNMap.put("DummyProtein", "olnDummy");
+        FileBasedProteinToOLNMap proteinOLNMap = new FileBasedProteinToOLNMap();
+        proteinOLNMap.addMapping("DummyProtein", "olnDummy");
 
         PeptideSequence p = null;
         try {
@@ -153,8 +153,8 @@ public class PeptideSequenceGeneratorImplUnitTest
         Genome genome = new Genome();
         genome.addGene("olnDummy", gene);
 
-        Map<String, String> proteinOLNMap = new HashMap<String, String>();
-        proteinOLNMap.put("DummyProtein", "olnDummy");
+        FileBasedProteinToOLNMap proteinOLNMap = new FileBasedProteinToOLNMap();
+        proteinOLNMap.addMapping("DummyProtein", "olnDummy");
 
         PeptideSequence p = null;
         try {

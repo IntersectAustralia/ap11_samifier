@@ -30,7 +30,7 @@ public class SamifierRunner {
     private BigDecimal confidenceScore;
 
     private Genome genome;
-    private Map<String,String> proteinToOLNMap;
+    private ProteinToOLNMap proteinToOLNMap;
 
 
     public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath, BigDecimal confidenceScore)
@@ -53,25 +53,7 @@ public class SamifierRunner {
         proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
 
         PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
-
-        List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
-        List<File> searchResultFiles = new ArrayList<File>();
-        for (String searchResultsPath : searchResultsPaths)
-        {
-            File searchResultFile = new File(searchResultsPath);
-            if (!searchResultFile.exists())
-            {
-                System.err.println(searchResultFile + " does not exist");
-                System.exit(1);
-            }
-            searchResultFiles.add(searchResultFile);
-        }
-
-        for (File searchResultFile : searchResultFiles)
-        {
-            LOG.debug("Processing: " + searchResultFile.getAbsolutePath());
-            peptideSearchResults.addAll(peptideSearchResultsParser.parseResults(searchResultFile));
-        }
+        List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsPaths);
 
         FileWriter bedWriter = null;
         if (bedfilePath != null)

@@ -24,8 +24,8 @@ public class ResultsAnalyserOutputterUnitTest
         genome.addGene("YAL038W", geneInfo);
 
         PeptideSearchResult result = new PeptideSearchResult("q21_p1", "EFGILK", "KPYK1_YEAST", 469, 474 , new BigDecimal("25.95"));
-        Map<String, String> proteinToOLNMapping = new HashMap<String, String>();
-        proteinToOLNMapping.put("KPYK1_YEAST", "YAL038W");
+        FileBasedProteinToOLNMap proteinToOLNMapping = new FileBasedProteinToOLNMap();
+        proteinToOLNMapping.addMapping("KPYK1_YEAST", "YAL038W");
 
         PeptideSequence sequence = new PeptideSequence("", "24M238N3M", 63, 0, 0, null);
 
@@ -47,8 +47,8 @@ public class ResultsAnalyserOutputterUnitTest
         genome.addGene("YAL038W", geneInfo);
 
         PeptideSearchResult result = new PeptideSearchResult("q21_p1", "EFGILK", "KPYK1_YEAST", 469, 474 , new BigDecimal("25.95"));
-        Map<String, String> proteinToOLNMapping = new HashMap<String, String>();
-        proteinToOLNMapping.put("KPYK1_YEAST", "YAL038W");
+        FileBasedProteinToOLNMap proteinToOLNMapping = new FileBasedProteinToOLNMap();
+        proteinToOLNMapping.addMapping("KPYK1_YEAST", "YAL038W");
 
         PeptideSequence sequence = new PeptideSequence("", "23M", 0, 0, 0, null);
 

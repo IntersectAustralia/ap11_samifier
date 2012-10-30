@@ -1,6 +1,7 @@
 package au.org.intersect.samifier.parser;
 
 import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.ProteinToOLNMap;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,12 +30,37 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
 
     private static Logger LOG = Logger.getLogger(PeptideSearchResultsParserImpl.class);
 
-    private Map<String, String> proteinToOLNMapping;
+    private ProteinToOLNMap proteinToOLNMapping;
 
-    public PeptideSearchResultsParserImpl(Map<String,String> proteinToOLNMapping)
+    public PeptideSearchResultsParserImpl(ProteinToOLNMap proteinToOLNMapping)
     {
         this.proteinToOLNMapping = proteinToOLNMapping;
     }
+
+    @Override
+    public List<PeptideSearchResult> parseResults(String[] searchResultsPaths) throws MascotParsingException
+    {
+        List<PeptideSearchResult> peptideSearchResults = new ArrayList<PeptideSearchResult>();
+        List<File> searchResultFiles = new ArrayList<File>();
+        for (String searchResultsPath : searchResultsPaths)
+        {
+            File searchResultFile = new File(searchResultsPath);
+            if (!searchResultFile.exists())
+            {
+                System.err.println(searchResultFile + " does not exist");
+                System.exit(1);
+            }
+            searchResultFiles.add(searchResultFile);
+        }
+
+        for (File searchResultFile : searchResultFiles)
+        {
+            LOG.debug("Processing: " + searchResultFile.getAbsolutePath());
+            peptideSearchResults.addAll(parseResults(searchResultFile));
+        }
+        return peptideSearchResults;
+    }
+
 
     @Override
     public List<PeptideSearchResult> parseResults(File searchResultFile) throws MascotParsingException
@@ -172,7 +198,7 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
                     String dbSequenceXpath = "//mzidentml:DBSequence[@id='" + dbSequenceRef + "']";
                     Node dbSequence = (Node)xPath.evaluate(dbSequenceXpath, root, nodeType);
                     String protein = dbSequence.getAttributes().getNamedItem("accession").getNodeValue();
-                    if (!proteinToOLNMapping.containsKey(protein))
+                    if (!proteinToOLNMapping.containsProtein(protein))
                     {
                         LOG.info(protein + " not found in given accession mapping file");
                         continue;
@@ -224,7 +250,7 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
                 if (proteinPartMatcher.matches())
                 {
                     String protein = proteinPartMatcher.group(1);
-                    if (!proteinToOLNMapping.containsKey(protein))
+                    if (!proteinToOLNMapping.containsProtein(protein))
                     {
                         LOG.info("Protein ID not found in accession file");
                         LOG.info("ERR_ACC: " + protein);
