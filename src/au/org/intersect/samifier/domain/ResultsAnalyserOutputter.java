@@ -5,6 +5,8 @@ import java.util.Map;
 public class ResultsAnalyserOutputter
 {
     private static final String SEPARATOR = "\t";
+    private static final String TABLENAME = "Result";
+    private static final String DELIMITER = ",";
 
     private String proteinId;
     private String locusName;
@@ -111,5 +113,32 @@ public class ResultsAnalyserOutputter
         output.append(exons + SEPARATOR);
         output.append(exonString);
         return output.toString();
+    }
+    
+    public String toQuery()
+    {
+    	StringBuffer output = new StringBuffer();
+    	output.append("INSERT INTO " + TABLENAME + " (");
+    	output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,frame,exons,exonString) ");
+    	output.append("VALUES (");
+    	output.append(formColumnQuery(proteinId) + DELIMITER);
+    	output.append(formColumnQuery(locusName) + DELIMITER);
+    	output.append(formColumnQuery(geneId) + DELIMITER);
+    	output.append(formColumnQuery(score) + DELIMITER);
+    	output.append(formColumnQuery(startPosition) + DELIMITER);
+        output.append(formColumnQuery(stopPosition) + DELIMITER);
+        output.append(formColumnQuery(lengthInAminoacids) + DELIMITER);
+        output.append(formColumnQuery(chromosomeId) + DELIMITER);
+        output.append(formColumnQuery(geneStart) + DELIMITER);
+        output.append(formColumnQuery(geneEnd) + DELIMITER);
+        output.append(formColumnQuery(frame) + DELIMITER);
+        output.append(formColumnQuery(exons) + DELIMITER);
+        output.append(formColumnQuery(exonString) + ");");
+    	return output.toString();
+    }
+    
+    private String formColumnQuery(String field)
+    {
+    	return "'" + field + "'";
     }
 }
