@@ -7,6 +7,7 @@ public class GenomeNucleotides
 {
     private File geneFile;
     private StringBuffer genomeNucleotides = new StringBuffer();
+    private int size;
 
     public GenomeNucleotides(File geneFile) throws IOException
     {
@@ -48,5 +49,8 @@ public class GenomeNucleotides
     }
 
 
-
+    public int getSize()
+    {
+        return genomeNucleotides.length();
+    }
 }
