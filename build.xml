@@ -93,6 +93,35 @@
                 value="au.org.intersect.samifier.ResultsAnalyser"/>
           </manifest>
       </jar>
+
+        <jar destfile="${dist}/nucleotide_to_amino_acid.jar"
+             basedir="${build.classes.dir}"
+             includes="**/*Translation*.class,**/UnknownCodonException.class">
+            <zipgroupfileset dir="${lib.dir}" includes="**/*.jar" excludes="junit*"/>
+            <fileset dir=".">
+                <include name="LICENSE"/>
+            </fileset>
+
+            <manifest>
+                <attribute name="Main-Class"
+                           value="au.org.intersect.samifier.domain.CodonTranslationTable"/>
+            </manifest>
+        </jar>
+
+        <jar destfile="${dist}/protein_generator.jar"
+             basedir="${build.classes.dir}"
+             excludes="**/Test.class" >
+            <zipgroupfileset dir="${lib.dir}" includes="**/*.jar" excludes="junit*"/>
+            <fileset dir=".">
+                <include name="LICENSE"/>
+            </fileset>
+
+            <manifest>
+                <attribute name="Main-Class"
+                           value="au.org.intersect.samifier.ProteinGenerator"/>
+            </manifest>
+        </jar>
+
     </target>
 
     <target name="clean"
