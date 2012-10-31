@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
-public class ProteingLocationFileGenerator
+public class ProteinLocationFileGenerator
 {
     public static void generateFile(List<ProteinLocation> locations, Writer fileWriter, ProteinLocationBasedOutputterGenerator outputterGenerator)
             throws IOException

@@ -1,34 +1,66 @@
-package au.org.intersect.samifier.runner;
+package au.org.intersect.samifier.generator;
 
 import au.org.intersect.samifier.Samifier;
 import au.org.intersect.samifier.domain.*;
 import au.org.intersect.samifier.parser.*;
+import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ReverseProteinRunner
+public class VirtualProteinMascotLocationGenerator implements LocationGenerator
 {
-    private String[] searchResultsPaths;
+    private static Logger LOG = Logger.getLogger(VirtualProteinMascotLocationGenerator.class);
+
     private File genomeFile;
     private File translationTableFile;
     private File chromosomeDir;
-    private File outputFile;
-    private Genome genome;
+    private String[] searchResultsPaths;
 
+    private Genome genome;
     private ProteinToOLNMap proteinToOLNMap;
 
-    public ReverseProteinRunner(String[] searchResultsPaths, File translationTableFile, File genomeFile, File chromosomeDir, File outputFile)
+    public VirtualProteinMascotLocationGenerator(String[] searchResultsPaths, File translationTableFile, File genomeFile, File chromosomeDir)
     {
         this.searchResultsPaths = searchResultsPaths;
         this.genomeFile = genomeFile;
         this.chromosomeDir = chromosomeDir;
         this.translationTableFile = translationTableFile;
-        this.outputFile = outputFile;
     }
 
-    public void run() throws Exception
+    @Override
+    public List<ProteinLocation> generateLocations() throws LocationGeneratorException
     {
+        try
+        {
+            return doGenerateLocations();
+        }
+        catch (TranslationTableParsingException e)
+        {
+            throw new LocationGeneratorException("Error parsing translation table file", e);
+        }
+        catch (MascotParsingException e)
+        {
+            throw new LocationGeneratorException("Error parsing mascot file", e);
+        }
+        catch (GenomeFileParsingException e)
+        {
+            throw new LocationGeneratorException("Error parsing genome file", e);
+        }
+        catch (IOException e)
+        {
+            throw new LocationGeneratorException("Error parsing genome file", e);
+        }
+
+    }
+
+    public List<ProteinLocation> doGenerateLocations()
+            throws GenomeFileParsingException, MascotParsingException, IOException, TranslationTableParsingException
+    {
+        List<ProteinLocation> proteinLocations = new ArrayList<ProteinLocation>();
+
         GenomeParserImpl genomeParser = new GenomeParserImpl();
         genome = genomeParser.parseGenomeFile(genomeFile);
 
@@ -62,9 +94,9 @@ public class ReverseProteinRunner
                 proteinEnd += incrementStopPosition(geneInfo.getDirectionFlag());
             }
 
-            ProteinLocation proteinLocation = new ProteinLocation("", proteinStart, proteinEnd, geneInfo.getDirection(), "", peptideSearchResult.getConfidenceScore());
-            GffOutputter gffOutputter = new GffOutputter(proteinLocation, "");
+            proteinLocations.add(new ProteinLocation("?", proteinStart, proteinEnd, geneInfo.getDirection(), "?", peptideSearchResult.getConfidenceScore()));
         }
+        return proteinLocations;
     }
 
     private int incrementStartPosition(int directionFlag)

@@ -3,11 +3,12 @@ package au.org.intersect.samifier.runner;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class ReverseProteinRunnerUnitTest
+public class VirtualProteinMergerRunnerUnitTest
 {
     @Test
     public void testReverseProteinRunner()
@@ -19,13 +20,11 @@ public class ReverseProteinRunnerUnitTest
             File chromosomeDir = new File("test/resources/merger/");
             File translationTableFile = new File("test/resources/merger/bacterial_translation_table.txt");
 
-            File resultAnalysisFile = File.createTempFile("out", "txt");
-            resultAnalysisFile.deleteOnExit();
+            StringWriter out = new StringWriter();
 
-            ReverseProteinRunner analyser = new ReverseProteinRunner(mascotFiles, translationTableFile, genomeFile, chromosomeDir, null);
-
+            VirtualProteinMergerRunner analyser = new VirtualProteinMergerRunner(mascotFiles, translationTableFile, genomeFile, chromosomeDir, out);
             analyser.run();
-
+            System.out.println(out.toString());
         }
         catch(Exception e)
         {

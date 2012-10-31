@@ -4,7 +4,7 @@ import au.org.intersect.samifier.domain.*;
 import au.org.intersect.samifier.generator.CodonsPerIntervalLocationGenerator;
 import au.org.intersect.samifier.generator.GlimmerFileLocationGenerator;
 import au.org.intersect.samifier.generator.LocationGenerator;
-import au.org.intersect.samifier.util.ProteingLocationFileGenerator;
+import au.org.intersect.samifier.util.ProteinLocationFileGenerator;
 
 import java.io.*;
 import java.util.List;
@@ -63,13 +63,13 @@ public class ProteinGeneratorRunner
     {
         String genomeFileName = genomeFile.getName();
         GffOutputterGenerator outputterGenerator = new GffOutputterGenerator(genomeFileName);
-        ProteingLocationFileGenerator.generateFile(locations, gffWriter, outputterGenerator);
+        ProteinLocationFileGenerator.generateFile(locations, gffWriter, outputterGenerator);
     }
 
     private void generateAccessionFile(List<ProteinLocation> locations) throws IOException
     {
         AccessionOutputterGenerator outputterGenerator = new AccessionOutputterGenerator();
-        ProteingLocationFileGenerator.generateFile(locations, accessionWriter, outputterGenerator);
+        ProteinLocationFileGenerator.generateFile(locations, accessionWriter, outputterGenerator);
     }
 
     public void generateProteinsFile(List<ProteinLocation> locations, CodonTranslationTable table)
@@ -77,7 +77,7 @@ public class ProteinGeneratorRunner
     {
         StringBuilder genomeString = readGenomeFile(genomeFile);
         ProteinOutputterGenerator outputterGenerator = new ProteinOutputterGenerator(databaseName, genomeString, table);
-        ProteingLocationFileGenerator.generateFile(locations, outputWriter, outputterGenerator);
+        ProteinLocationFileGenerator.generateFile(locations, outputWriter, outputterGenerator);
     }
 
     private StringBuilder readGenomeFile(File genomeFile)
