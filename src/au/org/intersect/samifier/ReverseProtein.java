@@ -15,16 +15,25 @@ public class ReverseProtein
             .isRequired()
             .create("r");
 
+        Option translationTableOpt =
+                OptionBuilder.withArgName("Translation Table File")
+                        .hasArg()
+                        .withDescription("File containing a mapping of codons to amino acids, in the format used by NCBI.")
+                        .create("t");
+
+
         Options options = new Options();
         options.addOption(resultsFile);
+        options.addOption(translationTableOpt);
 
         CommandLineParser parser = new GnuParser();
         try
         {
             CommandLine line = parser.parse( options, args );
             String[] searchResultsPaths = line.getOptionValues("r");
+            File translationTableFile = new File(line.getOptionValue("t"));
 
-            ReverseProteinRunner reverseProteinRunner = new ReverseProteinRunner(searchResultsPaths);
+            ReverseProteinRunner reverseProteinRunner = new ReverseProteinRunner(searchResultsPaths, translationTableFile, null, null);
             reverseProteinRunner.run();
         }
         catch (ParseException pe)
