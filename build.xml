@@ -122,6 +122,19 @@
             </manifest>
         </jar>
 
+        <jar destfile="${dist}/virtual_protein_merger.jar"
+             basedir="${build.classes.dir}"
+             excludes="**/Test.class" >
+            <zipgroupfileset dir="${lib.dir}" includes="**/*.jar" excludes="junit*"/>
+            <fileset dir=".">
+                <include name="LICENSE"/>
+            </fileset>
+
+            <manifest>
+                <attribute name="Main-Class"
+                           value="au.org.intersect.samifier.VirtualProteinMerger"/>
+            </manifest>
+        </jar>
     </target>
 
     <target name="clean"

@@ -8,7 +8,9 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class VirtualProteinMascotLocationGenerator implements LocationGenerator
 {
@@ -21,6 +23,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
 
     private Genome genome;
     private ProteinToOLNMap proteinToOLNMap;
+    private Map<String, GenomeNucleotides> genomeNucleotidesMap = new HashMap<String, GenomeNucleotides>();
 
     public VirtualProteinMascotLocationGenerator(String[] searchResultsPaths, File translationTableFile, File genomeFile, File chromosomeDir)
     {
@@ -64,7 +67,6 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
         GenomeParserImpl genomeParser = new GenomeParserImpl();
         genome = genomeParser.parseGenomeFile(genomeFile);
 
-        ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
         proteinToOLNMap = new EqualProteinOLNMap();
 
         PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
@@ -80,7 +82,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
             int peptideStop = (peptideSearchResult.getPeptideStop() - 1) * 3;
 
             File geneFile = new File(chromosomeDir, geneInfo.getChromosome() + ".faa");
-            GenomeNucleotides genomeNucleotides = new GenomeNucleotides(geneFile);
+            GenomeNucleotides genomeNucleotides = getGenomeNucleotides(geneFile);
 
             int proteinStart = virtualGeneStart + peptideStart;
             while ( !translationTable.isStartCodon(genomeNucleotides.codonAt(proteinStart)))
@@ -97,6 +99,15 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
             proteinLocations.add(new ProteinLocation("?", proteinStart, proteinEnd, geneInfo.getDirection(), "?", peptideSearchResult.getConfidenceScore()));
         }
         return proteinLocations;
+    }
+
+    private GenomeNucleotides getGenomeNucleotides(File geneFile) throws IOException
+    {
+        if (!genomeNucleotidesMap.containsKey(geneFile))
+        {
+            genomeNucleotidesMap.put(geneFile.getName(), new GenomeNucleotides(geneFile));
+        }
+        return genomeNucleotidesMap.get(geneFile.getName());
     }
 
     private int incrementStartPosition(int directionFlag)

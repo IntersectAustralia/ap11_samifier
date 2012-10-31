@@ -66,7 +66,7 @@ public class VirtualProteinMerger
         catch (ParseException pe)
         {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("reverse_protein", options, true);
+            formatter.printHelp("virtual_protein_merger", options, true);
             System.exit(1);
         }
         catch (Exception e)
