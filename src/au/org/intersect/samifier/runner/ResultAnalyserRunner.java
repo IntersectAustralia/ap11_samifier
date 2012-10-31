@@ -71,7 +71,7 @@ public class ResultAnalyserRunner
         Genome genome = genomeParser.parseGenomeFile(genomeFile);
 
         ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
-        Map<String, String> proteinToOLNMap = proteinToOLNParser.parseMappingFile(proteinToOLNMapFile);
+        ProteinToOLNMap proteinToOLNMap = proteinToOLNParser.parseMappingFile(proteinToOLNMapFile);
 
         PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
         List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsFile);
