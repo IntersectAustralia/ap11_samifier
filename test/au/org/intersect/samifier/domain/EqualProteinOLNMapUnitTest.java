@@ -1,3 +1,5 @@
+package au.org.intersect.samifier.domain;
+
 import au.org.intersect.samifier.domain.EqualProteinOLNMap;
 import org.junit.Before;
 import org.junit.Test;
