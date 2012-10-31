@@ -22,7 +22,7 @@ public class ReverseProteinRunnerUnitTest
             File resultAnalysisFile = File.createTempFile("out", "txt");
             resultAnalysisFile.deleteOnExit();
 
-            ReverseProteinRunner analyser = new ReverseProteinRunner(mascotFiles, translationTableFile, genomeFile, chromosomeDir);
+            ReverseProteinRunner analyser = new ReverseProteinRunner(mascotFiles, translationTableFile, genomeFile, chromosomeDir, null);
 
             analyser.run();
 

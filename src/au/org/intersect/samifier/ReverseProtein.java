@@ -33,7 +33,7 @@ public class ReverseProtein
             String[] searchResultsPaths = line.getOptionValues("r");
             File translationTableFile = new File(line.getOptionValue("t"));
 
-            ReverseProteinRunner reverseProteinRunner = new ReverseProteinRunner(searchResultsPaths, translationTableFile, null, null);
+            ReverseProteinRunner reverseProteinRunner = new ReverseProteinRunner(searchResultsPaths, translationTableFile, null, null, null);
             reverseProteinRunner.run();
         }
         catch (ParseException pe)
