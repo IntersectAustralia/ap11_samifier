@@ -93,5 +93,6 @@ public class ResultAnalyserRunner
         	output.write(System.getProperty("line.separator"));
         }
         output.close();    	
+        hsqldb.shutdown();
     }
 }

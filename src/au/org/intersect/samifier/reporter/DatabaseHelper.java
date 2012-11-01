@@ -2,12 +2,13 @@ package au.org.intersect.samifier.reporter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.hsqldb.server.Server;
 
 public class DatabaseHelper {
 	
@@ -16,6 +17,23 @@ public class DatabaseHelper {
 	private static final String DELIMITER = "\t";
 	
 	private static Connection connection;
+	
+	public DatabaseHelper()
+	{
+		Server hsqlServer = null;
+		try
+		{
+			hsqlServer = new Server();
+			hsqlServer.setDatabaseName(0, "ap11");
+			hsqlServer.setDatabasePath(0, "mem:ap11");
+			
+			hsqlServer.start();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 	
 	public void connect()
 	{	
