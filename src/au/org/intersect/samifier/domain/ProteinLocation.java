@@ -4,9 +4,6 @@ import java.math.BigDecimal;
 
 public class ProteinLocation
 {
-    public static final String FORWARD = "+";
-    public static final String REVERSE = "-";
-
     private String name;
     private int startIndex;
     private int length;

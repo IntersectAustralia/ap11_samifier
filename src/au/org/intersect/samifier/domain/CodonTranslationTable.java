@@ -174,21 +174,6 @@ public class CodonTranslationTable
         return parts[1].toUpperCase();
     }
 
-    public static void main(String[] args)
-    {
-        try {
-            File f = new File(args[0]);
-            CodonTranslationTable table =
-                    CodonTranslationTable.parseTableFile(f);
-            System.out.println(table.proteinToAminoAcidSequence(args[1]));
-        }
-        catch (Exception e)
-        {
-            System.err.println(e);
-            System.exit(1);
-        }
-    }
-
     public boolean isStartCodon(String codon)
     {
         return startCodonMap.keySet().contains(codon);

@@ -12,8 +12,6 @@ import java.util.List;
 public class ProteinGeneratorRunner
 {
 
-    public static final int BASES_PER_CODON = 3;
-
     private String glimmerFilePath;
     private File genomeFile;
     private String interval;

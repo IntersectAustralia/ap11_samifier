@@ -168,8 +168,10 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
             QName nodeType = XPathConstants.NODE;
 
             NodeList peptideList = (NodeList)xPath.evaluate(xPathStr, root, nodesetType);
-            for (int peptideIndex = 0 ; peptideIndex < peptideList.getLength(); peptideIndex++)
-            {
+            //for (int peptideIndex = 0 ; peptideIndex < peptideList.getLength(); peptideIndex++)
+            int added = 0;
+            for (int peptideIndex = 0 ; added < 5; peptideIndex++)
+                {
                 Node peptideNode = peptideList.item(peptideIndex);
                 String peptideId = peptideNode.getAttributes().getNamedItem("id").getNodeValue();
                 String peptideSequenceXpath = "./mzidentml:peptideSequence";
@@ -203,7 +205,10 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
                         LOG.info(protein + " not found in given accession mapping file");
                         continue;
                     }
-                    results.add(new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop), confidenceScore));
+                    PeptideSearchResult searchResult = new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop), confidenceScore);
+                    System.out.println(searchResult);
+                    results.add(searchResult);
+                    added++;
                 }
             }
         }

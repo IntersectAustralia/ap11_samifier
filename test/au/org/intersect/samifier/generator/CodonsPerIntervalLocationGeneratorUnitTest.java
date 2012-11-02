@@ -1,5 +1,6 @@
 package au.org.intersect.samifier.generator;
 
+import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.ProteinLocation;
 import org.junit.Test;
 
@@ -30,7 +31,7 @@ public class CodonsPerIntervalLocationGeneratorUnitTest
             int reverseHalf = 0;
             for (ProteinLocation loc : locations)
             {
-                if (loc.getDirection().equals(ProteinLocation.FORWARD))
+                if (loc.getDirection().equals(GenomeConstant.FORWARD_FLAG))
                 {
                     forward++;
                     if (loc.getName().matches("p\\d+b\\.\\+\\d+"))

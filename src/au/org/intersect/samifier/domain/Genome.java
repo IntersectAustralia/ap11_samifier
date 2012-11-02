@@ -1,5 +1,6 @@
 package au.org.intersect.samifier.domain;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,9 +29,19 @@ public class Genome
         return genes.get(orderedLocusName);
     }
 
-    public Set<Map.Entry<String, GeneInfo>> getGenes()
+    public Set<Map.Entry<String, GeneInfo>> getGeneEntries()
     {
         return genes.entrySet();
+    }
+
+    public Collection<GeneInfo> getGenes()
+    {
+        return genes.values();
+    }
+
+    public Set<String> getLocusNames()
+    {
+        return genes.keySet();
     }
 
     public String toString()

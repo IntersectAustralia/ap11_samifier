@@ -31,7 +31,7 @@ public class VirtualProteinMerger
 
         Option genomeFileOpt = OptionBuilder.withArgName("genomeFile")
                 .hasArg()
-                .withDescription("GenomeParserImpl file in gff format")
+                .withDescription("Genome file in gff format")
                 .isRequired()
                 .create("g");
 

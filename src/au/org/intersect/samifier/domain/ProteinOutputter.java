@@ -35,7 +35,7 @@ public class ProteinOutputter implements Outputter
         String sequence = genomeString.substring(startIndex, stopIndex);
 
         String aminoAcidSequence = null;
-        if (proteinLocation.getDirection().equals(ProteinLocation.REVERSE))
+        if (proteinLocation.getDirection().equals(GenomeConstant.REVERSE_FLAG))
         {
             StringBuilder invertedReversedSequence = new StringBuilder(invertNucleotideSequence(sequence.toString())).reverse();
             aminoAcidSequence = translationTable.proteinToAminoAcidSequence(invertedReversedSequence.toString());

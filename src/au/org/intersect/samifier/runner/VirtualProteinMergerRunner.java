@@ -1,10 +1,8 @@
 package au.org.intersect.samifier.runner;
 
-import au.org.intersect.samifier.Samifier;
 import au.org.intersect.samifier.domain.*;
 import au.org.intersect.samifier.generator.LocationGenerator;
 import au.org.intersect.samifier.generator.VirtualProteinMascotLocationGenerator;
-import au.org.intersect.samifier.parser.*;
 import au.org.intersect.samifier.util.ProteinLocationFileGenerator;
 
 import java.io.File;
