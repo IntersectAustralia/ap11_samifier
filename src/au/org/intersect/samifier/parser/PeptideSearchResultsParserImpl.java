@@ -168,9 +168,7 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
             QName nodeType = XPathConstants.NODE;
 
             NodeList peptideList = (NodeList)xPath.evaluate(xPathStr, root, nodesetType);
-            //for (int peptideIndex = 0 ; peptideIndex < peptideList.getLength(); peptideIndex++)
-            int added = 0;
-            for (int peptideIndex = 0 ; added < 5; peptideIndex++)
+            for (int peptideIndex = 0 ; peptideIndex < peptideList.getLength(); peptideIndex++)
                 {
                 Node peptideNode = peptideList.item(peptideIndex);
                 String peptideId = peptideNode.getAttributes().getNamedItem("id").getNodeValue();
@@ -208,7 +206,6 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
                     PeptideSearchResult searchResult = new PeptideSearchResult(id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(stop), confidenceScore);
                     System.out.println(searchResult);
                     results.add(searchResult);
-                    added++;
                 }
             }
         }
