@@ -6,9 +6,7 @@ import org.junit.Test;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -25,7 +23,7 @@ public class PeptideSequenceGeneratorImplUnitTest
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 71, 79, "+"));
         locations.add(new GeneSequence(GeneSequence.INTRON, 80, 141, "+"));
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 142, 213, "+"));
-        GeneInfo gene = new GeneInfo("chrI", 1, 250, GeneInfo.FORWARD, locations);
+        GeneInfo gene = new GeneInfo("chrI", 1, 250, GenomeConstant.FORWARD_FLAG, locations);
         List<NucleotideSequence> parts = null;
         try {
             PeptideSequenceGeneratorImpl sequenceGenerator = new PeptideSequenceGeneratorImpl(null, null, null);
@@ -54,7 +52,7 @@ public class PeptideSequenceGeneratorImplUnitTest
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 1, 9, "+"));
         locations.add(new GeneSequence(GeneSequence.INTRON, 10, 11, "+"));
         locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 12, 14, "+"));
-        GeneInfo gene = new GeneInfo("chrI", 1, 250, GeneInfo.FORWARD, locations);
+        GeneInfo gene = new GeneInfo("chrI", 1, 250, GenomeConstant.FORWARD_FLAG, locations);
         List<NucleotideSequence> parts = null;
         try {
             PeptideSequenceGeneratorImpl sequenceGenerator = new PeptideSequenceGeneratorImpl(null, null, null);
@@ -81,11 +79,11 @@ public class PeptideSequenceGeneratorImplUnitTest
         PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 33, 36, dummyBigDecimal);
 
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
-        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.FORWARD));
-        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.FORWARD));
-        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.FORWARD));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GenomeConstant.FORWARD_FLAG));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GenomeConstant.FORWARD_FLAG));
+        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GenomeConstant.FORWARD_FLAG));
         File chromosomeDirectory = new File("test/resources/");
-        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.FORWARD, locations);
+        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GenomeConstant.FORWARD_FLAG, locations);
 
         Genome genome = new Genome();
         genome.addGene("olnDummy", gene);
@@ -112,11 +110,11 @@ public class PeptideSequenceGeneratorImplUnitTest
     {
         PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 3, 6, dummyBigDecimal);
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
-        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.FORWARD));
-        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.FORWARD));
-        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.FORWARD));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GenomeConstant.FORWARD_FLAG));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GenomeConstant.FORWARD_FLAG));
+        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GenomeConstant.FORWARD_FLAG));
         File chromosomeDirectory = new File("test/resources/");
-        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.FORWARD, locations);
+        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GenomeConstant.FORWARD_FLAG, locations);
 
         Genome genome = new Genome();
         genome.addGene("olnDummy", gene);
@@ -144,11 +142,11 @@ public class PeptideSequenceGeneratorImplUnitTest
         PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 81, 85, dummyBigDecimal);
 
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
-        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GeneInfo.REVERSE));
-        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GeneInfo.REVERSE));
-        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GeneInfo.REVERSE));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87286, 87387, GenomeConstant.REVERSE_FLAG));
+        locations.add(new GeneSequence(GeneSequence.CODING_SEQUENCE, 87501, 87752, GenomeConstant.REVERSE_FLAG));
+        locations.add(new GeneSequence(GeneSequence.INTRON, 87388, 87500, GenomeConstant.REVERSE_FLAG));
         File chromosomeDirectory = new File("test/resources/");
-        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GeneInfo.REVERSE, locations);
+        GeneInfo gene = new GeneInfo("chrI", 87286, 87752, GenomeConstant.REVERSE_FLAG, locations);
 
         Genome genome = new Genome();
         genome.addGene("olnDummy", gene);

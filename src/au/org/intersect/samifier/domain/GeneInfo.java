@@ -14,9 +14,6 @@ public class GeneInfo
     private String direction;
     private List<GeneSequence> locations;
 
-    public static final String FORWARD = "+";
-    public static final String REVERSE = "-";
-
     public GeneInfo()
     {
         //locations = new TreeSet(new GeneSequenceComparator());
@@ -80,7 +77,7 @@ public class GeneInfo
 
     public int getDirectionFlag()
     {
-        if (GeneInfo.REVERSE.equals(getDirection()))
+        if (GenomeConstant.REVERSE_FLAG.equals(getDirection()))
         {
             return Samifier.SAM_REVERSE_FLAG;
         }
@@ -104,6 +101,11 @@ public class GeneInfo
     public String toString()
     {
         return "chromosome: "+chromosome+", start: "+start+", direction: "+direction;
+    }
+
+    public boolean isForward()
+    {
+        return GenomeConstant.FORWARD_FLAG.equals(getDirection());
     }
 }
 

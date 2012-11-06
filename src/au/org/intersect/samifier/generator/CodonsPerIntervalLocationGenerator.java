@@ -1,7 +1,7 @@
 package au.org.intersect.samifier.generator;
 
+import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.ProteinLocation;
-import au.org.intersect.samifier.runner.ProteinGeneratorRunner;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -49,7 +49,7 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator
             baseCount += StringUtils.chomp(line).length();
         }
 
-        int basesPerInterval = codonsPerInterval * ProteinGeneratorRunner.BASES_PER_CODON;
+        int basesPerInterval = codonsPerInterval * GenomeConstant.BASES_PER_CODON;
         if (basesPerInterval >= baseCount)
         {
             // TODO: log this to error file
@@ -59,7 +59,7 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator
         List<ProteinLocation> locations = new ArrayList<ProteinLocation>();
         int nameIndex = 0;
         int halfIntervalSize = basesPerInterval / 2;
-        int lastCodonStartPosition = baseCount - ProteinGeneratorRunner.BASES_PER_CODON;
+        int lastCodonStartPosition = baseCount - GenomeConstant.BASES_PER_CODON;
 
         // Forward locations
         for (int i=1; i <= baseCount; i += basesPerInterval)
@@ -119,13 +119,13 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator
             // i.e. a full codon
             if (startIndex <= 0)
             {
-                int shiftFactor = endIndex % ProteinGeneratorRunner.BASES_PER_CODON;
+                int shiftFactor = endIndex % GenomeConstant.BASES_PER_CODON;
                 startIndex = 1 + shiftFactor;
                 //endIndex += shiftFactor;
             }
             if (endIndex > baseCount)
             {
-                int leftOverBases = (baseCount - startIndex + 1) % ProteinGeneratorRunner.BASES_PER_CODON;
+                int leftOverBases = (baseCount - startIndex + 1) % GenomeConstant.BASES_PER_CODON;
                 endIndex = baseCount - leftOverBases;
             }
 
@@ -142,7 +142,7 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator
                     (subIndex+1);
             int length = endIndex - startIndex + 1;
             String frame = Integer.toString(subIndex + 1);
-            locations.add(new ProteinLocation(name, startIndex, length, isForward ? ProteinLocation.FORWARD : ProteinLocation.REVERSE, frame));
+            locations.add(new ProteinLocation(name, startIndex, length, isForward ? GenomeConstant.FORWARD_FLAG : GenomeConstant.REVERSE_FLAG, frame));
         }
     }
 

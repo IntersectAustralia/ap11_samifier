@@ -7,12 +7,10 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 {
     private static Logger LOG = Logger.getLogger(PeptideSequenceGeneratorImpl.class);
-    public static final int BASES_PER_CODON = 3;
 
     private Genome genome;
     private ProteinToOLNMap proteinOLNMap;
@@ -82,8 +80,8 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 
         // Coordinates for the peptide are 1-based, so substract 1 so it
         // can be used with a 0-based string slice.
-        int relativeStart = (peptide.getPeptideStart() - 1) * BASES_PER_CODON;
-        int relativeStop  = peptide.getPeptideStop() * BASES_PER_CODON - 1;
+        int relativeStart = (peptide.getPeptideStart() - 1) * GenomeConstant.BASES_PER_CODON;
+        int relativeStop  = peptide.getPeptideStop() * GenomeConstant.BASES_PER_CODON - 1;
 
         int absoluteStartIndex = 0;
         int absoluteStopIndex = 0;
@@ -165,7 +163,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
             readCursor = substringEnd;
         }
 
-        String peptideSequence = GeneInfo.REVERSE.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
+        String peptideSequence = GenomeConstant.REVERSE_FLAG.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
         // When direction is reverse,
         //  5           17
         // |####----#####|
@@ -175,8 +173,8 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
         //   absoluteStartIndex = 2, from 17 to 15
         //   startIndex  = (17-5 = 12) - 11 + 1 = 2 (because it is 1 based)
         //   stopIndex  = (17-5 = 12) - 2 + 1 = 11 (because it is 1 based)
-        int startIndex = GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
-        int stopIndex = GeneInfo.REVERSE.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStartIndex + 1) : absoluteStopIndex;
+        int startIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
+        int stopIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStartIndex + 1) : absoluteStopIndex;
         int bedStartIndex = gene.getStart() + startIndex - 1; // BED files are zero based (6 in the example)
         int bedStopIndex  = gene.getStart() + stopIndex - 1; // BED files are zero based (15 in the example)
         return new PeptideSequence(peptideSequence, cigar.toString(), startIndex, bedStartIndex, bedStopIndex, gene);
@@ -185,7 +183,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
     private void updateCigar(StringBuilder cigar, int size, String type, String direction)
     {
         String marker = GeneSequence.INTRON.equals(type) ? "N" : "M";
-        if (GeneInfo.REVERSE.equals(direction))
+        if (GenomeConstant.REVERSE_FLAG.equals(direction))
         {
             cigar.insert(0, marker);
             cigar.insert(0, size);
@@ -255,7 +253,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
                 readStop = (stopIndex - 1) % line.length();
                 sequence.append(line.substring(readStart, readStop + 1));
 
-                String sequenceString = GeneInfo.REVERSE.equals(direction) ? sequence.reverse().toString() : sequence.toString();
+                String sequenceString = GenomeConstant.REVERSE_FLAG.equals(direction) ? sequence.reverse().toString() : sequence.toString();
                 parts.add(new NucleotideSequence(sequenceString, GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
             }
 
@@ -268,7 +266,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
             }
         }
 
-        if (GeneInfo.REVERSE.equals(direction))
+        if (GenomeConstant.REVERSE_FLAG.equals(direction))
         {
             Collections.reverse(parts);
         }

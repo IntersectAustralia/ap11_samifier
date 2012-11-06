@@ -77,6 +77,23 @@
           </manifest>
       </jar>
 
+      <jar destfile="${dist}/codon_finder.jar"
+        basedir="${build.classes.dir}"
+        excludes="**/Test.class" >
+        <zipgroupfileset dir="${lib.dir}" includes="**/*.jar" excludes="junit*"/>
+          <fileset dir="${src.dir}/resources">
+              <include name="**/log4j.properties"/>
+          </fileset>
+          <fileset dir=".">
+              <include name="LICENSE"/>
+          </fileset>
+
+          <manifest>
+            <attribute name="Main-Class"
+                value="au.org.intersect.samifier.tool.CodonFinder"/>
+          </manifest>
+      </jar>
+
       <jar destfile="${dist}/results_analyser.jar"
         basedir="${build.classes.dir}"
         excludes="**/Test.class" >
@@ -104,7 +121,7 @@
 
             <manifest>
                 <attribute name="Main-Class"
-                           value="au.org.intersect.samifier.domain.CodonTranslationTable"/>
+                           value="au.org.intersect.samifier.tool.NucleotideToAminoacid"/>
             </manifest>
         </jar>
 

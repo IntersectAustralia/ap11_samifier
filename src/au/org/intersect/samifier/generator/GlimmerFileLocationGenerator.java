@@ -1,5 +1,6 @@
 package au.org.intersect.samifier.generator;
 
+import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.ProteinLocation;
 import au.org.intersect.samifier.domain.ProteinLocationComparator;
 import org.apache.commons.io.FileUtils;
@@ -65,13 +66,13 @@ public class GlimmerFileLocationGenerator implements LocationGenerator
 
             BigDecimal confidenceScore = new BigDecimal(columns[4]);
 
-            if (direction.equals(ProteinLocation.FORWARD))
+            if (direction.equals(GenomeConstant.FORWARD_FLAG))
             {
                 proteinLocations.add(new ProteinLocation(name, firstIndex, secondIndex - firstIndex + 1, direction, frame, confidenceScore));
             }
-            else if (direction.startsWith(ProteinLocation.REVERSE))
+            else if (direction.startsWith(GenomeConstant.REVERSE_FLAG))
             {
-                proteinLocations.add(new ProteinLocation(name, secondIndex, firstIndex - secondIndex + 1, ProteinLocation.REVERSE, frame, confidenceScore));
+                proteinLocations.add(new ProteinLocation(name, secondIndex, firstIndex - secondIndex + 1, GenomeConstant.REVERSE_FLAG, frame, confidenceScore));
             }
             else
             {
