@@ -1,21 +1,21 @@
 package au.org.intersect.samifier;
 
+import java.io.File;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import au.org.intersect.samifier.reporter.DatabaseHelper;
 import au.org.intersect.samifier.runner.ResultAnalyserRunner;
-import org.apache.commons.cli.*;
-
-import java.io.File;
-import java.sql.SQLException;
 
 public class ResultsAnalyser
-{
-    private File searchResultsFile;
-    private File genomeFile;
-    private File proteinToOLNMapFile;
-    private File outputFile;
-    private File chromosomeDir;
-    private String sqlQuery;
-    
+{    
     public static void main(String ... args)
     {
         Option resultsFile = OptionBuilder.withArgName("searchResultsFile")
@@ -68,9 +68,15 @@ public class ResultsAnalyser
 
             ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, mapFile, outfile, chromosomeDir, sqlQuery);
             
-            if (sqlQuery.isEmpty())
+            if (sqlQuery == null)
             {
             	analyser.run();	
+            }
+            else if (sqlQuery.isEmpty())
+            {
+            	DatabaseHelper db = new DatabaseHelper();
+            	db.printTableDetails(null);           	
+            	db.shutdown();
             }
             else
             {
@@ -90,6 +96,5 @@ public class ResultsAnalyser
             e.printStackTrace();
             System.exit(1);
         }
-
     }
 }

@@ -1,16 +1,23 @@
 package au.org.intersect.samifier.runner;
 
-import au.org.intersect.samifier.domain.*;
-import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
-import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
-import au.org.intersect.samifier.parser.*;
-import au.org.intersect.samifier.reporter.DatabaseHelper;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
+import au.org.intersect.samifier.domain.Genome;
+import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.PeptideSequence;
+import au.org.intersect.samifier.domain.ProteinToOLNMap;
+import au.org.intersect.samifier.domain.ResultsAnalyserOutputter;
+import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
+import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
+import au.org.intersect.samifier.parser.GenomeParserImpl;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
+import au.org.intersect.samifier.parser.ProteinToOLNParser;
+import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
+import au.org.intersect.samifier.reporter.DatabaseHelper;
 
 public class ResultAnalyserRunner
 {
@@ -56,6 +63,7 @@ public class ResultAnalyserRunner
         for (PeptideSearchResult peptideSearchResult : peptideSearchResults)
         {
             PeptideSequence peptideSequence = sequenceGenerator.getPeptideSequence(peptideSearchResult);
+            if (peptideSequence == null) continue;
             ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(peptideSearchResult, proteinToOLNMap, genome, peptideSequence);  
 
             output.write(outputter.toString());
@@ -83,7 +91,7 @@ public class ResultAnalyserRunner
         {
             PeptideSequence peptideSequence = sequenceGenerator.getPeptideSequence(peptideSearchResult);
             ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(peptideSearchResult, proteinToOLNMap, genome, peptideSequence); 
-            hsqldb.executeQuery(outputter.toQuery());
+            hsqldb.execute(outputter.toQuery());
         }
         
         Collection<String> resultSet = hsqldb.filterResult(sqlQuery.toString());

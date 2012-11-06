@@ -1,5 +1,6 @@
 package au.org.intersect.samifier.reporter;
 
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -26,12 +27,17 @@ public class DatabaseHelper {
 			hsqlServer = new Server();
 			hsqlServer.setDatabaseName(0, "ap11");
 			hsqlServer.setDatabasePath(0, "mem:ap11");
-			
+
+			hsqlServer.setSilent(true);
 			hsqlServer.start();
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+		finally
+		{
+			hsqlServer.shutdown();
 		}
 	}
 	
@@ -107,9 +113,50 @@ public class DatabaseHelper {
 		return collection;
 	}
 	
-	public synchronized void executeQuery(String expression) throws SQLException
+	public synchronized void execute(String expression) throws SQLException
 	{
 		Statement statement = connection.createStatement();
 		statement.execute(expression);
+	}
+	
+	public synchronized ResultSet executeQuery(String expression) throws SQLException
+	{
+		Statement statement = connection.createStatement();
+		return statement.executeQuery(expression);
+	}
+	
+
+	public void printMetadata(PrintStream ps) throws SQLException
+	{
+		if (ps == null)
+		{
+			ps = System.out;
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		
+		ResultSet rs = executeQuery("SELECT * FROM information_schema.system_columns WHERE table_name='RESULT'");
+		
+		boolean first = true;
+		
+		while(rs.next())
+		{
+			if (first) {
+				sb.append("\nTABLE NAME: " + rs.getString("TABLE_NAME"));
+				sb.append("\n-----------------------");
+				first = false;
+			}
+			sb.append('\n');
+			sb.append(rs.getString("COLUMN_NAME"));
+		}
+		rs.close();
+		
+		ps.println(sb.toString());
+	}
+
+	public void printTableDetails(PrintStream ps) throws SQLException {
+    	connect();
+    	generateTables();
+    	printMetadata(ps);
 	}
 }
