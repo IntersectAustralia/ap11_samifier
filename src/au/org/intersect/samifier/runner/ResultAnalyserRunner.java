@@ -18,6 +18,7 @@ import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
 import au.org.intersect.samifier.parser.ProteinToOLNParser;
 import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import au.org.intersect.samifier.reporter.DatabaseHelper;
+import au.org.intersect.samifier.reporter.ReportLister;
 
 public class ResultAnalyserRunner
 {
@@ -27,9 +28,13 @@ public class ResultAnalyserRunner
     private File outputFile;
     private File chromosomeDir;
     private String sqlQuery;
+    private String repListFile;
+    private String repId;
+    
     private static DatabaseHelper hsqldb;
     
-    public ResultAnalyserRunner(File searchResultsFile, File genomeFile, File proteinToOLNMapFile, File outputFile, File chromosomeDir, String sqlQuery) throws Exception
+    public ResultAnalyserRunner(File searchResultsFile, File genomeFile, File proteinToOLNMapFile, 
+    		File outputFile, File chromosomeDir, String sqlQuery, String repListFile, String repId) throws Exception
     {
         this.searchResultsFile = searchResultsFile;
         this.genomeFile = genomeFile;
@@ -37,6 +42,8 @@ public class ResultAnalyserRunner
         this.outputFile = outputFile;
         this.chromosomeDir = chromosomeDir;
         this.sqlQuery = sqlQuery;
+        this.repListFile = repListFile;
+        this.repId = repId;
     }
     
     public void initMemoryDb() throws Exception
@@ -93,13 +100,24 @@ public class ResultAnalyserRunner
             ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(peptideSearchResult, proteinToOLNMap, genome, peptideSequence); 
             hsqldb.execute(outputter.toQuery());
         }
+
+        Collection<String> resultSet;
+        if (!(sqlQuery == null || sqlQuery.isEmpty()))
+        {
+        	resultSet = hsqldb.filterResult(sqlQuery.toString());
+        }
+        else
+        {
+        	ReportLister reportLister = new ReportLister(repListFile);
+        	resultSet = hsqldb.filterResult(reportLister.getProperty(repId));
+        }
         
-        Collection<String> resultSet = hsqldb.filterResult(sqlQuery.toString());
         for (String set : resultSet)
         {
         	output.write(set);
         	output.write(System.getProperty("line.separator"));
         }
+        
         output.close();    	
         hsqldb.shutdown();
     }

@@ -8,6 +8,8 @@ import java.util.Collection;
 
 import org.junit.Test;
 
+import au.org.intersect.samifier.reporter.DatabaseHelper;
+
 import static org.mockito.Mockito.*;
 
 public class DatabaseHelperTest {

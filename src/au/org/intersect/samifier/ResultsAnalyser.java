@@ -47,6 +47,14 @@ public class ResultsAnalyser
                 .hasArg()
                 .withDescription("Filters the result through the use of a SQL statement to the output file")
                 .create("sql");
+        Option repListOpt = OptionBuilder.withArgName("reportList")
+        		.hasArg()
+        		.withDescription("A file containing all the pre-built SQL queries")
+        		.create("replist");
+        Option repIdOpt = OptionBuilder.withArgName("reportId")
+        		.hasArg()
+        		.withDescription("Access a built in report query")
+        		.create("rep");     
         
         Options options = new Options();
         options.addOption(resultsFile);
@@ -55,7 +63,9 @@ public class ResultsAnalyser
         options.addOption(outputFile);
         options.addOption(chrDirOpt);
         options.addOption(sqlOpt);
-        
+        options.addOption(repListOpt);
+        options.addOption(repIdOpt);
+
         CommandLineParser parser = new GnuParser();
         try {
             CommandLine line = parser.parse( options, args );
@@ -65,12 +75,19 @@ public class ResultsAnalyser
             File outfile = new File(line.getOptionValue("o"));
             File chromosomeDir = new File(line.getOptionValue("c"));
             String sqlQuery = line.getOptionValue("sql");
-
-            ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, mapFile, outfile, chromosomeDir, sqlQuery);
+            String repListFile = line.getOptionValue("replist");
+            String repId = line.getOptionValue("rep");
+            
+            ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, 
+            		mapFile, outfile, chromosomeDir, sqlQuery, repListFile, repId);
             
             if (sqlQuery == null)
             {
             	analyser.run();	
+            }
+            else if (!sqlQuery.isEmpty() && !repId.isEmpty())
+            {
+            	System.out.println("Only use either reportId or sqlQuery.");
             }
             else if (sqlQuery.isEmpty())
             {
@@ -82,7 +99,7 @@ public class ResultsAnalyser
             {
             	analyser.initMemoryDb();
             	analyser.runWithQuery();	
-            } 	     	          
+            }	     	          
         }
         catch (ParseException pe)
         {
