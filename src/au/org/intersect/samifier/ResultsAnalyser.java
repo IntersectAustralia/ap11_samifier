@@ -80,20 +80,32 @@ public class ResultsAnalyser
             
             ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, 
             		mapFile, outfile, chromosomeDir, sqlQuery, repListFile, repId);
-            
-            if (sqlQuery == null)
+
+            if (sqlQuery == null && repId == null)
             {
             	analyser.run();	
             }
-            else if (!sqlQuery.isEmpty() && (repId != null && !repId.isEmpty()))
+            else if (sqlQuery != null && (repId != null || repListFile != null))
             {
-            	System.out.println("Only use either reportId or sqlQuery.");
+            	 System.err.println("Only use either reportId or sqlQuery.");
             }
-            else if (sqlQuery.isEmpty())
+            else if (sqlQuery != null)
             {
-            	DatabaseHelper db = new DatabaseHelper();
-            	db.printTableDetails(null);           	
-            	db.shutdown();
+            	if (sqlQuery.isEmpty())
+            	{
+                	DatabaseHelper db = new DatabaseHelper();
+                	db.printTableDetails(null);           	
+                	db.shutdown();
+            	}
+            	else
+            	{
+                	analyser.initMemoryDb();
+                	analyser.runWithQuery();	
+            	}
+            }
+            else if (repId != null && repListFile == null)
+            {
+            	System.err.println("Cannot use reportId if no reportList is used.");
             }
             else
             {

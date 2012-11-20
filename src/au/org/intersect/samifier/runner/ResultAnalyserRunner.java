@@ -102,10 +102,11 @@ public class ResultAnalyserRunner
             hsqldb.execute(outputter.toQuery());
         }
 
-        Collection<String> resultSet;
-        if (!(sqlQuery == null || sqlQuery.isEmpty()))
+        Collection<String> resultSet = null;
+        if (sqlQuery != null)
         {
-        	resultSet = hsqldb.filterResult(sqlQuery.toString());
+        	if (!sqlQuery.isEmpty())
+        		resultSet = hsqldb.filterResult(sqlQuery.toString());
         }
         else
         {
