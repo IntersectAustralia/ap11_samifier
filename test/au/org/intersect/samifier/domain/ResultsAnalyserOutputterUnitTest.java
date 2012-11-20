@@ -17,11 +17,12 @@ public class ResultsAnalyserOutputterUnitTest
     {
         Genome genome = new Genome();
         GeneInfo geneInfo = new GeneInfo();
+        geneInfo.setId("YAL038W");
         geneInfo.setChromosome("chrI");
-        geneInfo.setDirection("+");
+        geneInfo.setDirection(1);
         geneInfo.setStart(75900);
         geneInfo.setStop(76400);
-        genome.addGene("YAL038W", geneInfo);
+        genome.addGene(geneInfo);
 
         PeptideSearchResult result = new PeptideSearchResult("q21_p1", "EFGILK", "KPYK1_YEAST", 469, 474 , new BigDecimal("25.95"));
         FileBasedProteinToOLNMap proteinToOLNMapping = new FileBasedProteinToOLNMap();
@@ -40,11 +41,12 @@ public class ResultsAnalyserOutputterUnitTest
     {
         Genome genome = new Genome();
         GeneInfo geneInfo = new GeneInfo();
+        geneInfo.setId("YAL038W");
         geneInfo.setChromosome("chrI");
-        geneInfo.setDirection("+");
+        geneInfo.setDirection(1);
         geneInfo.setStart(900);
         geneInfo.setStop(920);
-        genome.addGene("YAL038W", geneInfo);
+        genome.addGene(geneInfo);
 
         PeptideSearchResult result = new PeptideSearchResult("q21_p1", "EFGILK", "KPYK1_YEAST", 469, 474 , new BigDecimal("25.95"));
         FileBasedProteinToOLNMap proteinToOLNMapping = new FileBasedProteinToOLNMap();

@@ -7,6 +7,7 @@ import java.util.Set;
 
 public class Genome
 {
+
     private Map<String, GeneInfo> genes;
 
     public Genome()
@@ -14,9 +15,9 @@ public class Genome
         genes = new HashMap<String, GeneInfo>();
     }
 
-    public void addGene(String orderedLocusName, GeneInfo gene)
+    public void addGene(GeneInfo gene)
     {
-        genes.put(orderedLocusName, gene);
+        genes.put(gene.getId(), gene);
     }
 
     public boolean hasGene(String orderedLocusName)

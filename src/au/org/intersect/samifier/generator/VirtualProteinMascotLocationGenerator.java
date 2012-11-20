@@ -115,7 +115,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
                 continue;
             }
 
-            proteinLocations.add(new ProteinLocation("?", startPosition, stopPosition-startPosition, geneInfo.getDirection(), "?", peptideSearchResult.getConfidenceScore()));
+            proteinLocations.add(new ProteinLocation("?", startPosition, stopPosition-startPosition, geneInfo.getDirectionStr(), "?", peptideSearchResult.getConfidenceScore()));
         }
         return proteinLocations;
     }
@@ -124,7 +124,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
     {
         boolean reachedStart = false;
         int startIterator = proteinStart;
-        String direction = geneInfo.getDirection();
+        int direction = geneInfo.getDirection();
 
         boolean isStartCodon = translationTable.isStartCodon(genomeNucleotides.codonAt(startIterator, direction));
 
@@ -148,15 +148,15 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
     {
         boolean reachedStop = false;
         int endIterator = proteinEnd;
-        String direction = geneInfo.getDirection();
+        int direction = geneInfo.getDirection();
 
         boolean isStopCodon = translationTable.isStopCodon(genomeNucleotides.codonAt(endIterator, direction));
 
         while ( !reachedStop && !isStopCodon)
         {
-            endIterator += incrementStopPosition(geneInfo.getDirection());
+            endIterator += incrementStopPosition(direction);
             isStopCodon = translationTable.isStopCodon(genomeNucleotides.codonAt(endIterator, direction));
-            reachedStop = reachedEnd(endIterator, geneInfo.getDirection(), genomeNucleotides.getSize());
+            reachedStop = reachedEnd(endIterator, direction, genomeNucleotides.getSize());
         }
 
         if (reachedStop && !isStopCodon)
@@ -168,23 +168,23 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
         return endIterator;
     }
 
-    private boolean reachedEnd(int position, String direction, int size)
+    private boolean reachedEnd(int position, int direction, int size)
     {
-        if (GenomeConstant.REVERSE_FLAG.equals(direction))
+        if (direction == -1)
         {
             return position <= 0;
         }
         else
         {
-            return position + 3 >= size;
+            return position + GenomeConstant.BASES_PER_CODON >= size;
         }
     }
 
-    private boolean reachedStart(int position, String direction, int size)
+    private boolean reachedStart(int position, int direction, int size)
     {
-        if (GenomeConstant.REVERSE_FLAG.equals(direction))
+        if (direction == -1)
         {
-            return position + 3 >= size;
+            return position + GenomeConstant.BASES_PER_CODON >= size;
         }
         else
         {
@@ -201,14 +201,14 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
         return genomeNucleotidesMap.get(geneFile.getName());
     }
 
-    private int incrementStartPosition(String direction)
+    private int incrementStartPosition(int direction)
     {
-        return GenomeConstant.REVERSE_FLAG.equals(direction) ? GenomeConstant.BASES_PER_CODON : -GenomeConstant.BASES_PER_CODON;
+        return direction * GenomeConstant.BASES_PER_CODON;
     }
 
-    private int incrementStopPosition(String direction)
+    private int incrementStopPosition(int direction)
     {
-        return GenomeConstant.REVERSE_FLAG.equals(direction) ? -GenomeConstant.BASES_PER_CODON : GenomeConstant.BASES_PER_CODON;
+        return direction * GenomeConstant.BASES_PER_CODON;
     }
 
 }

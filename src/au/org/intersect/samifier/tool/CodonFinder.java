@@ -18,7 +18,7 @@ public class CodonFinder
         {
             File fastaFile = new File(args[0]);
             File translationTableFile = new File(args[1]);
-            String direction = args[2];
+            int direction = "+".equals(args[2]) ? 1 : -1;
             nucleotides = new GenomeNucleotides(fastaFile);
             translationTable = CodonTranslationTable.parseTableFile(translationTableFile);
 
@@ -48,7 +48,7 @@ public class CodonFinder
 
     }
 
-    private static void printCodonRange(int startCodonPosition, int endCodonPosition, String direction) throws UnknownCodonException
+    private static void printCodonRange(int startCodonPosition, int endCodonPosition, int direction) throws UnknownCodonException
     {
         for (int codonPosition = startCodonPosition; codonPosition <= endCodonPosition; codonPosition += GenomeConstant.BASES_PER_CODON)
         {
@@ -56,7 +56,7 @@ public class CodonFinder
         }
     }
 
-    private static void printCodonAt(int codonPosition, String direction) throws UnknownCodonException
+    private static void printCodonAt(int codonPosition, int direction) throws UnknownCodonException
     {
         String codon = nucleotides.codonAt(codonPosition, direction);
         System.out.print(codon);

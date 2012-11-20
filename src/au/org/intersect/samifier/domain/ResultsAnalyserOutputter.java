@@ -86,9 +86,9 @@ public class ResultsAnalyserOutputter
 
     private String getFrame(GeneInfo geneInfo)
     {
-        String direction = geneInfo.getDirection();
+        int direction = geneInfo.getDirection();
         int offset = (geneInfo.getStart() - 1) % 3;
-        return direction + Integer.toString(offset);
+        return (direction == 1 ? "+" : "-" )+ Integer.toString(offset);
     }
 
     private int numberOfExons(String cigarString)

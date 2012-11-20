@@ -9,9 +9,10 @@ import java.util.List;
 public class GeneInfo
 {
     private String chromosome;
+    private String id;
     private int start;
     private int stop;
-    private String direction;
+    private int direction;
     private List<GeneSequence> locations;
 
     public GeneInfo()
@@ -20,15 +21,16 @@ public class GeneInfo
         locations = new ArrayList<GeneSequence>();
     }
 
-    public GeneInfo(String chromosome, int start, int stop, String direction)
+    public GeneInfo(String chromosome, String id, int start, int stop, int direction)
     {
         //this(chromosome, start, direction, new TreeSet(new GeneSequenceComparator()));
-        this(chromosome, start, stop, direction, new ArrayList<GeneSequence>());
+        this(chromosome, id, start, stop, direction, new ArrayList<GeneSequence>());
     }
 
-    public GeneInfo(String chromosome, int start, int stop, String direction, List<GeneSequence> locations)
+    public GeneInfo(String chromosome, String id, int start, int stop, int direction, List<GeneSequence> locations)
     {
         setChromosome(chromosome);
+        setId(id);
         setStart(start);
         setStop(stop);
         setDirection(direction);
@@ -43,6 +45,16 @@ public class GeneInfo
     public String getChromosome()
     {
         return chromosome;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public String getId()
+    {
+        return id;
     }
 
     public void setStart(int start)
@@ -65,19 +77,19 @@ public class GeneInfo
         return stop;
     }
 
-    public void setDirection(String direction)
+    public void setDirection(int direction)
     {
         this.direction = direction;
     }
 
-    public String getDirection()
+    public int getDirection()
     {
         return direction;
     }
 
     public int getDirectionFlag()
     {
-        if (GenomeConstant.REVERSE_FLAG.equals(getDirection()))
+        if (GenomeConstant.REVERSE_FLAG.equals(getDirectionStr()))
         {
             return Samifier.SAM_REVERSE_FLAG;
         }
@@ -87,9 +99,19 @@ public class GeneInfo
         }
     }
 
+    public String getDirectionStr()
+    {
+        return getDirection() == 1 ? "+" : "-";
+    }
+
     public void addLocation(GeneSequence location)
     {
         locations.add(location);
+    }
+
+    public void setLocations(List<GeneSequence> locations)
+    {
+        this.locations = locations;
     }
 
     public List<GeneSequence> getLocations()
@@ -105,7 +127,7 @@ public class GeneInfo
 
     public boolean isForward()
     {
-        return GenomeConstant.FORWARD_FLAG.equals(getDirection());
+        return getDirection() == 1;
     }
 }
 

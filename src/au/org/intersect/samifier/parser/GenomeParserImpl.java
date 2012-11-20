@@ -15,15 +15,18 @@ import java.util.regex.Pattern;
 public class GenomeParserImpl implements GenomeParser
 {
 
-    public static final int CHROMOSOME_PART = 0;
-    public static final int TYPE_PART = 2;
-    public static final int ATTRIBUTES_PART = 8;
-    public static final int START_PART = 3;
-    public static final int STOP_PART = 4;
-    public static final int STRAND_PART = 6;
-
+    public static final Pattern GENE_RE = Pattern.compile("^(gene|gene_cassette|pseudogene|transposable_element_gene)$");
+    private static final String STRAND_FORWARD = "+";
+    private static final Pattern STRAND_RE = Pattern.compile("^([" + STRAND_FORWARD + "]|[-])$");
+    public static final String CODING_SEQUENCE = "CDS";
+    public static final String INTRON = "intron";
+    public static final Pattern SEQUENCE_RE = Pattern.compile("("+CODING_SEQUENCE+"|"+INTRON+")");
+    private static final Pattern ID_ATTRIBUTE_RE = Pattern.compile(".*Name=([^_;]+)[_;].*");
+    private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^_;]+)[_;].*");
+ 
     private String genomeFileName;
     private int lineNumber = 0;
+    private String line;
 
     public GenomeParserImpl()
     {
@@ -52,16 +55,15 @@ public class GenomeParserImpl implements GenomeParser
         try{
             reader = new BufferedReader(new FileReader(genomeFile));
 
-            String line;
             while ((line = reader.readLine()) != null)
             {
                 lineNumber++;
-                if (line.matches("^#.*$"))
+                if (line.matches("^\\s*#"))
                 {
                     continue;
                 }
                 // chromosome, source, type, start, stop, score, strand, phase, attributes
-                String[] parts = line.split("\\s+");
+                String[] parts = line.split("\\t",9);
                 if (parts.length < 9)
                 {
                     //throw new GenomeFileParsingException("Line "+lineNumber+": not in expected format");
@@ -72,10 +74,15 @@ public class GenomeParserImpl implements GenomeParser
                 {
                     continue;
                 }
-                Matcher typeMatcher = GeneSequence.SEQUENCE_RE.matcher(type);
-                if (typeMatcher.matches())
+                if (GENE_RE.matcher(type).matches())
                 {
-                    processSequence(parts, genome);
+                    GeneInfo gene = parseGene(parts);
+                    processGene(genome, gene);
+                }
+                else if (SEQUENCE_RE.matcher(type).matches())
+                {
+                    GeneSequence sequence = parseSequence(parts);
+                    processSequence(genome, parts[CHROMOSOME_PART], sequence);
                 }
             }
         }
@@ -89,53 +96,80 @@ public class GenomeParserImpl implements GenomeParser
         return genome;
     }
 
-    private void processSequence(String[] parts, Genome genome) throws GenomeFileParsingException {
-        String chromosome = parts[CHROMOSOME_PART];
-        String type = parts[TYPE_PART];
-        String orderedLocusName = extractOrderedLocusName(parts[ATTRIBUTES_PART]);
-        int start = Integer.parseInt(parts[START_PART]);
-        int stop = Integer.parseInt(parts[STOP_PART]);
-
-        if (start > stop)
-        {
-            StringBuffer errorMessage = new StringBuffer();
-            errorMessage.append("Error in the genome file: " + genomeFileName);
-            errorMessage.append(" line " + lineNumber);
-            errorMessage.append(". Ordered Locus Name: " + orderedLocusName);
-            errorMessage.append(". Start position: " + start);
-            errorMessage.append(". Stop position: " + stop);
-            errorMessage.append(".\nStart position later than end position");
-            throw new GenomeFileParsingException(errorMessage.toString());
-        }
-
-        String direction = parts[STRAND_PART];
-        GeneInfo gene;
-        if (genome.hasGene(orderedLocusName))
-        {
-            gene = genome.getGene(orderedLocusName);
-            if (gene == null)
-            {
-                System.err.println(orderedLocusName + " not found in genome object");
-                return;
-            }
-            GeneSequence seq = new GeneSequence(type, start, stop, direction);
-            gene.addLocation(seq);
-        }
-        else
-        {
-            gene = new GeneInfo(chromosome, start, stop, direction);
-            genome.addGene(orderedLocusName, gene);
-        }
+    private void throwParsingException(String message) throws GenomeFileParsingException
+    {
+        throw new GenomeFileParsingException("Error in " + genomeFileName + ":" + lineNumber + " " + line + "\n > " + message);
     }
 
-    private String extractOrderedLocusName(String attributes)
+    private int parseStrand(String direction) throws GenomeFileParsingException
     {
-        Pattern olnPattern = Pattern.compile(".*Name=([^_;]+)[_;].*");
-        Matcher m = olnPattern.matcher(attributes);
+        if (!STRAND_RE.matcher(direction).matches()) throwParsingException("Invalid strand " + direction);
+        return STRAND_FORWARD.equals(direction) ? 1 : -1;
+    }
+
+    private boolean parseSequenceType(String type) throws GenomeFileParsingException
+    {
+        return CODING_SEQUENCE.equals(type);
+    }
+
+    protected GeneInfo parseGene(String[] parts) throws GenomeFileParsingException
+    {
+        String chromosome = parts[CHROMOSOME_PART];
+        int start = Integer.parseInt(parts[START_PART]);
+        int stop = Integer.parseInt(parts[STOP_PART]);
+        String direction = parts[STRAND_PART];
+        if (start > stop) throwParsingException("Start-stop invalid");
+        return new GeneInfo(chromosome, extractId(parts[ATTRIBUTES_PART]), start, stop, parseStrand(direction));
+    } 
+
+    protected GeneSequence parseSequence(String[] parts) throws GenomeFileParsingException
+    {
+        String type = parts[TYPE_PART];
+        int start = Integer.parseInt(parts[START_PART]);
+        int stop = Integer.parseInt(parts[STOP_PART]);
+        String direction = parts[STRAND_PART];
+        if (start > stop) throwParsingException("Start-stop invalid");
+        return new GeneSequence(extractParent(parts[ATTRIBUTES_PART]), parseSequenceType(type), start, stop, parseStrand(direction));
+    }
+
+    private void processGene(Genome genome, GeneInfo gene)
+    {
+        genome.addGene(gene);
+    }
+
+    private void processSequence(Genome genome, String chromosome, GeneSequence sequence) throws GenomeFileParsingException
+    {
+        if (!genome.hasGene(sequence.getParentId()))
+        {
+            GeneInfo gene = new GeneInfo(chromosome, sequence.getParentId(), sequence.getStart(), sequence.getStop(), sequence.getDirection());
+            genome.addGene(gene);
+        }
+        GeneInfo gene = genome.getGene(sequence.getParentId());
+        if (gene.getDirection() != sequence.getDirection()) throwParsingException("A sequence in gene " + gene.getId() + " has inconsistent direction"); 
+        if (gene.getStart() > sequence.getStart()) throwParsingException("Start of sequence in gene " + gene.getId() + " overflows gene"); 
+        if (gene.getStop() < sequence.getStop()) throwParsingException("Stop of sequence in gene " + gene.getId() + " overflows gene"); 
+        genome.getGene(sequence.getParentId()).addLocation(sequence);
+    }
+
+    private String extractId(String attributes) throws GenomeFileParsingException
+    {
+        Matcher m = ID_ATTRIBUTE_RE.matcher(attributes);
         if (m.matches())
         {
             return m.group(1);
         }
-        return null;
+        throwParsingException("Attribute ID not found");
+        return null; // make compiler happy
+    }
+
+    private String extractParent(String attributes) throws GenomeFileParsingException
+    {
+        Matcher m = PARENT_ATTRIBUTE_RE.matcher(attributes);
+        if (m.matches())
+        {
+            return m.group(1);
+        }
+        throwParsingException("Attribute Parent not found");
+        return null; // make compiler happy
     }
 }

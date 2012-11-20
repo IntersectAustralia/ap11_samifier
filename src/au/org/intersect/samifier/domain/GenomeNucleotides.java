@@ -20,9 +20,9 @@ public class GenomeNucleotides
         return genomeNucleotides.charAt(position);
     }
 
-    public String codonAt(int position, String direction)
+    public String codonAt(int position, int direction)
     {
-        int increment = GenomeConstant.FORWARD_FLAG.equals(direction) ? 1 : -1;
+        int increment = direction;
 
         StringBuilder codon = new StringBuilder();
         codon.append(nucleotideAt(position));

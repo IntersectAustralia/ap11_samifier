@@ -28,7 +28,7 @@ public final class GenomeUnitTest
     {
         GenomeParserImpl genomeParser = new GenomeParserImpl();
         Genome genome = genomeParser.parseGenomeFile(genomeFile);
-        assertEquals("GenomeParserImpl has 3 genes", 3, genome.getGeneEntries().size());
+        assertEquals("GenomeParserImpl has 3 genes", 4, genome.getGeneEntries().size());
         assertTrue("GenomeParserImpl has gene YAL038W", genome.hasGene("YAL038W"));
         assertTrue("GenomeParserImpl has gene YAL038W", genome.hasGene("YDL075W"));
         assertTrue("GenomeParserImpl has gene YPL249C-A", genome.hasGene("YPL249C-A"));

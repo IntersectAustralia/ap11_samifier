@@ -1,37 +1,53 @@
 package au.org.intersect.samifier.domain;
 
+import static au.org.intersect.samifier.parser.GenomeParser.STRAND_PART;
+import static au.org.intersect.samifier.parser.GenomeParser.TYPE_PART;
+import static au.org.intersect.samifier.parser.GenomeParser.START_PART;
+import static au.org.intersect.samifier.parser.GenomeParser.STOP_PART;
+
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class GeneSequence
 {
 
-    public static final String GENE = "gene";
     public static final String CODING_SEQUENCE = "CDS";
     public static final String INTRON = "intron";
-    public static final Pattern SEQUENCE_RE =
-        Pattern.compile("(" + GENE + "|" + CODING_SEQUENCE + "|" + INTRON +")");
+    public static final Pattern SEQUENCE_RE = Pattern.compile("("+CODING_SEQUENCE+"|"+INTRON+")");
 
-    private String sequenceType;
+    private String parentId;
+    private boolean codingSequence;
     private int start;
     private int stop;
-    private String direction;
+    private int direction;
 
-    public GeneSequence(String sequenceType, int start, int stop, String direction)
+    public GeneSequence(String parentId, boolean codingSequence, int start, int stop, int direction)
     {
-        setSequenceType(sequenceType);
+        setParentId(parentId);
+        setSequenceType(codingSequence);
         setStart(start);
         setStop(stop);
         setDirection(direction);
     }
 
-    public void setSequenceType(String sequenceType)
+    public void setParentId(String parentId)
     {
-        this.sequenceType = sequenceType;
+        this.parentId = parentId;
     }
 
-    public String getSequenceType()
+    public String getParentId()
     {
-        return sequenceType;
+        return parentId;
+    }
+
+    public void setSequenceType(boolean codingSequence)
+    {
+        this.codingSequence = codingSequence;
+    }
+
+    public boolean getSequenceType()
+    {
+        return codingSequence;
     }
 
     public void setStart(int start)
@@ -54,12 +70,12 @@ public class GeneSequence
         return stop;
     }
 
-    public void setDirection(String direction)
+    public void setDirection(int direction)
     {
         this.direction = direction;
     }
 
-    public String getDirection()
+    public int getDirection()
     {
         return direction;
     }

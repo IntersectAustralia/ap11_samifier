@@ -85,7 +85,7 @@ public class ResultsAnalyser
             {
             	analyser.run();	
             }
-            else if (!sqlQuery.isEmpty() && !repId.isEmpty())
+            else if (!sqlQuery.isEmpty() && (repId != null && !repId.isEmpty()))
             {
             	System.out.println("Only use either reportId or sqlQuery.");
             }

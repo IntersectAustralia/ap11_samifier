@@ -75,6 +75,11 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
             throw new PeptideSequenceGeneratorException("Cannot open chromosome file", e);
         }
 
+        if (sequenceParts.size() == 0)
+        {
+            throw new PeptideSequenceGeneratorException(gene.getId() + " in " + chromosomeFile.getName() + " seems empty", null);
+        }
+
         StringBuilder nucleotideSequence = new StringBuilder();
         StringBuilder cigar = new StringBuilder();
 
@@ -86,7 +91,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
         int absoluteStartIndex = 0;
         int absoluteStopIndex = 0;
         int readCursor = 0;
-        String direction = gene.getDirection();
+        String direction = gene.getDirectionStr();
 
         /*
          * The chromosome nucleotide sequence contains everything- exons and
@@ -173,6 +178,10 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
         //   absoluteStartIndex = 2, from 17 to 15
         //   startIndex  = (17-5 = 12) - 11 + 1 = 2 (because it is 1 based)
         //   stopIndex  = (17-5 = 12) - 2 + 1 = 11 (because it is 1 based)
+        if (peptideSequence.length() == 0)
+        {
+            return null;
+        }
         int startIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
         int stopIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStartIndex + 1) : absoluteStopIndex;
         int bedStartIndex = gene.getStart() + startIndex - 1; // BED files are zero based (6 in the example)
@@ -203,7 +212,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
             throw new FileNotFoundException(chromosomeFile.getAbsolutePath() + " not found");
         }
 
-        String direction = gene.getDirection();
+        String direction = gene.getDirectionStr();
 
         List<NucleotideSequence> parts = new ArrayList<NucleotideSequence>();
         BufferedReader reader = null;
@@ -219,7 +228,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
                 int startIndex = location.getStart();
                 int stopIndex  = location.getStop();
 
-                if (GeneSequence.INTRON.equals(location.getSequenceType()))
+                if (!location.getSequenceType())
                 {
                     parts.add(new NucleotideSequence(null, GeneSequence.INTRON, startIndex, stopIndex));
                     continue;
@@ -254,6 +263,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
                 sequence.append(line.substring(readStart, readStop + 1));
 
                 String sequenceString = GenomeConstant.REVERSE_FLAG.equals(direction) ? sequence.reverse().toString() : sequence.toString();
+                // System.out.println(sequenceString + " >> " + sequenceString.length() + " " + (stopIndex - startIndex + 1));
                 parts.add(new NucleotideSequence(sequenceString, GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
             }
 

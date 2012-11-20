@@ -89,26 +89,16 @@ public class DatabaseHelper {
 		Statement statement = connection.createStatement();
 		ResultSet resultSet = statement.executeQuery(expression);
 		Collection<String> collection = new ArrayList<String>();
+        int cols = resultSet.getMetaData().getColumnCount();
 		while (resultSet.next())
 		{
-			String proteinId = resultSet.getString("proteinId");
-			String locusName = resultSet.getString("locusName");
-			String geneId = resultSet.getString("geneId");
-			String score = resultSet.getString("score");
-			String startPosition = resultSet.getString("startPosition");
-			String stopPosition = resultSet.getString("stopPosition");
-			String lengthInAminoacids = resultSet.getString("lengthInAminoacids");
-			String chromosomeId = resultSet.getString("chromosomeId");
-			String geneStart = resultSet.getString("geneStart");
-			String geneEnd = resultSet.getString("geneEnd");
-			String frame = resultSet.getString("frame");
-			String exons = resultSet.getString("exons");
-			String exonString = resultSet.getString("exonString");
-			String result = proteinId + DELIMITER + locusName + DELIMITER + geneId + DELIMITER
-					+ score + DELIMITER + startPosition + DELIMITER + stopPosition + DELIMITER + lengthInAminoacids + DELIMITER
-					+ chromosomeId + DELIMITER + geneStart + DELIMITER + geneEnd + DELIMITER + frame + DELIMITER
-					+ exons + DELIMITER + exonString;
-			collection.add(result);
+            StringBuilder sb = new StringBuilder();
+            for( int c = 1; c <= cols; c ++)
+            {
+                if (c > 1) sb.append(DELIMITER);
+                sb.append(resultSet.getString(c));
+            }
+			collection.add(sb.toString());
 		}
 		return collection;
 	}

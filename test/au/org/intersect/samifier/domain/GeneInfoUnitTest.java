@@ -16,7 +16,7 @@ public final class GeneInfoUnitTest
     public void testAddLocation()
     {
         GeneInfo gene = new GeneInfo();
-        GeneSequence gs1 = new GeneSequence(GeneSequence.CODING_SEQUENCE, 1, 10, null);
+        GeneSequence gs1 = new GeneSequence("PARENT01", true, 1, 10, 1);
         gene.addLocation(gs1);
         List<GeneSequence> locationList = gene.getLocations();
         assertSame("Adding a location", gs1, locationList.get(0));
@@ -26,9 +26,9 @@ public final class GeneInfoUnitTest
     public void testAddLocationPreservesOrder()
     {
         GeneInfo gene = new GeneInfo();
-        GeneSequence gs1 = new GeneSequence(GeneSequence.CODING_SEQUENCE, 1, 10, null);
-        GeneSequence gs2 = new GeneSequence(GeneSequence.CODING_SEQUENCE, 2, 10, null);
-        GeneSequence gs3 = new GeneSequence(GeneSequence.CODING_SEQUENCE, 3, 10, null);
+        GeneSequence gs1 = new GeneSequence("G01", true, 1, 10, 1);
+        GeneSequence gs2 = new GeneSequence("G01", true, 2, 10, 1);
+        GeneSequence gs3 = new GeneSequence("G01", true, 3, 10, 1);
         gene.addLocation(gs3);
         gene.addLocation(gs1);
         gene.addLocation(gs2);

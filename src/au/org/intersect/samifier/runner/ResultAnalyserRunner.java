@@ -97,6 +97,7 @@ public class ResultAnalyserRunner
         for (PeptideSearchResult peptideSearchResult : peptideSearchResults)
         {
             PeptideSequence peptideSequence = sequenceGenerator.getPeptideSequence(peptideSearchResult);
+            if (peptideSequence == null || peptideSequence.getNucleotideSequence().isEmpty()) continue;
             ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(peptideSearchResult, proteinToOLNMap, genome, peptideSequence); 
             hsqldb.execute(outputter.toQuery());
         }
