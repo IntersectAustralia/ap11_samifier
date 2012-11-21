@@ -2,6 +2,7 @@ package au.org.intersect.samifier;
 
 import java.io.File;
 
+import au.org.intersect.samifier.reporter.ReportLister;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -79,7 +80,7 @@ public class ResultsAnalyser
             String repId = line.getOptionValue("rep");
             
             ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, 
-            		mapFile, outfile, chromosomeDir, sqlQuery, repListFile, repId);
+            		mapFile, outfile, chromosomeDir);
 
             if (sqlQuery == null && repId == null)
             {
@@ -91,27 +92,12 @@ public class ResultsAnalyser
             }
             else if (sqlQuery != null)
             {
-            	if (sqlQuery.isEmpty())
-            	{
-                	DatabaseHelper db = new DatabaseHelper();
-                	db.printTableDetails(null);           	
-                	db.shutdown();
-            	}
-            	else
-            	{
-                	analyser.initMemoryDb();
-                	analyser.runWithQuery();	
-            	}
-            }
-            else if (repId != null && repListFile == null)
-            {
-            	System.err.println("Cannot use reportId if no reportList is used.");
+                mainWithQuery(analyser, sqlQuery);
             }
             else
             {
-            	analyser.initMemoryDb();
-            	analyser.runWithQuery();	
-            }	     	          
+                mainWithReportId(analyser, repId, repListFile);
+            }
         }
         catch (ParseException pe)
         {
@@ -125,5 +111,38 @@ public class ResultsAnalyser
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private static void mainWithQuery(ResultAnalyserRunner analyser, String sqlQuery) throws Exception {
+        if (sqlQuery.isEmpty())
+        {
+            DatabaseHelper db = new DatabaseHelper();
+            db.printTableDetails(null);
+            db.shutdown();
+            return;
+        }
+        analyser.initMemoryDb();
+        analyser.runWithQuery(sqlQuery);
+    }
+
+    private static void mainWithReportId(ResultAnalyserRunner analyser, String repId, String repListFile) throws Exception {
+        if (repListFile == null || !(new File(repListFile)).exists())
+        {
+            System.err.println("Cannot use reportId if no reportList is used");
+            return;
+        }
+        String sqlQuery = getQueryFromFile(repId, repListFile);
+        if (sqlQuery == null || sqlQuery.isEmpty())
+        {
+            System.err.println("reportId does not exists or query is empty");
+            return;
+        }
+        analyser.initMemoryDb();
+        analyser.runWithQuery(sqlQuery);
+    }
+
+    private static String getQueryFromFile(String repId, String repListFile) {
+        ReportLister reportLister = new ReportLister(repListFile);
+        return reportLister.getQueryByReportId(repId);
     }
 }
