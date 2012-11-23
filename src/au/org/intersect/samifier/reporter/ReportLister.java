@@ -21,7 +21,7 @@ public class ReportLister
 		}
 	}
 	
-	public String getProperty(String repId)
+	public String getQueryByReportId(String repId)
 	{
 		String id = "rep." + repId;
 		return reportProperties.get(id).toString();
