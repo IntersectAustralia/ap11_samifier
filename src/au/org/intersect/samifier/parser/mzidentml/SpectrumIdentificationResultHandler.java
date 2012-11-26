@@ -7,6 +7,7 @@ public class SpectrumIdentificationResultHandler extends DefaultHandler
 {
 	private static final String SPECTRUM_ID_ITEM = "SpectrumIdentificationItem";
 	private static final String SPECTRUM_ID_RESULT = "SpectrumIdentificationResult";
+	private static final String ATTR_PEPTIDE_REF = "Peptide_ref";
 	private MzidReader reader;
 	
 	public SpectrumIdentificationResultHandler(MzidReader mzidReader)
@@ -17,10 +18,11 @@ public class SpectrumIdentificationResultHandler extends DefaultHandler
 	
 	public void startElement(String uri, String name, String qName, Attributes attrs)
 	{
-		if (SPECTRUM_ID_ITEM.equals(qName))
+		String peptideSeq = reader.getSequenceFromPeptideRef(attrs.getValue(ATTR_PEPTIDE_REF));
+		if (SPECTRUM_ID_ITEM.equals(qName) && !peptideSeq.isEmpty())
 		{
-			System.out.println("<Spectrum Item PeptideEvidence and cvParam>");
-			// create item handler
+			SpectrumIdentificationItemHandler spectrumIdItemHandler = new SpectrumIdentificationItemHandler(reader, peptideSeq);
+			reader.pushHandler(spectrumIdItemHandler);
 		}	 
 	}
 	

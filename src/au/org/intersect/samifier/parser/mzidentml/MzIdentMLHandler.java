@@ -25,13 +25,11 @@ public class MzIdentMLHandler extends DefaultHandler
 		}
 		else if (SEQUENCE_COLLECITON.equals(qName))
 		{
-			System.out.println("New handler:" + qName);
 			SequenceCollectionHandler sequenceHandler = new SequenceCollectionHandler(reader);
 			reader.pushHandler(sequenceHandler);
 		}
 		else if (DATA_COLLECTION.equals(qName))
 		{
-			System.out.println("New handler:" + qName);
 			DataCollectionHandler dataHandler = new DataCollectionHandler(reader);
 			reader.pushHandler(dataHandler);
 		}
@@ -41,7 +39,8 @@ public class MzIdentMLHandler extends DefaultHandler
 	{
 		if (MZIDENTML.equals(qName))
 		{
-			// Build all
+			// Port over to current impl after review
+			reader.seeResults();
 		}
 	}
 	
@@ -52,8 +51,8 @@ public class MzIdentMLHandler extends DefaultHandler
 		{
 			sb.append(ch[i]);
 		}
-		//if (sb.toString().trim().length() > 0)
-		//	System.out.println("MzIdenMLHandler print: " + sb.toString());
+		if (sb.toString().trim().length() > 0)
+			System.out.println("MzIdenMLHandler print: " + sb.toString());
 	}
 	
 	public void startDocument()

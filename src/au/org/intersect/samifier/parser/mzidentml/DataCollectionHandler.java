@@ -19,7 +19,6 @@ public class DataCollectionHandler extends DefaultHandler
 	{
 		if (ANALYSIS_DATA.equals(qName))
 		{
-			System.out.println("New handler:" + qName);
 			AnalysisDataHandler analysisHandler = new AnalysisDataHandler(reader);
 			reader.pushHandler(analysisHandler);
 		}	 

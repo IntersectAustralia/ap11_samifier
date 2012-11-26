@@ -19,7 +19,6 @@ public class AnalysisDataHandler extends DefaultHandler
 	{
 		if (SPECTRUM_ID_LIST.equals(qName))
 		{
-			System.out.println("New handler:" + qName);
 			SpectrumIdentificationListHandler spectrumListHandler = new SpectrumIdentificationListHandler(reader);
 			reader.pushHandler(spectrumListHandler);
 		}	 

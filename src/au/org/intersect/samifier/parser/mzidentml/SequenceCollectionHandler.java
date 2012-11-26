@@ -8,6 +8,8 @@ public class SequenceCollectionHandler extends DefaultHandler
 	private static final String SEQUENCE_COLLECITON = "SequenceCollection";
 	private static final String DB_SEQUENCE = "DBSequence";
 	private static final String PEPTIDE = "Peptide";
+	private static final String ATTR_ID = "id";
+	private static final String ATTR_ACCESSION = "accession";
 	private MzidReader reader;
 
 	public SequenceCollectionHandler(MzidReader mzidReader)
@@ -20,12 +22,11 @@ public class SequenceCollectionHandler extends DefaultHandler
 	{
 		if (DB_SEQUENCE.equals(qName))
 		{
-			System.out.println("DBSequence attrs: N/A");
+			reader.storeDbSequence(attrs.getValue(ATTR_ID), attrs.getValue(ATTR_ACCESSION));
 		}
 		else if (PEPTIDE.equals(qName))
 		{
-			System.out.println("New handler for peptides:" + qName);
-			PeptideHandler peptideHandler = new PeptideHandler(reader);
+			PeptideHandler peptideHandler = new PeptideHandler(reader, attrs.getValue(ATTR_ID));
 			reader.pushHandler(peptideHandler);
 		}
 	}
