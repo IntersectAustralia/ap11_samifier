@@ -27,15 +27,25 @@ public class PeptideSearchResultsParserImplUnitTest
             PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
 
             List<PeptideSearchResult> list = peptideSearchResultsParser.parseResults(mascotFile);
+            // The parser should find sixteen results - same as mzid file
             assertEquals("Parser should find seven ", 7, list.size());
-
+            System.out.println(list.toString());
             assertTrue(list.contains(new PeptideSearchResult("q21_p1", "EFGILK", "KPYK1_YEAST", 469, 474 , new BigDecimal("25.95"))));
             assertTrue(list.contains(new PeptideSearchResult("q131_p1", "SVIDNAR", "KPYK1_YEAST", 62, 68 , new BigDecimal("40.45"))));
             assertTrue(list.contains(new PeptideSearchResult("q217_p1", "INFGIEK", "KPYK1_YEAST", 460, 466 , new BigDecimal("37.51"))));
             assertTrue(list.contains(new PeptideSearchResult("q376_p2", "TGIAIGLNK", "RL36B_YEAST", 5, 13 , new BigDecimal("35.86"))));
             assertTrue(list.contains(new PeptideSearchResult("q887_p1", "KRNEEEDAK", "RL31A_YEAST", 78, 86 , new BigDecimal("40.09"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q887_p1", "KRNEEEDAK", "RL31B_YEAST", 78, 86 , new BigDecimal("40.09"))));
             assertTrue(list.contains(new PeptideSearchResult("q1009_p2", "EYTINLHKR", "RL31A_YEAST", 11, 19 , new BigDecimal("52.75"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q1009_p2", "EYTINLHKR", "RL31B_YEAST", 11, 19 , new BigDecimal("52.75"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q1009_p2", "EYTINLHKR", "RL31_ASHGO", 11, 19 , new BigDecimal("52.75"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q1009_p2", "EYTINLHKR", "RL31_CYAPA", 18, 26 , new BigDecimal("52.75"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q1009_p2", "EYTINLHKR", "RL31_DICDI", 10, 18 , new BigDecimal("52.75"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q1009_p2", "EYTINLHKR", "RL31_NICGU", 16, 24 , new BigDecimal("52.75"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q1009_p2", "EYTINLHKR", "RL31_PANGI", 16, 24 , new BigDecimal("52.75"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q1009_p2", "EYTINLHKR", "RL31_PERFR", 17, 25 , new BigDecimal("52.75"))));
             assertTrue(list.contains(new PeptideSearchResult("q2365_p1", "NEEEDAKNPLFSYVEPVLVASAK", "RL31A_YEAST", 80, 102 , new BigDecimal("20.69"))));
+            //assertTrue(list.contains(new PeptideSearchResult("q2365_p1", "NEEEDAKNPLFSYVEPVLVASAK", "RL31B_YEAST", 80, 102 , new BigDecimal("20.69"))));
         }
         catch(Exception e)
         {
@@ -57,7 +67,6 @@ public class PeptideSearchResultsParserImplUnitTest
 
             List<PeptideSearchResult> list = peptideSearchResultsParser.parseResults(mascotFile);
             assertEquals("Parser should find sixteen ", 16, list.size());
-            System.out.println();
             assertTrue(list.contains(new PeptideSearchResult("PE_11_1_KPYK1_YEAST_0_469_474", "EFGILK", "KPYK1_YEAST", 469, 474 , new BigDecimal("25.95"))));
             assertTrue(list.contains(new PeptideSearchResult("PE_11_2_KPYK1_YEAST_0_62_68", "SVIDNAR", "KPYK1_YEAST", 62, 68 , new BigDecimal("40.45"))));
             assertTrue(list.contains(new PeptideSearchResult("PE_11_3_KPYK1_YEAST_0_460_466", "INFGIEK", "KPYK1_YEAST", 460, 466 , new BigDecimal("37.51"))));
