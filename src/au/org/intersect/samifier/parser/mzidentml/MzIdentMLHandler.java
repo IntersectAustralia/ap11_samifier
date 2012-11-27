@@ -20,7 +20,6 @@ public class MzIdentMLHandler extends DefaultHandler
 	{
 		if (MZIDENTML.equals(qName))
 		{
-			System.out.println("Qualifier name:" + qName);
 			return;
 		}
 		else if (SEQUENCE_COLLECITON.equals(qName))
@@ -34,27 +33,7 @@ public class MzIdentMLHandler extends DefaultHandler
 			reader.pushHandler(dataHandler);
 		}
 	}
-	
-	public void endElement(String uri, String name, String qName)
-	{
-		if (MZIDENTML.equals(qName))
-		{
-			// Port over to current impl after review
-			reader.seeResults();
-		}
-	}
-	
-	public void characters(char ch[], int start, int length)
-	{
-		StringBuffer sb = new StringBuffer();
-		for (int i = start; i < start + length; i++)
-		{
-			sb.append(ch[i]);
-		}
-		if (sb.toString().trim().length() > 0)
-			System.out.println("MzIdenMLHandler print: " + sb.toString());
-	}
-	
+
 	public void startDocument()
 	{
 		System.out.println("Start document");

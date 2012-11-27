@@ -46,12 +46,12 @@ public class MzidReader
 		}
 	}
 	
-	public Object run()
+	public List<PeptideSearchResult> run()
 	{
 		try
 		{
 			xmlReader.parse(inputSource);
-			return buildResponse();
+			return results;
 		}
 		catch (Exception e)
 		{
@@ -120,16 +120,11 @@ public class MzidReader
 		{
 			System.out.println(result.toString());
 		}
+		System.out.println("Size of results: " + results.size());
 	}
 	
 	private void switchHandler(DefaultHandler handler)
 	{
 		xmlReader.setContentHandler(handler);
 	}
-	
-	private Object buildResponse() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
