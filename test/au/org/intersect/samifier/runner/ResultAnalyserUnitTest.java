@@ -1,17 +1,17 @@
 package au.org.intersect.samifier.runner;
 
-import au.org.intersect.samifier.ResultsAnalyser;
-import au.org.intersect.samifier.runner.ResultAnalyserRunner;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import java.io.File;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import au.org.intersect.samifier.ResultsAnalyser;
+import au.org.intersect.samifier.reporter.ReportLister;
 
 public class ResultAnalyserUnitTest
 {
@@ -25,15 +25,11 @@ public class ResultAnalyserUnitTest
             File mapFile = new File("test/resources/test_accession.txt");
             File genomeFile = new File("test/resources/test_genome.gff");
             File chromosomeDir = new File("test/resources/");
-            String sqlQuery = null;
-            String repList = null;
-            String repId = null;
             File resultAnalysisFile = File.createTempFile("out", "txt");
             resultAnalysisFile.deleteOnExit();
 
             ResultAnalyserRunner analyser = new ResultAnalyserRunner(mascotFile, genomeFile, mapFile, 
-            		resultAnalysisFile, chromosomeDir, sqlQuery, repList, repId);
-
+            		resultAnalysisFile, chromosomeDir);
             analyser.run();
 
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected_results_analysis.txt"));
@@ -64,17 +60,15 @@ public class ResultAnalyserUnitTest
             File genomeFile = new File("test/resources/test_genome.gff");
             File chromosomeDir = new File("test/resources/");
             String sqlQuery = "SELECT * FROM RESULT";
-            String repList = null;
-            String repId = null;
             
             File resultAnalysisFile = File.createTempFile("out", "txt");
             resultAnalysisFile.deleteOnExit();
 
             ResultAnalyserRunner analyser = new ResultAnalyserRunner(mascotFile, genomeFile, mapFile, 
-            		resultAnalysisFile, chromosomeDir, sqlQuery, repList, repId);
+            		resultAnalysisFile, chromosomeDir);
             
             analyser.initMemoryDb();
-            analyser.runWithQuery();
+            analyser.runWithQuery(sqlQuery);
 
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected_results_analysis.txt"));
             List<String> gotLines = FileUtils.readLines(resultAnalysisFile);
@@ -105,17 +99,17 @@ public class ResultAnalyserUnitTest
             File mapFile = new File("test/resources/test_accession.txt");
             File genomeFile = new File("test/resources/test_genome.gff");
             File chromosomeDir = new File("test/resources/");
-            String sqlQuery = null;
             String repList = "test/resources/replist.properties";
             String repId = "all_genes";
             File resultAnalysisFile = File.createTempFile("out", "txt");
             resultAnalysisFile.deleteOnExit();
 
             ResultAnalyserRunner analyser = new ResultAnalyserRunner(mascotFile, genomeFile, mapFile, 
-            		resultAnalysisFile, chromosomeDir, sqlQuery, repList, repId);
+            		resultAnalysisFile, chromosomeDir);
+            ReportLister reportLister = new ReportLister(repList);
             
             analyser.initMemoryDb();
-            analyser.runWithQuery();
+            analyser.runWithQuery(reportLister.getQueryByReportId(repId));
 
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected_results_analysis.txt"));
             List<String> gotLines = FileUtils.readLines(resultAnalysisFile);

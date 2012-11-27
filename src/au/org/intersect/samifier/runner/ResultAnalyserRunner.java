@@ -18,7 +18,6 @@ import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
 import au.org.intersect.samifier.parser.ProteinToOLNParser;
 import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import au.org.intersect.samifier.reporter.DatabaseHelper;
-import au.org.intersect.samifier.reporter.ReportLister;
 
 public class ResultAnalyserRunner
 {
