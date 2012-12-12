@@ -21,6 +21,7 @@ public class ResultsAnalyserOutputter
     private String frame;
     private String exons;
     private String exonString;
+    private String queryId;  /// Change by Ignatius Pang  *%*%*%
 
     public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult, ProteinToOLNMap proteinToOLNMap, Genome genome, PeptideSequence peptideSequence)
     {
@@ -32,7 +33,7 @@ public class ResultsAnalyserOutputter
         this.startPosition = Integer.toString(peptideSearchResult.getPeptideStart());
         this.stopPosition = Integer.toString(peptideSearchResult.getPeptideStop());
         this.lengthInAminoacids = Integer.toString(peptideSearchResult.getSequenceLength());
-
+        
         GeneInfo geneInfo = genome.getGene(locusName);
 
         this.chromosomeId = geneInfo.getChromosome();
@@ -42,6 +43,9 @@ public class ResultsAnalyserOutputter
 
         this.exons = new Integer(numberOfExons(peptideSequence.getCigarString())).toString();;
         this.exonString = getExonString(peptideSequence, geneInfo);
+        
+        this.queryId= peptideSearchResult.getId(); /// Change by Ignatius Pang  *%*%*%
+
     }
 
     private String getExonString(PeptideSequence peptideSequence, GeneInfo geneInfo)
@@ -111,7 +115,9 @@ public class ResultsAnalyserOutputter
         output.append(geneEnd + SEPARATOR);
         output.append(frame + SEPARATOR);
         output.append(exons + SEPARATOR);
-        output.append(exonString);
+        output.append(exonString + SEPARATOR); /// Change by Ignatius Pang  *%*%*%        
+        output.append(queryId); /// Change by Ignatius Pang  *%*%*%
+
         return output.toString();
     }
     
@@ -119,7 +125,7 @@ public class ResultsAnalyserOutputter
     {
     	StringBuffer output = new StringBuffer();
     	output.append("INSERT INTO " + TABLENAME + " (");
-    	output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,frame,exons,exonString) ");
+    	output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,frame,exons,exonString,queryId) ");
     	output.append("VALUES (");
     	output.append(formColumnQuery(proteinId) + DELIMITER);
     	output.append(formColumnQuery(locusName) + DELIMITER);
@@ -133,7 +139,9 @@ public class ResultsAnalyserOutputter
         output.append(formColumnQuery(geneEnd) + DELIMITER);
         output.append(formColumnQuery(frame) + DELIMITER);
         output.append(formColumnQuery(exons) + DELIMITER);
-        output.append(formColumnQuery(exonString) + ");");
+        output.append(formColumnQuery(exonString) + DELIMITER); /// Change by Ignatius Pang  *%*%*%  
+        output.append(formColumnQuery(queryId) + ");"); /// Change by Ignatius Pang  *%*%*%  
+
     	return output.toString();
     }
     

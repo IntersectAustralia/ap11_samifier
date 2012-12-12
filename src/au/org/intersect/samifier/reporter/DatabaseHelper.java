@@ -79,9 +79,10 @@ public class DatabaseHelper {
 		query.append("geneEnd varchar(255),");
 		query.append("frame varchar(255),");
 		query.append("exons varchar(255),");
-		query.append("exonString varchar(255)");
+		query.append("exonString varchar(255),"); /// Change by Ignatius Pang  *%*%*%  
+		query.append("queryId varchar(255)"); /// Change by Ignatius Pang  *%*%*%  
 		query.append(");");
-		statement.execute(query.toString());
+		statement.execute(query.toString()); 
 	}
 	
 	public synchronized Collection<String> filterResult(String expression) throws SQLException
