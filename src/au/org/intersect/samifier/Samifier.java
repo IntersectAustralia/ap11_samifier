@@ -1,5 +1,6 @@
 package au.org.intersect.samifier;
 
+import au.org.intersect.samifier.domain.DebuggingFlag;
 import au.org.intersect.samifier.runner.SamifierRunner;
 import org.apache.commons.cli.*;
 import org.apache.log4j.FileAppender;
@@ -61,6 +62,16 @@ public class Samifier
                                           .create("s");
 
         Options options = new Options();
+        
+        if ( DebuggingFlag.get_sbi_debug_flag() == 1 )
+        {
+            Option translationTableOpt = OptionBuilder.withArgName("Translation Table File")
+                    .hasArg()
+                    .withDescription("File containing a mapping of codons to amino acids, in the format used by NCBI.")
+                    .create("t");
+        	options.addOption(translationTableOpt);
+        }
+        
         options.addOption(resultsFile);
         options.addOption(mappingFile);
         options.addOption(genomeFileOpt);
@@ -92,8 +103,17 @@ public class Samifier
                 setFileLogger(logFileName);
             }
 
-            SamifierRunner samifier = new SamifierRunner(searchResultsPaths, genomeFile, mapFile, chromosomeDir, outfile, bedfilePath, confidenScore);
-            samifier.run();
+            if ( DebuggingFlag.get_sbi_debug_flag() == 1 )
+            {
+                File translationTableFile = new File(line.getOptionValue("t"));
+	            SamifierRunner samifier = new SamifierRunner(searchResultsPaths, genomeFile, mapFile, chromosomeDir, outfile, bedfilePath, confidenScore, translationTableFile);
+	            samifier.run();
+            }
+            else
+            {
+	            SamifierRunner samifier = new SamifierRunner(searchResultsPaths, genomeFile, mapFile, chromosomeDir, outfile, bedfilePath, confidenScore);
+	            samifier.run();
+            }
 
         }
         catch (ParseException pe)

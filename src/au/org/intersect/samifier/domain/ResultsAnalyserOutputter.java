@@ -94,6 +94,10 @@ public class ResultsAnalyserOutputter
 	             StringBuilder invertedReversedSequence = new StringBuilder(StringUtils.replaceChars(nucleotideString, "ACGT", "TGCA")).reverse();
 	             predictedAminoAcidSequence = translationTable.proteinToAminoAcidSequence(invertedReversedSequence.toString());
 	         }
+   	         else
+   	         {
+   	             predictedAminoAcidSequence = translationTable.proteinToAminoAcidSequence(nucleotideString);   	        	
+   	         }
 	         	         
 	         if ( predictedAminoAcidSequence.equals(mascotPeptideString) )
 	         {

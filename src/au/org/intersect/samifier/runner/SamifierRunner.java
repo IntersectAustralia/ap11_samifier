@@ -7,6 +7,8 @@ import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
 import au.org.intersect.samifier.parser.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -32,8 +34,21 @@ public class SamifierRunner {
 
     private Genome genome;
     private ProteinToOLNMap proteinToOLNMap;
+    private File translationTableFile;
 
 
+    public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath, BigDecimal confidenceScore, File translationTableFile) throws Exception
+    {
+        this.searchResultsPaths = searchResultsPaths;
+        this.genomeFile = genomeFile;
+        this.mapFile = mapFile;
+        this.chromosomeDir = chromosomeDir;
+        this.outfile = outfile;
+        this.bedfilePath = bedfilePath;
+        this.confidenceScore = confidenceScore;
+        this.translationTableFile = translationTableFile;
+    }
+    
     public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath, BigDecimal confidenceScore)
     {
         this.searchResultsPaths = searchResultsPaths;
@@ -114,10 +129,53 @@ public class SamifierRunner {
             { 	
 	            samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
             }
+            
+            try 
+            {
+	            if ( DebuggingFlag.get_sbi_debug_flag() == 1 )
+	            {
+	                CodonTranslationTable translationTable = CodonTranslationTable.parseTableFile(translationTableFile);
+	   	            String  nucleotideString = peptide.getNucleotideSequence();
+	            	int  direction = peptide.getGeneInfo().getDirection();
+	   	         	String mascotPeptideString = result.getPeptideSequence();
+	   	         	String predictedAminoAcidSequence = new String("");
+	   	         
+		   	         if ( direction != 1)
+		   	         {	        	 
+		   	             StringBuilder invertedReversedSequence = new StringBuilder(StringUtils.replaceChars(nucleotideString, "ACGT", "TGCA")).reverse();
+		   	             predictedAminoAcidSequence = translationTable.proteinToAminoAcidSequence(invertedReversedSequence.toString());
+		   	         }
+		   	         else
+		   	         {
+		   	             predictedAminoAcidSequence = translationTable.proteinToAminoAcidSequence(nucleotideString);   	        	
+		   	         }
+	   	         	         
+		   	         if ( ! predictedAminoAcidSequence.equals(mascotPeptideString) )
+		   	         {
+		   	        	String samEntryStrng = new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()).toString();
+		   	        	 
+		                  LOG.info("Incorrect nucleotide sequence for following SAM entry:\n" + samEntryStrng);    	 
+		   	         }            	
+	
+	            }
+            }catch (Exception npe)
+            {
+                LOG.info("Problem with internal validation of output nucleotide sequence!");    
+                npe.printStackTrace();
+
+            	System.err.println(npe);            	
+            }
+            
+            
         }
 
         String prevChromosome = null;
         Collections.sort(samEntries, new SAMEntryComparator());
+        
+        //////////////////////////////////////////////////
+        ////    Location to store SAM file headers     ///
+        //////////////////////////////////////////////////
+               
         for (SAMEntry samEntry : samEntries)
         {
             String chromosome = samEntry.getRname();
