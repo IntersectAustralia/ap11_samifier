@@ -21,6 +21,7 @@ public class ResultsAnalyserOutputter
     private String chromosomeId;
     private String geneStart;
     private String geneEnd;
+    private String strand;
     private String frame;
     private String exons;
     private String exonString;
@@ -45,6 +46,7 @@ public class ResultsAnalyserOutputter
         this.chromosomeId = geneInfo.getChromosome();
         this.geneStart = new Integer(geneInfo.getStart()).toString();
         this.geneEnd = new Integer(geneInfo.getStop()).toString();
+        this.strand = getStrand(geneInfo);
         this.frame = getFrame(geneInfo);
 
         this.exons = new Integer(numberOfExons(peptideSequence.getCigarString())).toString();;
@@ -70,6 +72,7 @@ public class ResultsAnalyserOutputter
         this.chromosomeId = geneInfo.getChromosome();
         this.geneStart = new Integer(geneInfo.getStart()).toString();
         this.geneEnd = new Integer(geneInfo.getStop()).toString();
+        this.strand = getStrand(geneInfo);
         this.frame = getFrame(geneInfo);
 
         this.exons = new Integer(numberOfExons(peptideSequence.getCigarString())).toString();;
@@ -143,11 +146,17 @@ public class ResultsAnalyserOutputter
         return exonString.toString();
     }
 
-    private String getFrame(GeneInfo geneInfo)
+    private String getStrand(GeneInfo geneInfo)
     {
         int direction = geneInfo.getDirection();
-        int offset = (geneInfo.getStart() - 1) % 3;
-        return (direction == 1 ? "+" : "-" )+ Integer.toString(offset);
+
+    	return (direction == 1 ? "+" : "-" );
+    }
+    
+    private String getFrame(GeneInfo geneInfo)
+    {
+    	int offset = (geneInfo.getStart() - 1) % 3;
+    	return Integer.toString(offset);
     }
 
     private int numberOfExons(String cigarString)
@@ -168,6 +177,7 @@ public class ResultsAnalyserOutputter
         output.append(chromosomeId + SEPARATOR);
         output.append(geneStart + SEPARATOR);
         output.append(geneEnd + SEPARATOR);
+        output.append(strand + SEPARATOR);
         output.append(frame + SEPARATOR);
         output.append(exons + SEPARATOR);
         output.append(exonString + SEPARATOR); /// Change by Ignatius Pang  *%*%*%  
@@ -192,11 +202,11 @@ public class ResultsAnalyserOutputter
     	
         if ( DebuggingFlag.get_sbi_debug_flag() == 1 ) 
         {
-	         output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,frame,exons,exonString,queryId,validatedSequence) ");        	
+	         output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,strand,frame,exons,exonString,queryId,validatedSequence) ");        	
         } 
         else 
         {
-        	output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,frame,exons,exonString,queryId) ");
+        	output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,strand,frame,exons,exonString,queryId) ");
         }
         
     	output.append("VALUES (");
@@ -210,6 +220,7 @@ public class ResultsAnalyserOutputter
         output.append(formColumnQuery(chromosomeId) + DELIMITER);
         output.append(formColumnQuery(geneStart) + DELIMITER);
         output.append(formColumnQuery(geneEnd) + DELIMITER);
+        output.append(formColumnQuery(strand) + DELIMITER);
         output.append(formColumnQuery(frame) + DELIMITER);
         output.append(formColumnQuery(exons) + DELIMITER);
         output.append(formColumnQuery(exonString) + DELIMITER); /// Change by Ignatius Pang  *%*%*%  
@@ -223,8 +234,6 @@ public class ResultsAnalyserOutputter
         {
         	output.append(formColumnQuery(queryId) + ");"); /// Change by Ignatius Pang  *%*%*%  
         }
-        
-        
 
     	return output.toString();
     }

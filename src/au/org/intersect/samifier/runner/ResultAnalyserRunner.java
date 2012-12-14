@@ -132,7 +132,7 @@ public class ResultAnalyserRunner
             CodonTranslationTable translationTable =  CodonTranslationTable.parseTableFile(translationTableFile);
             ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(peptideSearchResult, proteinToOLNMap, genome, peptideSequence, translationTable);
             String query = outputter.toQuery();
-            System.out.println(query);
+            //System.out.println(query);
             hsqldb.execute(query);
             }
             else

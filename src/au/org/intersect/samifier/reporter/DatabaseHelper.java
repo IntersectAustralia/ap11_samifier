@@ -79,7 +79,8 @@ public class DatabaseHelper {
 		query.append("chromosomeId varchar(255),");
 		query.append("geneStart varchar(255),");
 		query.append("geneEnd varchar(255),");
-		query.append("frame varchar(255),");
+		query.append("strand varchar(255),");
+		query.append("frame integer,");
 		query.append("exons varchar(255),");
 		query.append("exonString varchar(255),"); /// Change by Ignatius Pang  *%*%*%
 		

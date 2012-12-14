@@ -17,9 +17,14 @@ public class SAMEntry
     private String peptideSequence;
     private String qual = "*";
 
-    public SAMEntry(String qname, GeneInfo gene, int pos, String cigarString, String peptideSequence)
+    public SAMEntry(String qname, GeneInfo gene, int pos, String cigarString, String peptideSequence)    
     {
-        this(qname, gene.getDirectionFlag(), gene.getChromosome(), pos, 255, cigarString, "*", 0, 0, peptideSequence, "*");
+		this(qname, gene.getDirectionFlag(), gene.getChromosome(), pos, 255, cigarString, "*", 0, 0, peptideSequence, "*");
+    }
+    
+    public SAMEntry(String qname, GeneInfo gene, int pos, String cigarString, String peptideSequence, int mapq)    
+    {
+		this(qname, gene.getDirectionFlag(), gene.getChromosome(), pos, mapq, cigarString, "*", 0, 0, peptideSequence, "*");
     }
 
     private SAMEntry(String qname, int flag, String rname, int pos, int mapq, String cigarString, String rnext, int pnext, int tlen, String peptideSequence, String qual)

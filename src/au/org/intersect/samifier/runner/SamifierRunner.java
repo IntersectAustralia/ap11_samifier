@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.*;
 
 public class SamifierRunner {
@@ -104,7 +105,15 @@ public class SamifierRunner {
                 bedWriter.write(bedLineOutputter.toString());
             }
 
-            samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
+            if( DebuggingFlag.get_use_mascot_score_flag() == 1)
+            {	
+            	int mapq = result.getConfidenceScore().round(new MathContext(0)).intValue();
+	            samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence(), mapq));
+            }
+            else
+            { 	
+	            samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
+            }
         }
 
         String prevChromosome = null;
