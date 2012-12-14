@@ -11,6 +11,8 @@ import java.util.Collection;
 
 import org.hsqldb.server.Server;
 
+import au.org.intersect.samifier.domain.DebuggingFlag;
+
 public class DatabaseHelper {
 	
 	private static final String USER = "SA";
@@ -79,8 +81,18 @@ public class DatabaseHelper {
 		query.append("geneEnd varchar(255),");
 		query.append("frame varchar(255),");
 		query.append("exons varchar(255),");
-		query.append("exonString varchar(255),"); /// Change by Ignatius Pang  *%*%*%  
-		query.append("queryId varchar(255)"); /// Change by Ignatius Pang  *%*%*%  
+		query.append("exonString varchar(255),"); /// Change by Ignatius Pang  *%*%*%
+		
+		if (DebuggingFlag.get_sbi_debug_flag() == 1) /// Change by Ignatius Pang  *%*%*%  
+		{
+			query.append("queryId varchar(255),"); 
+			query.append("validatedSequence varchar(255)"); 
+		}
+		else
+		{
+			query.append("queryId varchar(255)"); 
+		}
+		
 		query.append(");");
 		statement.execute(query.toString()); 
 	}

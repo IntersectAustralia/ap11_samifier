@@ -1,6 +1,9 @@
 package au.org.intersect.samifier.domain;
 
 import java.util.Map;
+import au.org.intersect.samifier.domain.DebuggingFlag;
+import org.apache.commons.lang3.StringUtils;
+
 
 public class ResultsAnalyserOutputter
 {
@@ -22,8 +25,36 @@ public class ResultsAnalyserOutputter
     private String exons;
     private String exonString;
     private String queryId;  /// Change by Ignatius Pang  *%*%*%
+    private String validatedSequence;  /// Change by Ignatius Pang  *%*%*%
+    private CodonTranslationTable translationTable; /// Change by Ignatius Pang  *%*%*%
 
-    public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult, ProteinToOLNMap proteinToOLNMap, Genome genome, PeptideSequence peptideSequence)
+    
+    public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult, ProteinToOLNMap proteinToOLNMap, Genome genome, PeptideSequence peptideSequence)  
+    {
+        this.proteinId = peptideSearchResult.getProteinName();
+        this.locusName = proteinToOLNMap.getOLN(peptideSearchResult.getProteinName());
+        // This one needs to be confirmed
+        this.geneId = proteinToOLNMap.getOLN(peptideSearchResult.getProteinName());
+        this.score = peptideSearchResult.getConfidenceScore().toString();
+        this.startPosition = Integer.toString(peptideSearchResult.getPeptideStart());
+        this.stopPosition = Integer.toString(peptideSearchResult.getPeptideStop());
+        this.lengthInAminoacids = Integer.toString(peptideSearchResult.getSequenceLength());
+        
+        GeneInfo geneInfo = genome.getGene(locusName);
+
+        this.chromosomeId = geneInfo.getChromosome();
+        this.geneStart = new Integer(geneInfo.getStart()).toString();
+        this.geneEnd = new Integer(geneInfo.getStop()).toString();
+        this.frame = getFrame(geneInfo);
+
+        this.exons = new Integer(numberOfExons(peptideSequence.getCigarString())).toString();;
+        this.exonString = getExonString(peptideSequence, geneInfo);
+        
+        this.queryId= peptideSearchResult.getId(); /// Change by Ignatius Pang  *%*%*%
+      
+    }
+    
+    public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult, ProteinToOLNMap proteinToOLNMap, Genome genome, PeptideSequence peptideSequence, CodonTranslationTable translationTable) throws UnknownCodonException
     {
         this.proteinId = peptideSearchResult.getProteinName();
         this.locusName = proteinToOLNMap.getOLN(peptideSearchResult.getProteinName());
@@ -46,6 +77,30 @@ public class ResultsAnalyserOutputter
         
         this.queryId= peptideSearchResult.getId(); /// Change by Ignatius Pang  *%*%*%
 
+        
+        /// Change by Ignatius Pang  *%*%*%
+            this.translationTable = translationTable;
+
+	         String  nucleotideString = peptideSequence.getNucleotideSequence();
+	         int  direction = peptideSequence.getGeneInfo().getDirection(); //  getDirection() == 1 ? "+" : "-";
+	         String mascotPeptideString = peptideSearchResult.getPeptideSequence();
+	         String predictedAminoAcidSequence = new String("");
+	         
+	         if ( direction != 1)
+	         {	        	 
+	             StringBuilder invertedReversedSequence = new StringBuilder(StringUtils.replaceChars(nucleotideString, "ACGT", "TGCA")).reverse();
+	             predictedAminoAcidSequence = translationTable.proteinToAminoAcidSequence(invertedReversedSequence.toString());
+	         }
+	         	         
+	         if ( predictedAminoAcidSequence.equals(mascotPeptideString) )
+	         {
+	        	 this.validatedSequence = new String("True");	        	 
+	         }
+	         else
+	         {
+	        	 this.validatedSequence = new String("False");	        	 	        	
+	         }
+                
     }
 
     private String getExonString(PeptideSequence peptideSequence, GeneInfo geneInfo)
@@ -115,9 +170,18 @@ public class ResultsAnalyserOutputter
         output.append(geneEnd + SEPARATOR);
         output.append(frame + SEPARATOR);
         output.append(exons + SEPARATOR);
-        output.append(exonString + SEPARATOR); /// Change by Ignatius Pang  *%*%*%        
-        output.append(queryId); /// Change by Ignatius Pang  *%*%*%
-
+        output.append(exonString + SEPARATOR); /// Change by Ignatius Pang  *%*%*%  
+        
+        if ( DebuggingFlag.get_sbi_debug_flag() == 1 ) /// Change by Ignatius Pang  *%*%*%
+        {
+            output.append(queryId + SEPARATOR); 
+            output.append(validatedSequence);       	
+        }
+        else
+        {
+        	output.append(queryId); /// Change by Ignatius Pang  *%*%*%
+        }
+        
         return output.toString();
     }
     
@@ -125,7 +189,16 @@ public class ResultsAnalyserOutputter
     {
     	StringBuffer output = new StringBuffer();
     	output.append("INSERT INTO " + TABLENAME + " (");
-    	output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,frame,exons,exonString,queryId) ");
+    	
+        if ( DebuggingFlag.get_sbi_debug_flag() == 1 ) 
+        {
+	         output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,frame,exons,exonString,queryId,validatedSequence) ");        	
+        } 
+        else 
+        {
+        	output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,frame,exons,exonString,queryId) ");
+        }
+        
     	output.append("VALUES (");
     	output.append(formColumnQuery(proteinId) + DELIMITER);
     	output.append(formColumnQuery(locusName) + DELIMITER);
@@ -140,7 +213,18 @@ public class ResultsAnalyserOutputter
         output.append(formColumnQuery(frame) + DELIMITER);
         output.append(formColumnQuery(exons) + DELIMITER);
         output.append(formColumnQuery(exonString) + DELIMITER); /// Change by Ignatius Pang  *%*%*%  
-        output.append(formColumnQuery(queryId) + ");"); /// Change by Ignatius Pang  *%*%*%  
+        
+        if ( DebuggingFlag.get_sbi_debug_flag() == 1 ) 
+        {
+            output.append(formColumnQuery(queryId) + DELIMITER ); /// Change by Ignatius Pang  *%*%*%  
+            output.append(formColumnQuery(validatedSequence) + ");"); /// Change by Ignatius Pang  *%*%*%  
+        } 
+        else 
+        {
+        	output.append(formColumnQuery(queryId) + ");"); /// Change by Ignatius Pang  *%*%*%  
+        }
+        
+        
 
     	return output.toString();
     }

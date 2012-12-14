@@ -2,6 +2,7 @@ package au.org.intersect.samifier;
 
 import java.io.File;
 
+import au.org.intersect.samifier.domain.DebuggingFlag;
 import au.org.intersect.samifier.reporter.ReportLister;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -19,6 +20,8 @@ public class ResultsAnalyser
 {    
     public static void main(String ... args)
     {
+    	
+
         Option resultsFile = OptionBuilder.withArgName("searchResultsFile")
                 .hasArg()
                 .withDescription("Mascot search results file in txt format")
@@ -58,6 +61,16 @@ public class ResultsAnalyser
         		.create("rep");     
         
         Options options = new Options();
+        
+        if ( DebuggingFlag.get_sbi_debug_flag() == 1 )
+        {
+            Option translationTableOpt = OptionBuilder.withArgName("Translation Table File")
+                    .hasArg()
+                    .withDescription("File containing a mapping of codons to amino acids, in the format used by NCBI.")
+                    .create("t");
+        	options.addOption(translationTableOpt);
+        }
+        
         options.addOption(resultsFile);
         options.addOption(mappingFile);
         options.addOption(genomeFileOpt);
@@ -79,25 +92,55 @@ public class ResultsAnalyser
             String repListFile = line.getOptionValue("replist");
             String repId = line.getOptionValue("rep");
             
-            ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, 
-            		mapFile, outfile, chromosomeDir);
-
-            if (sqlQuery == null && repId == null)
+            /// Change by Ignatius Pang  *%*%*%
+            /// This debug flag is currently set to provide internal validation alternatively spliced peptides. 
+            /// The nucleotide sequence in the 'output' SAM file is compared with the amino acid sequence in the 'input' Mascot DAT or mzIdentML file.
+            if ( DebuggingFlag.get_sbi_debug_flag() == 1 )
             {
-            	analyser.run();	
-            }
-            else if (sqlQuery != null && (repId != null || repListFile != null))
-            {
-            	 System.err.println("Only use either reportId or sqlQuery.");
-            }
-            else if (sqlQuery != null)
-            {
-                mainWithQuery(analyser, sqlQuery);
+                File translationTableFile = new File(line.getOptionValue("t"));
+                ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, 
+                		mapFile, outfile, chromosomeDir, translationTableFile);
+                if (sqlQuery == null && repId == null)
+                {
+                	analyser.run();	
+                }
+                else if (sqlQuery != null && (repId != null || repListFile != null))
+                {
+                	 System.err.println("Only use either reportId or sqlQuery.");
+                }
+                else if (sqlQuery != null)
+                {
+                    mainWithQuery(analyser, sqlQuery);
+                }
+                else
+                {
+                    mainWithReportId(analyser, repId, repListFile);
+                }
             }
             else
             {
-                mainWithReportId(analyser, repId, repListFile);
+            	ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, 
+                		mapFile, outfile, chromosomeDir);
+                if (sqlQuery == null && repId == null)
+                {
+                	analyser.run();	
+                }
+                else if (sqlQuery != null && (repId != null || repListFile != null))
+                {
+                	 System.err.println("Only use either reportId or sqlQuery.");
+                }
+                else if (sqlQuery != null)
+                {
+                    mainWithQuery(analyser, sqlQuery);
+                }
+                else
+                {
+                    mainWithReportId(analyser, repId, repListFile);
+                }
             }
+
+
+
         }
         catch (ParseException pe)
         {
