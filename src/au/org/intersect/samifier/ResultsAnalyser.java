@@ -67,6 +67,7 @@ public class ResultsAnalyser
             Option translationTableOpt = OptionBuilder.withArgName("Translation Table File")
                     .hasArg()
                     .withDescription("File containing a mapping of codons to amino acids, in the format used by NCBI.")
+                    .isRequired()
                     .create("t");
         	options.addOption(translationTableOpt);
         }
