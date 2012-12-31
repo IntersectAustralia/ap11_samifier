@@ -21,6 +21,8 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
 {
 
     private static Logger LOG = Logger.getLogger(PeptideSearchResultsParserImpl.class);
+    private static Pattern linePattern = Pattern.compile("^(q\\d+_p\\d+)=([^;]+);(.+)$");
+    private static Pattern proteinPartPattern = Pattern.compile("^\"([^\"]+)\":\\d\\:(\\d+)\\:(\\d+)\\:\\d$");
 
     private ProteinToOLNMap proteinToOLNMapping;
 
@@ -142,8 +144,6 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
         List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
         // Expected format:
         // q21_p1=0,705.406113,-0.000065,4,EFGILK,18,00000000,25.95,0000000001000002010,0,0;"KPYK1_YEAST":0:469:474:1,"RL31B_YEAST":0:78:86:1
-        Pattern linePattern = Pattern.compile("^(q\\d+_p\\d+)=([^;]+);(.+)$");
-        Pattern proteinPartPattern = Pattern.compile("^\"([^\"]+)\":\\d\\:(\\d+)\\:(\\d+)\\:\\d$");
         Matcher lineMatcher = linePattern.matcher(line);
 
         if (lineMatcher.matches())
@@ -169,12 +169,6 @@ public class PeptideSearchResultsParserImpl implements PeptideSearchResultsParse
                 if (proteinPartMatcher.matches())
                 {
                     String protein = proteinPartMatcher.group(1);
-                    if (!proteinToOLNMapping.containsProtein(protein))
-                    {
-                        LOG.info("Protein ID not found in accession file");
-                        LOG.info("ERR_ACC: " + protein);
-                        continue;
-                    }
                     int start = Integer.parseInt(proteinPartMatcher.group(2));
                     int stop  = Integer.parseInt(proteinPartMatcher.group(3));
                     results.add(new PeptideSearchResult(id, peptideSequence, protein, start, stop, confidenceScore));
