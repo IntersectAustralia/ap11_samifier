@@ -17,7 +17,7 @@ public class GffOutputterUnitTest
         GffOutputter gffOutputter = new GffOutputter(proteinLocation,"test");
         String lineFeed = System.getProperty("line.separator");
         String firstLine = gffOutputter.getOutput().split(lineFeed)[0];
-        String firstToken = firstLine.split(" ")[0];
+        String firstToken = firstLine.split("\t")[0];
         assertEquals("test", firstToken);
     }
 
@@ -28,7 +28,7 @@ public class GffOutputterUnitTest
         GffOutputter gffOutputter = new GffOutputter(proteinLocation,"test.txt");
         String lineFeed = System.getProperty("line.separator");
         String firstLine = gffOutputter.getOutput().split(lineFeed)[0];
-        String firstToken = firstLine.split(" ")[0];
+        String firstToken = firstLine.split("\t")[0];
         assertEquals("test", firstToken);
     }
 
@@ -40,9 +40,9 @@ public class GffOutputterUnitTest
         String lineFeed = System.getProperty("line.separator");
 
         StringBuffer expectedOutput = new StringBuffer();
-        expectedOutput.append("test Glimmer gene  1 3 0 + 1 ID=glimmer_name;Name=glimmer_name;Note=");
+        expectedOutput.append("test\tGlimmer\tgene\t1\t3\t0\t+\t1\tID=glimmer_name;Name=glimmer_name;Note=");
         expectedOutput.append(lineFeed);
-        expectedOutput.append("test Glimmer CDS  1 3 0 + 1 ID=glimmer_name;Name=glimmer_name;Note=");
+        expectedOutput.append("test\tGlimmer\tCDS\t1\t3\t0\t+\t1\tID=glimmer_name;Name=glimmer_name;Note=");
         expectedOutput.append(lineFeed);
         assertEquals(expectedOutput.toString(), gffOutputter.getOutput());
     }

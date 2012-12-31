@@ -33,28 +33,35 @@ public class GffOutputter implements Outputter
     {
         StringBuilder output = new StringBuilder();
 
-        output.append(genomeFileName);
-        output.append(" Glimmer gene ");
-        output.append(" " + start);
-        output.append(" " + end);
-        output.append(" " + glimmerScore);
-        output.append(" " + directionFlag);
-        output.append(" " + frame);
-        output.append(" ID=" + glimmerName + ";Name=" + glimmerName + ";Note=");
+        output.append(getOutputLine("gene"));
         output.append(System.getProperty("line.separator"));
 
-        output.append(genomeFileName);
-        output.append(" Glimmer CDS ");
-        output.append(" " + start);
-        output.append(" " + end);
-        output.append(" " + glimmerScore);
-        output.append(" " + directionFlag);
-        output.append(" " + frame);
-        output.append(" ID=" + glimmerName + ";Name=" + glimmerName + ";Note=");
+        output.append(getOutputLine("CDS"));
         output.append(System.getProperty("line.separator"));
 
         return output.toString();
 
+    }
+
+    private String getOutputLine(String type)
+    {
+        StringBuilder output = new StringBuilder();
+        output.append(genomeFileName);
+        column(output, "Glimmer");
+        column(output, type);
+        column(output, Integer.toString(start));
+        column(output, Integer.toString(end));
+        column(output, glimmerScore);
+        column(output, directionFlag);
+        column(output, frame);
+        column(output, "ID=" + glimmerName + ";Name=" + glimmerName + ";Note=");
+        return output.toString();
+    }
+
+    private void column(StringBuilder buff, String field)
+    {
+        buff.append('\t');
+        buff.append(field);
     }
 
     private String genomeFileNameNoExtension(String genomeFileName)
