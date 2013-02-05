@@ -40,9 +40,9 @@ public class GffOutputterUnitTest
         String lineFeed = System.getProperty("line.separator");
 
         StringBuffer expectedOutput = new StringBuffer();
-        expectedOutput.append("test\tGlimmer\tgene\t1\t3\t0\t+\t1\tID=glimmer_name;Name=glimmer_name;Note=");
+        expectedOutput.append("test\tGlimmer\tgene\t1\t2\t0\t+\t1\tID=glimmer_name;Name=glimmer_name;Note=");
         expectedOutput.append(lineFeed);
-        expectedOutput.append("test\tGlimmer\tCDS\t1\t3\t0\t+\t1\tID=glimmer_name;Name=glimmer_name;Note=");
+        expectedOutput.append("test\tGlimmer\tCDS\t1\t2\t0\t+\t1\tID=glimmer_name;Name=glimmer_name;Note=");
         expectedOutput.append(lineFeed);
         assertEquals(expectedOutput.toString(), gffOutputter.getOutput());
     }

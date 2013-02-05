@@ -50,7 +50,7 @@ public class ProteinLocation
 
     public int getStop()
     {
-        return startIndex + length;
+        return startIndex + length - 1;
     }
 
     public String getDirection()
