@@ -77,7 +77,9 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 
         if (sequenceParts.size() == 0)
         {
-            throw new PeptideSequenceGeneratorException(gene.getId() + " in " + chromosomeFile.getName() + " seems empty", null);
+            //throw new PeptideSequenceGeneratorException(gene.getId() + " in " + chromosomeFile.getName() + " seems empty", null);
+            LOG.warn(gene.getId() + " in " + chromosomeFile.getName() + " seems empty");
+            return null;
         }
 
         StringBuilder nucleotideSequence = new StringBuilder();
