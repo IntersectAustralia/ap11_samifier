@@ -12,6 +12,11 @@ import java.util.List;
 public class ProteinLocationFileGenerator
 {
     public static void generateFile(List<ProteinLocation> locations, Writer fileWriter, ProteinLocationBasedOutputterGenerator outputterGenerator)
+            throws IOException{
+        generateFile(locations, fileWriter, outputterGenerator,null);
+    }
+
+    public static void generateFile(List<ProteinLocation> locations, Writer fileWriter, ProteinLocationBasedOutputterGenerator outputterGenerator, String header)
             throws IOException
     {
         if (fileWriter != null)
@@ -20,6 +25,10 @@ public class ProteinLocationFileGenerator
             try
             {
                 writer = new BufferedWriter(fileWriter);
+                if (header != null && header.length() > 0) {
+                    writer.append(header);
+                    writer.append("\n");
+                }
                 for (ProteinLocation location : locations)
                 {
                     writer.append(outputterGenerator.getOutputterFor(location).getOutput());

@@ -4,6 +4,7 @@ package au.org.intersect.samifier.parser;
 import au.org.intersect.samifier.domain.GeneInfo;
 import au.org.intersect.samifier.domain.GeneSequence;
 import au.org.intersect.samifier.domain.Genome;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,15 +15,15 @@ import java.util.regex.Pattern;
 
 public class GenomeParserImpl implements GenomeParser
 {
-
+    private static Logger LOG = Logger.getLogger(GenomeParserImpl.class);
     public static final Pattern GENE_RE = Pattern.compile("^(gene|gene_cassette|pseudogene|transposable_element_gene)$");
     private static final String STRAND_FORWARD = "+";
     private static final Pattern STRAND_RE = Pattern.compile("^([" + STRAND_FORWARD + "]|[-])$");
     public static final String CODING_SEQUENCE = "CDS";
     public static final String INTRON = "intron";
     public static final Pattern SEQUENCE_RE = Pattern.compile("("+CODING_SEQUENCE+"|"+INTRON+")");
-    private static final Pattern ID_ATTRIBUTE_RE = Pattern.compile(".*Name=([^_;]+)[_;].*");
-    private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^_;]+)[_;].*");
+    private static final Pattern ID_ATTRIBUTE_RE = Pattern.compile(".*Name=([^_;]+).*");
+    private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^_;]+).*");
  
     private String genomeFileName;
     private int lineNumber = 0;
@@ -67,6 +68,7 @@ public class GenomeParserImpl implements GenomeParser
                 if (parts.length < 9)
                 {
                     //throw new GenomeFileParsingException("Line "+lineNumber+": not in expected format");
+                    LOG.warn("Line "+lineNumber+": not in expected format");
                     continue;
                 }
                 String type = parts[2];

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 
 public class VirtualProteinMascotLocationGenerator implements LocationGenerator
@@ -39,7 +40,13 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
     {
         try
         {
-            return doGenerateLocations();
+            List <ProteinLocation> locations = doGenerateLocations();
+            Collections.sort(locations);
+            for (int i=0; i < locations.size(); i++) {
+                locations.get(i).setName("q" + i);
+            }
+            return  locations;
+
         }
         catch (TranslationTableParsingException e)
         {
@@ -83,7 +90,9 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
                 System.err.println(peptideSearchResult.getProteinName() + " not found in the genome");
                 continue;
             }
-
+            if (peptideSearchResult.getId().equalsIgnoreCase("q38_p5")) {
+                System.out.println("Surprise");
+            }
             int virtualGeneStart = geneInfo.getStart()-1;
             int virtualGeneStop = geneInfo.getStop()-1;
 
@@ -115,7 +124,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
                 continue;
             }
 
-            proteinLocations.add(new ProteinLocation("?", startPosition, stopPosition-startPosition, geneInfo.getDirectionStr(), "?", peptideSearchResult.getConfidenceScore()));
+            proteinLocations.add(new ProteinLocation("?", startPosition, Math.abs(stopPosition-startPosition), geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(), peptideSearchResult.getProteinName()));
         }
         return proteinLocations;
     }
@@ -194,7 +203,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator
 
     private GenomeNucleotides getGenomeNucleotides(File geneFile) throws IOException
     {
-        if (!genomeNucleotidesMap.containsKey(geneFile))
+        if (!genomeNucleotidesMap.containsKey(geneFile.getName()))
         {
             genomeNucleotidesMap.put(geneFile.getName(), new GenomeNucleotides(geneFile));
         }

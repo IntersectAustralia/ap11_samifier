@@ -1,5 +1,8 @@
 package au.org.intersect.samifier.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GffOutputter implements Outputter
 {
     public String genomeFileName;
@@ -9,6 +12,7 @@ public class GffOutputter implements Outputter
     private String directionFlag;
     private String frame;
     private String glimmerName;
+    private String virtualProteinName;
 
     public GffOutputter(ProteinLocation location, String genomeFileNameWithExtension)
     {
@@ -26,6 +30,7 @@ public class GffOutputter implements Outputter
         this.directionFlag = location.getDirection();
         this.frame = location.getFrame();
         this.glimmerName = location.getName();
+        this.virtualProteinName = location.getVirtualProteinName();
     }
 
     @Override
@@ -33,17 +38,17 @@ public class GffOutputter implements Outputter
     {
         StringBuilder output = new StringBuilder();
 
-        output.append(getOutputLine("gene"));
+        output.append(getOutputLine("gene",false));
         output.append(System.getProperty("line.separator"));
 
-        output.append(getOutputLine("CDS"));
+        output.append(getOutputLine("CDS",true));
         output.append(System.getProperty("line.separator"));
 
         return output.toString();
 
     }
 
-    private String getOutputLine(String type)
+    private String getOutputLine(String type, boolean addParent)
     {
         StringBuilder output = new StringBuilder();
         output.append(genomeFileName);
@@ -54,7 +59,17 @@ public class GffOutputter implements Outputter
         column(output, glimmerScore);
         column(output, directionFlag);
         column(output, frame);
-        column(output, "ID=" + glimmerName + ";Name=" + glimmerName + ";Note=");
+        ArrayList<String> attributes = new ArrayList<String>();
+        attributes.add("Name=" + glimmerName);
+        if (addParent) {
+            attributes.add("Parent="+glimmerName);
+        } else {
+            attributes.add("ID=" + glimmerName);
+        }
+        if (virtualProteinName != null && virtualProteinName.length() > 0 ) {
+            attributes.add("Virtual_protein="+virtualProteinName);
+        }
+        column(output, attributes);
         return output.toString();
     }
 
@@ -64,6 +79,14 @@ public class GffOutputter implements Outputter
         buff.append(field);
     }
 
+    private void column(StringBuilder buff, List<String> attributes)
+    {
+        buff.append('\t');
+        for (String attribute : attributes)
+        {
+            buff.append(attribute+";");
+        }
+    }
     private String genomeFileNameNoExtension(String genomeFileName)
     {
         int indexOfDot = genomeFileName.lastIndexOf('.');
