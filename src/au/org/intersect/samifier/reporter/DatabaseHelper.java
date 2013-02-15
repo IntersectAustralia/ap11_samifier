@@ -67,7 +67,8 @@ public class DatabaseHelper {
 	public synchronized void generateTables() throws SQLException
 	{
 		Statement statement = connection.createStatement();
-		StringBuffer query = new StringBuffer();
+        statement.execute("DROP TABLE Result IF EXISTS");
+        StringBuffer query = new StringBuffer();
 		query.append("CREATE TABLE Result (");
 		query.append("proteinId varchar(255),");
 		query.append("locusName varchar(255),");

@@ -50,9 +50,11 @@ public class DatabaseHelperTest {
     			+ "\nchromosomeId"
     			+ "\ngeneStart"
     			+ "\ngeneEnd"
+                + "\nstrand"
     			+ "\nframe"
     			+ "\nexons"
-    			+ "\nexonString";
+    			+ "\nexonString"
+                + "\nqueryid";
     	expectedString = expectedString.toUpperCase();
     	DatabaseHelper db = new DatabaseHelper();
     	db.printTableDetails(ps);

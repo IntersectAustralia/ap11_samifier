@@ -2,7 +2,6 @@ package au.org.intersect.samifier.generator;
 
 import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.ProteinLocation;
-import au.org.intersect.samifier.domain.ProteinLocationComparator;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -36,7 +35,7 @@ public class GlimmerFileLocationGenerator implements LocationGenerator
             throw new LocationGeneratorException("Error with file " + glimmerFilePath, e);
         }
 
-        Collections.sort(locations, new ProteinLocationComparator());
+        Collections.sort(locations);
         return locations;
     }
 

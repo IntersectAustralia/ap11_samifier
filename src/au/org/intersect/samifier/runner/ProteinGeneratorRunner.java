@@ -38,6 +38,7 @@ public class ProteinGeneratorRunner
     {
         LocationGenerator locationGenerator = createLocationGenerator();
         List<ProteinLocation> locations = locationGenerator.generateLocations();
+        boolean isVirtualMode = (glimmerFilePath == null);
         generateProteinsFile(locations, CodonTranslationTable.parseTableFile(translationTableFile));
         generateGffFile(locations);
         generateAccessionFile(locations);
@@ -61,7 +62,7 @@ public class ProteinGeneratorRunner
     {
         String genomeFileName = genomeFile.getName();
         GffOutputterGenerator outputterGenerator = new GffOutputterGenerator(genomeFileName);
-        ProteinLocationFileGenerator.generateFile(locations, gffWriter, outputterGenerator);
+        ProteinLocationFileGenerator.generateFile(locations, gffWriter, outputterGenerator,"##gff-version 3");
     }
 
     private void generateAccessionFile(List<ProteinLocation> locations) throws IOException

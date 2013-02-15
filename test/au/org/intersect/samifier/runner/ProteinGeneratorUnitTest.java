@@ -30,7 +30,7 @@ public final class ProteinGeneratorUnitTest
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/protein_generator/test_virtual_protein_file.fa"));
             String [] outputAsArray = out.toString().split(System.getProperty("line.separator"));
             assertEquals(outputAsArray.length, expectedLines.size());
-
+            System.out.println(out);
             for (int i = 0; i < expectedLines.size(); i++)
             {
                 assertEquals("Line " + i + " should be", expectedLines.get(i), outputAsArray[i]);

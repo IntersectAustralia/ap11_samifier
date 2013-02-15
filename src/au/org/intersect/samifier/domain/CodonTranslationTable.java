@@ -21,8 +21,7 @@ public class CodonTranslationTable
     private Map<String, String> codonMap;
     private Map<String, String> startCodonMap;
     private Set<String> stopCodons;
-
-    private CodonTranslationTable(){}
+    private boolean virtualProteinMode;
 
     public static CodonTranslationTable parseTableFile(File f)
             throws IOException, FileNotFoundException, TranslationTableParsingException
@@ -135,11 +134,11 @@ public class CodonTranslationTable
 
         // Start codon may be different
         String startCodon = nucleotideSequence.substring(0,3).toUpperCase();
-        if (startCodonMap.containsKey(startCodon))
+        /*if (!virtualProteinMode && startCodonMap.containsKey(startCodon))
         {
             aminoAcidSequence.append(toStartAminoAcid(startCodon));
             startIndex = 3;
-        }
+        } */
 
         for (int i=startIndex; i < length; i+=3)
         {

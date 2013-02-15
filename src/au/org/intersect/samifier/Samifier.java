@@ -119,6 +119,8 @@ public class Samifier
         }
         catch (ParseException pe)
         {
+            System.err.println(pe);
+            //System.err.println(pe.getMessage());
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("samifier", options, true);
             System.exit(1);

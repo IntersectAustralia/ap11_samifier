@@ -65,16 +65,18 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator
         for (int i=1; i <= baseCount; i += basesPerInterval)
         {
             addLocations(locations, i, nameIndex, basesPerInterval, baseCount, true, false);
+            addLocations(locations, i, nameIndex, basesPerInterval, baseCount, false, false);
             int halfIntervalStart = i + halfIntervalSize;
             if (halfIntervalStart <= lastCodonStartPosition)
             {
                 addLocations(locations, halfIntervalStart, nameIndex, basesPerInterval, baseCount, true, true);
+                addLocations(locations, halfIntervalStart, nameIndex, basesPerInterval, baseCount, false, true);
             }
             nameIndex++;
         }
 
         // Reverse locations
-        for (int i=baseCount; i > 0; i -= basesPerInterval)
+        /*for (int i=baseCount; i > 0; i -= basesPerInterval)
         {
             int start = i - basesPerInterval;
             addLocations(locations, start, nameIndex, basesPerInterval, baseCount, false, false);
@@ -85,7 +87,7 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator
                 addLocations(locations, halfIntervalStart, nameIndex, basesPerInterval, baseCount, false, true);
             }
             nameIndex++;
-        }
+        } */
         return locations;
     }
 
@@ -104,16 +106,16 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator
             }
 
             int endIndex = startIndex + basesPerInterval - 1;
-            if (isForward)
-            {
+           // if (isForward)
+           // {
                 startIndex += subIndex;
                 endIndex   += subIndex;
-            }
-            else
-            {
-                startIndex -= subIndex;
-                endIndex   -= subIndex;
-            }
+          //  }
+          //  else
+          //  {
+          //      startIndex -= subIndex;
+          //      endIndex   -= subIndex;
+          //  }
 
             // Ensure the start and end positions are a multiple of 3.
             // i.e. a full codon

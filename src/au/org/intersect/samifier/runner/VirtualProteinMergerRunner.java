@@ -7,6 +7,7 @@ import au.org.intersect.samifier.util.ProteinLocationFileGenerator;
 
 import java.io.File;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 
 public class VirtualProteinMergerRunner
@@ -31,8 +32,9 @@ public class VirtualProteinMergerRunner
     {
         LocationGenerator locationGenerator = new VirtualProteinMascotLocationGenerator(searchResultsPaths, translationTableFile, genomeFile, chromosomeDir);
         List<ProteinLocation> locations = locationGenerator.generateLocations();
+        Collections.sort(locations);
         String genomeFileName = genomeFile.getName();
         GffOutputterGenerator outputterGenerator = new GffOutputterGenerator(genomeFileName);
-        ProteinLocationFileGenerator.generateFile(locations, outputFile, outputterGenerator);
+        ProteinLocationFileGenerator.generateFile(locations, outputFile, outputterGenerator,"##gff-version 3");
     }
 }
