@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GeneInfo
-{
+public class GeneInfo {
     private String chromosome;
     private String id;
     private int start;
@@ -15,20 +14,21 @@ public class GeneInfo
     private int direction;
     private List<GeneSequence> locations;
 
-    public GeneInfo()
-    {
-        //locations = new TreeSet(new GeneSequenceComparator());
+    public GeneInfo() {
+        // locations = new TreeSet(new GeneSequenceComparator());
         locations = new ArrayList<GeneSequence>();
     }
 
-    public GeneInfo(String chromosome, String id, int start, int stop, int direction)
-    {
-        //this(chromosome, start, direction, new TreeSet(new GeneSequenceComparator()));
-        this(chromosome, id, start, stop, direction, new ArrayList<GeneSequence>());
+    public GeneInfo(String chromosome, String id, int start, int stop,
+            int direction) {
+        // this(chromosome, start, direction, new TreeSet(new
+        // GeneSequenceComparator()));
+        this(chromosome, id, start, stop, direction,
+                new ArrayList<GeneSequence>());
     }
 
-    public GeneInfo(String chromosome, String id, int start, int stop, int direction, List<GeneSequence> locations)
-    {
+    public GeneInfo(String chromosome, String id, int start, int stop,
+            int direction, List<GeneSequence> locations) {
         setChromosome(chromosome);
         setId(id);
         setStart(start);
@@ -37,97 +37,77 @@ public class GeneInfo
         this.locations = locations;
     }
 
-    public void setChromosome(String chromosome)
-    {
+    public void setChromosome(String chromosome) {
         this.chromosome = chromosome;
     }
 
-    public String getChromosome()
-    {
+    public String getChromosome() {
         return chromosome;
     }
 
-    public void setId(String id)
-    {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public void setStart(int start)
-    {
+    public void setStart(int start) {
         this.start = start;
     }
 
-    public int getStart()
-    {
+    public int getStart() {
         return start;
     }
 
-    public void setStop(int stop)
-    {
+    public void setStop(int stop) {
         this.stop = stop;
     }
 
-    public int getStop()
-    {
+    public int getStop() {
         return stop;
     }
 
-    public void setDirection(int direction)
-    {
+    public void setDirection(int direction) {
         this.direction = direction;
     }
 
-    public int getDirection()
-    {
+    public int getDirection() {
         return direction;
     }
 
-    public int getDirectionFlag()
-    {
-        if (GenomeConstant.REVERSE_FLAG.equals(getDirectionStr()))
-        {
+    public int getDirectionFlag() {
+        if (GenomeConstant.REVERSE_FLAG.equals(getDirectionStr())) {
             return Samifier.SAM_REVERSE_FLAG;
-        }
-        else
-        {
+        } else {
             return 0;
         }
     }
 
-    public String getDirectionStr()
-    {
+    public String getDirectionStr() {
         return getDirection() == 1 ? "+" : "-";
     }
 
-    public void addLocation(GeneSequence location)
-    {
+    public void addLocation(GeneSequence location) {
         locations.add(location);
     }
 
-    public void setLocations(List<GeneSequence> locations)
-    {
+    public void setLocations(List<GeneSequence> locations) {
         this.locations = locations;
     }
 
-    public List<GeneSequence> getLocations()
-    {
+    public List<GeneSequence> getLocations() {
         Collections.sort(locations, new GeneSequenceComparator());
         return locations;
     }
 
-    public String toString()
-    {
-        return "chromosome: "+chromosome+", start: "+start+", direction: "+direction;
+    public String toString() {
+        return "chromosome: " + chromosome + ", start: " + start
+                + ", direction: " + direction;
     }
 
-    public boolean isForward()
-    {
+    public boolean isForward() {
         return getDirection() == 1;
     }
 }
-

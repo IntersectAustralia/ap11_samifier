@@ -4,11 +4,10 @@ import au.org.intersect.samifier.domain.ProteinLocation;
 
 import java.util.List;
 
-public interface LocationGenerator
-{
-    /**
-     * returns a list of the protein locations
-     * @return a list of the protein locations
+public interface LocationGenerator {
+
+     /*
+      * @return a list of the protein locations
      */
-    public List<ProteinLocation> generateLocations() throws LocationGeneratorException;
+    List<ProteinLocation> generateLocations() throws LocationGeneratorException;
 }

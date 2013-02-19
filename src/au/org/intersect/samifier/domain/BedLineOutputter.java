@@ -1,14 +1,12 @@
 package au.org.intersect.samifier.domain;
 
-public class BedLineOutputter
-{
+public class BedLineOutputter {
     private String chromosomeName;
     private int geneStart;
     private int geneStop;
     private String proteinName;
 
-    public BedLineOutputter(PeptideSequence peptide, String proteinName)
-    {
+    public BedLineOutputter(PeptideSequence peptide, String proteinName) {
         this.chromosomeName = peptide.getGeneInfo().getChromosome();
         this.geneStart = peptide.getGeneInfo().getStart();
         this.geneStop = peptide.getGeneInfo().getStop();
@@ -16,8 +14,7 @@ public class BedLineOutputter
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder output = new StringBuilder();
         output.append(chromosomeName).append("\t");
         output.append(geneStart).append("\t");
@@ -27,6 +24,5 @@ public class BedLineOutputter
 
         return output.toString();
     }
-
 
 }

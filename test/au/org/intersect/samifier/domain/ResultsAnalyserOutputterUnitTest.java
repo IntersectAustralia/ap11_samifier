@@ -1,14 +1,9 @@
 package au.org.intersect.samifier.domain;
 
-import au.org.intersect.samifier.parser.GenomeParserImpl;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ResultsAnalyserOutputterUnitTest
 {

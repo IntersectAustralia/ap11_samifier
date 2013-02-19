@@ -1,66 +1,66 @@
 package au.org.intersect.samifier;
 
 import au.org.intersect.samifier.runner.ProteinGeneratorRunner;
-import org.apache.commons.cli.*;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 public class ProteinGenerator {
 
-    private ProteinGenerator(){}
+    private ProteinGenerator() {
+    }
 
-
-
-    public static void main(String[] args)
-    {
-        Option translationTableOpt =
-            OptionBuilder.withArgName("Translation Table File")
-                         .hasArg()
-                         .withDescription("File containing a mapping of codons to amino acids, in the format used by NCBI.")
-                         .create("t");
-        Option splitIntervalOpt =
-            OptionBuilder.withArgName("Split Interval")
-                         .hasArg()
-                         .withType(Number.class)
-                         .withDescription("Size of the intervals (number of codons) into which the genome will be split. Can't be used with the -g option.")
-                         .create("i");
-        Option glimmerFileOpt =
-            OptionBuilder.withArgName("Glimmer File")
-                         .hasArg()
-                         .withDescription("Glimmer txt file. Can't be used with the -i option.")
-                         .create("g");
-        Option genomeFileOpt =
-            OptionBuilder.withArgName("Genome File")
-                         .hasArg()
-                         .withDescription("Genome file in FASTA format")
-                         .isRequired()
-                         .create("f");
-        Option databaseNameOpt =
-            OptionBuilder.withArgName("Database Name")
-                         .hasArg()
-                         .withDescription("Database name")
-                         .isRequired()
-                         .create("d");
-        Option outputFileOpt =
-            OptionBuilder.withArgName("Output File")
-                         .hasArg()
-                         .withDescription("Filename to write the FASTA format file to")
-                         .isRequired()
-                         .create("o");
-        Option gffFileOpt =
-                OptionBuilder.withArgName("GFF File")
-                        .hasArg()
-                        .withDescription("Filename to write the GFF file to")
-                        .isRequired(false)
-                        .create("p");
-        Option accessionFileOpt =
-                OptionBuilder.withArgName("Accession File")
-                        .hasArg()
-                        .withDescription("Filename to write the accession file to")
-                        .isRequired(false)
-                        .create("q");
+    public static void main(String[] args) {
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("Translation Table File");
+        OptionBuilder
+                .withDescription("File containing a mapping of codons to amino acids, in the format used by NCBI.");
+        Option translationTableOpt = OptionBuilder.create("t");
+        OptionBuilder.withArgName("Split Interval");
+        OptionBuilder.hasArg();
+        OptionBuilder.withType(Number.class);
+        OptionBuilder.withDescription("Size of the intervals (number of codons) into which the genome will be split. Can't be used with the -g option.");
+        Option splitIntervalOpt = OptionBuilder.create("i");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("Glimmer File");
+        OptionBuilder.withDescription("Glimmer txt file. Can't be used with the -i option.");
+        Option glimmerFileOpt = OptionBuilder.create("g");
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription("Genome file in FASTA format");
+        OptionBuilder.withArgName("Genome File");
+        OptionBuilder.isRequired();
+        Option genomeFileOpt = OptionBuilder.create("f");
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription("Database name");
+        OptionBuilder.withArgName("Database Name");
+        OptionBuilder.isRequired();
+        Option databaseNameOpt = OptionBuilder.create("d");
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription("Filename to write the FASTA format file to");
+        OptionBuilder.withArgName("Output File");
+        OptionBuilder.isRequired();
+        Option outputFileOpt = OptionBuilder.create("o");
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription("Filename to write the GFF file to");
+        OptionBuilder.withArgName("GFF File");
+        OptionBuilder.isRequired(false);
+        Option gffFileOpt = OptionBuilder.create("p");
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription("Filename to write the accession file to");
+        OptionBuilder.withArgName("Accession File");
+        OptionBuilder.isRequired(false);
+        Option accessionFileOpt = OptionBuilder.create("q");
         Options options = new Options();
         options.addOption(translationTableOpt);
         options.addOption(splitIntervalOpt);
@@ -73,7 +73,7 @@ public class ProteinGenerator {
 
         CommandLineParser parser = new GnuParser();
         try {
-            CommandLine line = parser.parse( options, args );
+            CommandLine line = parser.parse(options, args);
             File translationTableFile = new File(line.getOptionValue("t"));
             File genomeFile = new File(line.getOptionValue("f"));
             String glimmerFilePath = line.getOptionValue("g");
@@ -85,8 +85,7 @@ public class ProteinGenerator {
             String gffFilename = line.getOptionValue("p");
             Writer gffWriter = null;
 
-            if (gffFilename != null)
-            {
+            if (gffFilename != null) {
                 File gffFile = new File(gffFilename);
                 gffWriter = new FileWriter(gffFile);
             }
@@ -94,31 +93,27 @@ public class ProteinGenerator {
             String accessionFilename = line.getOptionValue("q");
             Writer accessionWriter = null;
 
-            if (accessionFilename != null)
-            {
+            if (accessionFilename != null) {
                 File accessionFile = new File(accessionFilename);
                 accessionWriter = new FileWriter(accessionFile);
             }
 
-            if ((glimmerFilePath == null && interval == null) ||
-                (glimmerFilePath != null && interval != null))
-            {
+            if ((glimmerFilePath == null && interval == null)
+                    || (glimmerFilePath != null && interval != null)) {
+                outputWriter.close();
                 throw new ParseException("Only one of -i or -g permitted");
             }
-            ProteinGeneratorRunner runner = new ProteinGeneratorRunner(glimmerFilePath, genomeFile, interval,
-                    databaseName, outputWriter, translationTableFile, gffWriter, accessionWriter);
+            ProteinGeneratorRunner runner = new ProteinGeneratorRunner(
+                    glimmerFilePath, genomeFile, interval, databaseName,
+                    outputWriter, translationTableFile, gffWriter,
+                    accessionWriter);
             runner.run();
-        }
-        catch (ParseException pe)
-        {
+        } catch (ParseException pe) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("protein_generator", options, true);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.println(e);
             e.printStackTrace();
         }
     }
 }
-

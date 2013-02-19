@@ -16,62 +16,65 @@ import org.apache.commons.cli.ParseException;
 import au.org.intersect.samifier.reporter.DatabaseHelper;
 import au.org.intersect.samifier.runner.ResultAnalyserRunner;
 
-public class ResultsAnalyser
-{    
-    public static void main(String ... args)
-    {
-    	
+public class ResultsAnalyser {
+    public static void main(String... args) {
 
-        Option resultsFile = OptionBuilder.withArgName("searchResultsFile")
-                .hasArg()
-                .withDescription("Mascot search results file in txt format")
-                .isRequired()
-                .create("r");
-        Option mappingFile = OptionBuilder.withArgName("mappingFile")
-                .hasArg()
-                .withDescription("File mapping protein identifier to ordered locus name")
-                .isRequired()
-                .create("m");
-        Option genomeFileOpt = OptionBuilder.withArgName("genomeFile")
-                .hasArg()
-                .withDescription("Genome file in gff format")
-                .isRequired()
-                .create("g");
-        Option outputFile = OptionBuilder.withArgName("outputFile")
-                .hasArg()
-                .withDescription("Filename to write the SAM format file to")
-                .isRequired()
-                .create("o");
-        Option chrDirOpt  = OptionBuilder.withArgName("chromosomeDir")
-                .hasArg()
-                .withDescription("Directory containing the chromosome files in FASTA format for the given genome")
-                .isRequired()
-                .create("c");
-        Option sqlOpt  = OptionBuilder.withArgName("sqlQuery")
-                .hasArg()
-                .withDescription("Filters the result through the use of a SQL statement to the output file")
-                .create("sql");
-        Option repListOpt = OptionBuilder.withArgName("reportList")
-        		.hasArg()
-        		.withDescription("A file containing all the pre-built SQL queries")
-        		.create("replist");
-        Option repIdOpt = OptionBuilder.withArgName("reportId")
-        		.hasArg()
-        		.withDescription("Access a built in report query")
-        		.create("rep");     
-        
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription("Mascot search results file in txt format");
+        OptionBuilder.withArgName("searchResultsFile");
+        OptionBuilder.isRequired();
+        Option resultsFile = OptionBuilder.create("r");
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription("File mapping protein identifier to ordered locus name");
+        OptionBuilder.withArgName("mappingFile");
+        OptionBuilder.isRequired();
+        Option mappingFile = OptionBuilder.create("m");
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription("Genome file in gff format");
+        OptionBuilder.withArgName("genomeFile");
+        OptionBuilder.isRequired();
+        Option genomeFileOpt = OptionBuilder.create("g");
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription("Filename to write the SAM format file to");
+        OptionBuilder.withArgName("outputFile");
+        OptionBuilder.isRequired();
+        Option outputFile = OptionBuilder.create("o");
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription("Directory containing the chromosome files in FASTA format for the given genome");
+        OptionBuilder.withArgName("chromosomeDir");
+        OptionBuilder.isRequired();
+        Option chrDirOpt = OptionBuilder.create("c");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("sqlQuery");
+        OptionBuilder
+                .withDescription("Filters the result through the use of a SQL statement to the output file");
+        Option sqlOpt = OptionBuilder.create("sql");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("reportList");
+        OptionBuilder
+                .withDescription("A file containing all the pre-built SQL queries");
+        Option repListOpt = OptionBuilder.create("replist");
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName("reportId");
+        OptionBuilder.withDescription("Access a built in report query");
+        Option repIdOpt = OptionBuilder.create("rep");
+
         Options options = new Options();
-        
-        if ( DebuggingFlag.get_sbi_debug_flag() == 1 )
-        {
-            Option translationTableOpt = OptionBuilder.withArgName("Translation Table File")
-                    .hasArg()
-                    .withDescription("File containing a mapping of codons to amino acids, in the format used by NCBI.")
-                    .isRequired()
-                    .create("t");
-        	options.addOption(translationTableOpt);
+
+        if (DebuggingFlag.get_sbi_debug_flag() == 1) {
+            OptionBuilder.hasArg();
+            OptionBuilder
+                    .withDescription("File containing a mapping of codons to amino acids, in the format used by NCBI.");
+            OptionBuilder.withArgName("Translation Table File");
+            OptionBuilder.isRequired();
+            Option translationTableOpt = OptionBuilder.create("t");
+            options.addOption(translationTableOpt);
         }
-        
+
         options.addOption(resultsFile);
         options.addOption(mappingFile);
         options.addOption(genomeFileOpt);
@@ -83,7 +86,7 @@ public class ResultsAnalyser
 
         CommandLineParser parser = new GnuParser();
         try {
-            CommandLine line = parser.parse( options, args );
+            CommandLine line = parser.parse(options, args);
             File searchResultsFile = new File(line.getOptionValue("r"));
             File genomeFile = new File(line.getOptionValue("g"));
             File mapFile = new File(line.getOptionValue("m"));
@@ -92,74 +95,58 @@ public class ResultsAnalyser
             String sqlQuery = line.getOptionValue("sql");
             String repListFile = line.getOptionValue("replist");
             String repId = line.getOptionValue("rep");
-            
-            /// Change by Ignatius Pang  *%*%*%
-            /// This debug flag is currently set to provide internal validation alternatively spliced peptides. 
-            /// The nucleotide sequence in the 'output' SAM file is compared with the amino acid sequence in the 'input' Mascot DAT or mzIdentML file.
-            if ( DebuggingFlag.get_sbi_debug_flag() == 1 )
-            {
+
+            // / Change by Ignatius Pang *%*%*%
+            // / This debug flag is currently set to provide internal validation
+            // alternatively spliced peptides.
+            // / The nucleotide sequence in the 'output' SAM file is compared
+            // with the amino acid sequence in the 'input' Mascot DAT or
+            // mzIdentML file.
+            if (DebuggingFlag.get_sbi_debug_flag() == 1) {
                 File translationTableFile = new File(line.getOptionValue("t"));
-                ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, 
-                		mapFile, outfile, chromosomeDir, translationTableFile);
-                if (sqlQuery == null && repId == null)
-                {
-                	analyser.run();	
-                }
-                else if (sqlQuery != null && (repId != null || repListFile != null))
-                {
-                	 System.err.println("Only use either reportId or sqlQuery.");
-                }
-                else if (sqlQuery != null)
-                {
+                ResultAnalyserRunner analyser = new ResultAnalyserRunner(
+                        searchResultsFile, genomeFile, mapFile, outfile,
+                        chromosomeDir, translationTableFile);
+                if (sqlQuery == null && repId == null) {
+                    analyser.run();
+                } else if (sqlQuery != null
+                        && (repId != null || repListFile != null)) {
+                    System.err.println("Only use either reportId or sqlQuery.");
+                } else if (sqlQuery != null) {
                     mainWithQuery(analyser, sqlQuery);
-                }
-                else
-                {
+                } else {
                     mainWithReportId(analyser, repId, repListFile);
                 }
-            }
-            else
-            {
-            	ResultAnalyserRunner analyser = new ResultAnalyserRunner(searchResultsFile, genomeFile, 
-                		mapFile, outfile, chromosomeDir);
-                if (sqlQuery == null && repId == null)
-                {
-                	analyser.run();	
-                }
-                else if (sqlQuery != null && (repId != null || repListFile != null))
-                {
-                	 System.err.println("Only use either reportId or sqlQuery.");
-                }
-                else if (sqlQuery != null)
-                {
+            } else {
+                ResultAnalyserRunner analyser = new ResultAnalyserRunner(
+                        searchResultsFile, genomeFile, mapFile, outfile,
+                        chromosomeDir);
+                if (sqlQuery == null && repId == null) {
+                    analyser.run();
+                } else if (sqlQuery != null
+                        && (repId != null || repListFile != null)) {
+                    System.err.println("Only use either reportId or sqlQuery.");
+                } else if (sqlQuery != null) {
                     mainWithQuery(analyser, sqlQuery);
-                }
-                else
-                {
+                } else {
                     mainWithReportId(analyser, repId, repListFile);
                 }
             }
 
-
-
-        }
-        catch (ParseException pe)
-        {
+        } catch (ParseException pe) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("result_analyser", options, true);
             System.exit(1);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.println(e);
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    private static void mainWithQuery(ResultAnalyserRunner analyser, String sqlQuery) throws Exception {
-        if (sqlQuery.isEmpty())
-        {
+    private static void mainWithQuery(ResultAnalyserRunner analyser,
+            String sqlQuery) throws Exception {
+        if (sqlQuery.isEmpty()) {
             DatabaseHelper db = new DatabaseHelper();
             db.printTableDetails(null);
             db.shutdown();
@@ -169,15 +156,14 @@ public class ResultsAnalyser
         analyser.runWithQuery(sqlQuery);
     }
 
-    private static void mainWithReportId(ResultAnalyserRunner analyser, String repId, String repListFile) throws Exception {
-        if (repListFile == null || !(new File(repListFile)).exists())
-        {
+    private static void mainWithReportId(ResultAnalyserRunner analyser,
+            String repId, String repListFile) throws Exception {
+        if (repListFile == null || !(new File(repListFile)).exists()) {
             System.err.println("Cannot use reportId if no reportList is used");
             return;
         }
         String sqlQuery = getQueryFromFile(repId, repListFile);
-        if (sqlQuery == null || sqlQuery.isEmpty())
-        {
+        if (sqlQuery == null || sqlQuery.isEmpty()) {
             System.err.println("reportId does not exists or query is empty");
             return;
         }

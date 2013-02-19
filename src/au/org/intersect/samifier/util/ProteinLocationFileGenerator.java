@@ -9,43 +9,36 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
-public class ProteinLocationFileGenerator
-{
-    public static void generateFile(List<ProteinLocation> locations, Writer fileWriter, ProteinLocationBasedOutputterGenerator outputterGenerator)
-            throws IOException{
-        generateFile(locations, fileWriter, outputterGenerator,null);
+public class ProteinLocationFileGenerator {
+    public static void generateFile(List<ProteinLocation> locations,
+            Writer fileWriter,
+            ProteinLocationBasedOutputterGenerator outputterGenerator)
+            throws IOException {
+        generateFile(locations, fileWriter, outputterGenerator, null);
     }
 
-    public static void generateFile(List<ProteinLocation> locations, Writer fileWriter, ProteinLocationBasedOutputterGenerator outputterGenerator, String header)
-            throws IOException
-    {
-        if (fileWriter != null)
-        {
+    public static void generateFile(List<ProteinLocation> locations,
+            Writer fileWriter,
+            ProteinLocationBasedOutputterGenerator outputterGenerator,
+            String header) throws IOException {
+        if (fileWriter != null) {
             BufferedWriter writer = null;
-            try
-            {
+            try {
                 writer = new BufferedWriter(fileWriter);
                 if (header != null && header.length() > 0) {
                     writer.append(header);
                     writer.append("\n");
                 }
-                for (ProteinLocation location : locations)
-                {
-                    writer.append(outputterGenerator.getOutputterFor(location).getOutput());
+                for (ProteinLocation location : locations) {
+                    writer.append(outputterGenerator.getOutputterFor(location)
+                            .getOutput());
                 }
-            }
-            catch(IOException e)
-            {
+            } catch (IOException e) {
                 System.exit(-1);
-            }
-            catch (OutputException e)
-            {
+            } catch (OutputException e) {
                 System.exit(-1);
-            }
-            finally
-            {
-                if (writer != null)
-                {
+            } finally {
+                if (writer != null) {
                     writer.close();
                 }
             }

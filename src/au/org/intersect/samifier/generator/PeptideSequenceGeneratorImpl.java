@@ -1,53 +1,63 @@
 package au.org.intersect.samifier.generator;
 
-import au.org.intersect.samifier.domain.*;
-import org.apache.log4j.Logger;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
-{
-    private static Logger LOG = Logger.getLogger(PeptideSequenceGeneratorImpl.class);
+import org.apache.log4j.Logger;
+
+import au.org.intersect.samifier.domain.GeneInfo;
+import au.org.intersect.samifier.domain.GeneSequence;
+import au.org.intersect.samifier.domain.Genome;
+import au.org.intersect.samifier.domain.GenomeConstant;
+import au.org.intersect.samifier.domain.NucleotideSequence;
+import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.PeptideSequence;
+import au.org.intersect.samifier.domain.ProteinToOLNMap;
+import au.org.intersect.samifier.parser.FastaParserImpl;
+
+public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
+    private static Logger LOG = Logger
+            .getLogger(PeptideSequenceGeneratorImpl.class);
 
     private Genome genome;
     private ProteinToOLNMap proteinOLNMap;
     private File chromosomeDirectory;
+    private FastaParserImpl fasta;
 
-    public PeptideSequenceGeneratorImpl(Genome genome, ProteinToOLNMap proteinOLNMap, File chromosomeDirectory)
-    {
+    public PeptideSequenceGeneratorImpl(Genome genome,
+            ProteinToOLNMap proteinOLNMap, File chromosomeDirectory) {
         this.genome = genome;
         this.proteinOLNMap = proteinOLNMap;
         this.chromosomeDirectory = chromosomeDirectory;
+        this.fasta = new FastaParserImpl();
     }
 
     @Override
-    public List<PeptideSequence> getPeptideSequences(List<PeptideSearchResult> peptideSearchResults) throws PeptideSequenceGeneratorException
-    {
+    public List<PeptideSequence> getPeptideSequences(
+            List<PeptideSearchResult> peptideSearchResults)
+            throws PeptideSequenceGeneratorException {
         List<PeptideSequence> peptideSequenceList = new ArrayList<PeptideSequence>();
-        for (PeptideSearchResult searchResult : peptideSearchResults)
-        {
+        for (PeptideSearchResult searchResult : peptideSearchResults) {
             PeptideSequence sequence = getPeptideSequence(searchResult);
-            if (sequence != null)
-            {
+            if (sequence != null) {
                 peptideSequenceList.add(sequence);
             }
         }
         return peptideSequenceList;
     }
 
-
     @Override
-    public PeptideSequence getPeptideSequence(PeptideSearchResult peptideSearchResult) throws PeptideSequenceGeneratorException
-    {
+    public PeptideSequence getPeptideSequence(
+            PeptideSearchResult peptideSearchResult)
+            throws PeptideSequenceGeneratorException {
         String proteinName = peptideSearchResult.getProteinName();
         String oln = proteinOLNMap.getOLN(proteinName);
 
         GeneInfo gene = genome.getGene(oln);
-        if (gene == null)
-        {
+        if (gene == null) {
             LOG.info("Protein ID found in accession file, but locus not found in genome file");
             LOG.info("ERR_GFF: " + proteinName + " " + oln);
             return null;
@@ -55,30 +65,29 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 
         File chromosomeFile = getChromosomeFile(gene);
 
-        return getPeptideSequenceFromChromosomeFile(peptideSearchResult, chromosomeFile, gene);
+        return getPeptideSequenceFromChromosomeFile(peptideSearchResult,
+                chromosomeFile, gene);
     }
 
-    public PeptideSequence getPeptideSequenceFromChromosomeFile(PeptideSearchResult peptide, File chromosomeFile, GeneInfo gene)
-            throws PeptideSequenceGeneratorException
-    {
+    public PeptideSequence getPeptideSequenceFromChromosomeFile(
+            PeptideSearchResult peptide, File chromosomeFile, GeneInfo gene)
+            throws PeptideSequenceGeneratorException {
         List<NucleotideSequence> sequenceParts;
-        try
-        {
+        try {
             sequenceParts = extractSequenceParts(chromosomeFile, gene);
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new PeptideSequenceGeneratorException("Chromosome file not found", e);
-        }
-        catch (IOException e)
-        {
-            throw new PeptideSequenceGeneratorException("Cannot open chromosome file", e);
+        } catch (FileNotFoundException e) {
+            throw new PeptideSequenceGeneratorException(
+                    "Chromosome file not found", e);
+        } catch (IOException e) {
+            throw new PeptideSequenceGeneratorException(
+                    "Cannot open chromosome file", e);
         }
 
-        if (sequenceParts.size() == 0)
-        {
-            //throw new PeptideSequenceGeneratorException(gene.getId() + " in " + chromosomeFile.getName() + " seems empty", null);
-            LOG.warn(gene.getId() + " in " + chromosomeFile.getName() + " seems empty");
+        if (sequenceParts.size() == 0) {
+            // throw new PeptideSequenceGeneratorException(gene.getId() + " in "
+            // + chromosomeFile.getName() + " seems empty", null);
+            LOG.warn(gene.getId() + " in " + chromosomeFile.getName()
+                    + " seems empty");
             return null;
         }
 
@@ -87,8 +96,10 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 
         // Coordinates for the peptide are 1-based, so substract 1 so it
         // can be used with a 0-based string slice.
-        int relativeStart = (peptide.getPeptideStart() - 1) * GenomeConstant.BASES_PER_CODON;
-        int relativeStop  = peptide.getPeptideStop() * GenomeConstant.BASES_PER_CODON - 1;
+        int relativeStart = (peptide.getPeptideStart() - 1)
+                * GenomeConstant.BASES_PER_CODON;
+        int relativeStop = peptide.getPeptideStop()
+                * GenomeConstant.BASES_PER_CODON - 1;
 
         int absoluteStartIndex = 0;
         int absoluteStopIndex = 0;
@@ -98,28 +109,22 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
         /*
          * The chromosome nucleotide sequence contains everything- exons and
          * introns. The peptide positions we are given exclude the introns.
-         *
          * Hence, we walk through each sequence part (describe in the genome
          * file), skipping past introns and just counting through exons.
          */
-        for (NucleotideSequence part : sequenceParts)
-        {
+        for (NucleotideSequence part : sequenceParts) {
             // Skip introns, but mark them in the cigar string
-            if (GeneSequence.INTRON.equals(part.getType()))
-            {
+            if (GeneSequence.INTRON.equals(part.getType())) {
                 /*
-                   We don't start cigar strings with introns.
-                   A non-empty cigar string means we've already got part
-                   of the peptide's sequence, and this intron is in the middle.
-                */
-                int size = part.getStopIndex()-part.getStartIndex()+1;
-                if (cigar.length() > 0)
-                {
+                 * We don't start cigar strings with introns. A non-empty cigar
+                 * string means we've already got part of the peptide's
+                 * sequence, and this intron is in the middle.
+                 */
+                int size = part.getStopIndex() - part.getStartIndex() + 1;
+                if (cigar.length() > 0) {
                     updateCigar(cigar, size, GeneSequence.INTRON, direction);
                     absoluteStopIndex += size;
-                }
-                else
-                {
+                } else {
                     // This intron is before our absolute start position
                     absoluteStartIndex += size;
                     absoluteStopIndex += size;
@@ -129,12 +134,11 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 
             int sequenceSize = part.getSequence().length();
             int substringStart = 0;
-            int substringEnd   = sequenceSize;
+            int substringEnd = sequenceSize;
 
             // If the desired start position is not in this coding sequence,
             // move our cursor past it
-            if (relativeStart > (readCursor + sequenceSize - 1))
-            {
+            if (relativeStart > (readCursor + sequenceSize - 1)) {
                 readCursor += sequenceSize;
                 absoluteStartIndex += sequenceSize;
                 absoluteStopIndex += sequenceSize;
@@ -144,8 +148,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
             // After skipping through, the next part should have the starting
             // position within it. Update the absoluteStartIndex for the last
             // time.
-            if (readCursor < relativeStart)
-            {
+            if (readCursor < relativeStart) {
                 substringStart = relativeStart - readCursor;
                 absoluteStartIndex += substringStart;
                 absoluteStopIndex += substringStart;
@@ -153,143 +156,78 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator
 
             // If this part contains the stop position, then this is the last
             // part to process.
-            if ((readCursor + sequenceSize) > relativeStop)
-            {
+            if ((readCursor + sequenceSize) > relativeStop) {
                 substringEnd = relativeStop - readCursor + 1;
-                nucleotideSequence.append(part.getSequence().substring(substringStart, substringEnd));
+                nucleotideSequence.append(part.getSequence().substring(
+                        substringStart, substringEnd));
                 int partSize = substringEnd - substringStart;
                 absoluteStopIndex += partSize;
-                updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE, direction);
+                updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE,
+                        direction);
                 break;
             }
 
-            nucleotideSequence.append(part.getSequence().substring(substringStart, substringEnd));
+            nucleotideSequence.append(part.getSequence().substring(
+                    substringStart, substringEnd));
             int partSize = substringEnd - substringStart;
             absoluteStopIndex += partSize;
-            updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE, direction);
-            readCursor = substringEnd;
+            updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE,
+                    direction);
+            // readCursor = substringEnd;
+            readCursor += part.getSequence().length();
         }
 
-        String peptideSequence = GenomeConstant.REVERSE_FLAG.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
+        String peptideSequence = GenomeConstant.REVERSE_FLAG.equals(direction) ? nucleotideSequence
+                .reverse().toString() : nucleotideSequence.toString();
         // When direction is reverse,
-        //  5           17
+        // 5 17
         // |####----#####|
-        //   ^        S
-        //   6        15
-        //   absoluteStopIndex = 11, from 17 to 6
-        //   absoluteStartIndex = 2, from 17 to 15
-        //   startIndex  = (17-5 = 12) - 11 + 1 = 2 (because it is 1 based)
-        //   stopIndex  = (17-5 = 12) - 2 + 1 = 11 (because it is 1 based)
-        if (peptideSequence.length() == 0)
-        {
+        // ^ S
+        // 6 15
+        // absoluteStopIndex = 11, from 17 to 6
+        // absoluteStartIndex = 2, from 17 to 15
+        // startIndex = (17-5 = 12) - 11 + 1 = 2 (because it is 1 based)
+        // stopIndex = (17-5 = 12) - 2 + 1 = 11 (because it is 1 based)
+        if (peptideSequence.length() == 0) {
             return null;
         }
-        int startIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
-        int stopIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStartIndex + 1) : absoluteStopIndex;
-        int bedStartIndex = gene.getStart() + startIndex - 1; // BED files are zero based (6 in the example)
-        int bedStopIndex  = gene.getStart() + stopIndex - 1; // BED files are zero based (15 in the example)
-        return new PeptideSequence(peptideSequence, cigar.toString(), startIndex, bedStartIndex, bedStopIndex, gene);
+        int startIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene
+                .getStop() - gene.getStart() - absoluteStopIndex + 1)
+                : absoluteStartIndex;
+        int stopIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene
+                .getStop() - gene.getStart() - absoluteStartIndex + 1)
+                : absoluteStopIndex;
+        int bedStartIndex = gene.getStart() + startIndex - 1; // BED files are
+                                                              // zero based (6
+                                                              // in the
+                                                              // example)
+        int bedStopIndex = gene.getStart() + stopIndex - 1; // BED files are
+                                                            // zero based (15 in
+                                                            // the example)
+        return new PeptideSequence(peptideSequence, cigar.toString(),
+                startIndex, bedStartIndex, bedStopIndex, gene);
     }
 
-    private void updateCigar(StringBuilder cigar, int size, String type, String direction)
-    {
+    private void updateCigar(StringBuilder cigar, int size, String type,
+            String direction) {
         String marker = GeneSequence.INTRON.equals(type) ? "N" : "M";
-        if (GenomeConstant.REVERSE_FLAG.equals(direction))
-        {
+        if (GenomeConstant.REVERSE_FLAG.equals(direction)) {
             cigar.insert(0, marker);
             cigar.insert(0, size);
-        }
-        else
-        {
+        } else {
             cigar.append(size);
             cigar.append(marker);
         }
     }
 
-    protected List<NucleotideSequence> extractSequenceParts(File chromosomeFile, GeneInfo gene)
-            throws FileNotFoundException, IOException
-    {
-        if (!chromosomeFile.exists())
-        {
-            throw new FileNotFoundException(chromosomeFile.getAbsolutePath() + " not found");
-        }
-
-        String direction = gene.getDirectionStr();
-
-        List<NucleotideSequence> parts = new ArrayList<NucleotideSequence>();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader(chromosomeFile));
-            // Skip header of FASTA file
-            String line = reader.readLine();
-
-            int readCursor = 0;
-            List<GeneSequence> locations = gene.getLocations();
-            for (GeneSequence location : locations)
-            {
-                int startIndex = location.getStart();
-                int stopIndex  = location.getStop();
-
-                if (!location.getSequenceType())
-                {
-                    parts.add(new NucleotideSequence(null, GeneSequence.INTRON, startIndex, stopIndex));
-                    continue;
-                }
-
-                StringBuilder sequence = new StringBuilder();
-
-                // Read forward to startIndex
-                while (readCursor < startIndex)
-                {
-                    line = reader.readLine();
-                    line = line.replace("\r", "").replace("\n", "");
-                    readCursor += line.length();
-                }
-
-                // GFF (GenomeParserImpl) files use 1-based indices
-                int readStart = (startIndex - 1) % line.length();
-                int readStop  = line.length();
-
-                // Read in the nucleotide sequence
-                while (readCursor < stopIndex)
-                {
-                    sequence.append(line.substring(readStart, readStop));
-                    readStart = 0;
-                    line = reader.readLine();
-                    line = line.replace("\r", "").replace("\n", "");
-                    readCursor += line.length();
-                }
-
-                // Get the last piece
-                readStop = (stopIndex - 1) % line.length();
-                sequence.append(line.substring(readStart, readStop + 1));
-
-                String sequenceString = GenomeConstant.REVERSE_FLAG.equals(direction) ? sequence.reverse().toString() : sequence.toString();
-                // System.out.println(sequenceString + " >> " + sequenceString.length() + " " + (stopIndex - startIndex + 1));
-                parts.add(new NucleotideSequence(sequenceString, GeneSequence.CODING_SEQUENCE, startIndex, stopIndex));
-            }
-
-        }
-        finally
-        {
-            if (reader != null)
-            {
-                reader.close();
-            }
-        }
-
-        if (GenomeConstant.REVERSE_FLAG.equals(direction))
-        {
-            Collections.reverse(parts);
-        }
-
-        return parts;
+    protected List<NucleotideSequence> extractSequenceParts(
+            File chromosomeFile, GeneInfo gene) throws IOException {
+        return fasta.extractSequenceParts(chromosomeFile, gene);
     }
 
     private File getChromosomeFile(GeneInfo gene) {
         // TODO: find the different chrormosome file extensions
         return new File(chromosomeDirectory, gene.getChromosome() + ".fa");
     }
-
 
 }

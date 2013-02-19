@@ -36,9 +36,10 @@ public class SamifierRunner {
     private ProteinToOLNMap proteinToOLNMap;
     private File translationTableFile;
 
-
-    public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath, BigDecimal confidenceScore, File translationTableFile) throws Exception
-    {
+    public SamifierRunner(String[] searchResultsPaths, File genomeFile,
+            File mapFile, File chromosomeDir, File outfile, String bedfilePath,
+            BigDecimal confidenceScore, File translationTableFile)
+            throws Exception {
         this.searchResultsPaths = searchResultsPaths;
         this.genomeFile = genomeFile;
         this.mapFile = mapFile;
@@ -48,9 +49,10 @@ public class SamifierRunner {
         this.confidenceScore = confidenceScore;
         this.translationTableFile = translationTableFile;
     }
-    
-    public SamifierRunner(String[] searchResultsPaths, File genomeFile, File mapFile, File chromosomeDir, File outfile, String bedfilePath, BigDecimal confidenceScore)
-    {
+
+    public SamifierRunner(String[] searchResultsPaths, File genomeFile,
+            File mapFile, File chromosomeDir, File outfile, String bedfilePath,
+            BigDecimal confidenceScore) {
         this.searchResultsPaths = searchResultsPaths;
         this.genomeFile = genomeFile;
         this.mapFile = mapFile;
@@ -60,139 +62,139 @@ public class SamifierRunner {
         this.confidenceScore = confidenceScore;
     }
 
-    public void run() throws Exception
-    {
+    public void run() throws Exception {
         GenomeParserImpl genomeParser = new GenomeParserImpl();
         genome = genomeParser.parseGenomeFile(genomeFile);
 
         ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
         proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
 
-        PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
-        List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsPaths);
+        PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(
+                proteinToOLNMap);
+        List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser
+                .parseResults(searchResultsPaths);
 
         FileWriter bedWriter = null;
-        if (bedfilePath != null)
-        {
+        if (bedfilePath != null) {
             bedWriter = new FileWriter(bedfilePath);
         }
         FileWriter sam = new FileWriter(outfile);
+        // sort serch result by proteins
+        peptideSearchResults = peptideSearchResultsParser
+                .sortResultsByChromosome(peptideSearchResults, proteinToOLNMap,
+                        genome);
         createSAM(peptideSearchResults, sam, bedWriter);
-
     }
 
-
-    public void createSAM(List<PeptideSearchResult> peptideSearchResults, Writer output, Writer bedWriter)
-            throws PeptideSequenceGeneratorException, IOException
-    {
+    public void createSAM(List<PeptideSearchResult> peptideSearchResults,
+            Writer output, Writer bedWriter)
+            throws PeptideSequenceGeneratorException, IOException {
         LOG.debug("creating sam file");
         List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
-        PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(genome, proteinToOLNMap, chromosomeDir);
+        PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(
+                genome, proteinToOLNMap, chromosomeDir);
         Set<String> foundProteins = new HashSet<String>();
 
         PeptideSearchResultFilter peptideFilter = null;
-        if (confidenceScore != null)
-        {
+        if (confidenceScore != null) {
             peptideFilter = new ConfidenceScoreFilter(confidenceScore);
         }
 
-        for (PeptideSearchResult result : peptideSearchResults)
-        {
-            if (peptideFilter != null && !peptideFilter.accepts(result))
-            {
+        for (PeptideSearchResult result : peptideSearchResults) {
+            if (peptideFilter != null && !peptideFilter.accepts(result)) {
                 continue;
             }
 
-            PeptideSequence peptide = sequenceGenerator.getPeptideSequence(result);
-            if (peptide == null)
-            {
+            PeptideSequence peptide = sequenceGenerator
+                    .getPeptideSequence(result);
+            if (peptide == null) {
                 continue;
             }
-
             String proteinName = result.getProteinName();
-            String resultName = proteinName+"."+result.getId();
-            int peptideStart = peptide.getStartIndex() + peptide.getGeneInfo().getStart();
+            String resultName = proteinName + "." + result.getId();
+            int peptideStart = peptide.getStartIndex()
+                    + peptide.getGeneInfo().getStart();
 
-            if (bedWriter != null && !foundProteins.contains(proteinName))
-            {
+            if (bedWriter != null && !foundProteins.contains(proteinName)) {
                 foundProteins.add(proteinName);
-                BedLineOutputter bedLineOutputter = new BedLineOutputter(peptide, proteinName);
+                BedLineOutputter bedLineOutputter = new BedLineOutputter(
+                        peptide, proteinName);
                 bedWriter.write(bedLineOutputter.toString());
             }
 
-            if( DebuggingFlag.get_use_mascot_score_flag() == 1)
-            {	
-            	int mapq = result.getConfidenceScore().round(new MathContext(0)).intValue();
-	            samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence(), mapq));
+            if (DebuggingFlag.get_use_mascot_score_flag() == 1) {
+                int mapq = result.getConfidenceScore()
+                        .round(new MathContext(0)).intValue();
+                samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(),
+                        peptideStart, peptide.getCigarString(), peptide
+                                .getNucleotideSequence(), mapq));
+            } else {
+                samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(),
+                        peptideStart, peptide.getCigarString(), peptide
+                                .getNucleotideSequence()));
             }
-            else
-            { 	
-	            samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()));
-            }
-            
-            try 
-            {
-	            if ( DebuggingFlag.get_sbi_debug_flag() == 1 )
-	            {
-	                CodonTranslationTable translationTable = CodonTranslationTable.parseTableFile(translationTableFile);
-	   	            String  nucleotideString = peptide.getNucleotideSequence();
-	            	int  direction = peptide.getGeneInfo().getDirection();
-	   	         	String mascotPeptideString = result.getPeptideSequence();
-	   	         	String predictedAminoAcidSequence = new String("");
-	   	         
-		   	         if ( direction != 1)
-		   	         {	        	 
-		   	             StringBuilder invertedReversedSequence = new StringBuilder(StringUtils.replaceChars(nucleotideString, "ACGT", "TGCA")).reverse();
-		   	             predictedAminoAcidSequence = translationTable.proteinToAminoAcidSequence(invertedReversedSequence.toString());
-		   	         }
-		   	         else
-		   	         {
-		   	             predictedAminoAcidSequence = translationTable.proteinToAminoAcidSequence(nucleotideString);   	        	
-		   	         }
-	   	         	         
-		   	         if ( ! predictedAminoAcidSequence.equals(mascotPeptideString) )
-		   	         {
-		   	        	String samEntryStrng = new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), peptide.getNucleotideSequence()).toString();
-		   	        	 
-		                  LOG.info("Incorrect nucleotide sequence for following SAM entry:\n" + samEntryStrng);    	 
-		   	         }            	
-	
-	            }
-            }catch (Exception npe)
-            {
-                LOG.info("Problem with internal validation of output nucleotide sequence!");    
+
+            try {
+                if (DebuggingFlag.get_sbi_debug_flag() == 1) {
+                    CodonTranslationTable translationTable = CodonTranslationTable
+                            .parseTableFile(translationTableFile);
+                    String nucleotideString = peptide.getNucleotideSequence();
+                    int direction = peptide.getGeneInfo().getDirection();
+                    String mascotPeptideString = result.getPeptideSequence();
+                    String predictedAminoAcidSequence = new String("");
+
+                    if (direction != 1) {
+                        StringBuilder invertedReversedSequence = new StringBuilder(
+                                StringUtils.replaceChars(nucleotideString,
+                                        "ACGT", "TGCA")).reverse();
+                        predictedAminoAcidSequence = translationTable
+                                .proteinToAminoAcidSequence(invertedReversedSequence
+                                        .toString());
+                    } else {
+                        predictedAminoAcidSequence = translationTable
+                                .proteinToAminoAcidSequence(nucleotideString);
+                    }
+
+                    if (!predictedAminoAcidSequence.equals(mascotPeptideString)) {
+                        String samEntryStrng = new SAMEntry(resultName,
+                                peptide.getGeneInfo(), peptideStart,
+                                peptide.getCigarString(),
+                                peptide.getNucleotideSequence()).toString();
+
+                        LOG.info("Incorrect nucleotide sequence for following SAM entry:\n"
+                                + samEntryStrng);
+                    }
+
+                }
+            } catch (Exception npe) {
+                LOG.info("Problem with internal validation of output nucleotide sequence!");
                 npe.printStackTrace();
 
-            	System.err.println(npe);            	
+                System.err.println(npe);
             }
-            
-            
+
         }
 
         String prevChromosome = null;
         Collections.sort(samEntries, new SAMEntryComparator());
-        
-        //////////////////////////////////////////////////
-        ////    Location to store SAM file headers     ///
-        //////////////////////////////////////////////////
-               
-        for (SAMEntry samEntry : samEntries)
-        {
+
+        // ////////////////////////////////////////////////
+        // // Location to store SAM file headers ///
+        // ////////////////////////////////////////////////
+
+        for (SAMEntry samEntry : samEntries) {
             String chromosome = samEntry.getRname();
-            if (! chromosome.equals(prevChromosome))
-            {
+            if (!chromosome.equals(prevChromosome)) {
                 samEntry.setRnext("=");
                 prevChromosome = chromosome;
             }
             output.write(samEntry.toString());
         }
 
-        if (bedWriter != null)
-        {
+        if (bedWriter != null) {
             bedWriter.close();
         }
         output.close();
     }
 
 }
-
