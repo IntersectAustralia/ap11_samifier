@@ -9,7 +9,6 @@ public class GffOutputter implements Outputter {
     private Integer end;
     private String glimmerScore;
     private String directionFlag;
-    private String frame;
     private String glimmerName;
     private String virtualProteinName;
 
@@ -24,7 +23,6 @@ public class GffOutputter implements Outputter {
             this.glimmerScore = "0";
         }
         this.directionFlag = location.getDirection();
-        this.frame = location.getFrame();
         this.glimmerName = location.getName();
         this.virtualProteinName = location.getVirtualProteinName();
     }

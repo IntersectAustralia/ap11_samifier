@@ -1,19 +1,26 @@
 package au.org.intersect.samifier;
 
-import au.org.intersect.samifier.domain.DebuggingFlag;
-import au.org.intersect.samifier.runner.SamifierRunner;
-import org.apache.commons.cli.*;
+import java.io.File;
+import java.math.BigDecimal;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
-import java.io.File;
-import java.math.BigDecimal;
+import au.org.intersect.samifier.domain.DebuggingFlag;
+import au.org.intersect.samifier.runner.SamifierRunner;
 
 public class Samifier {
 
-    private static Logger LOG = Logger.getLogger(Samifier.class);
     public static final int SAM_REVERSE_FLAG = 0x10;
 
     public static void main(String[] args) {

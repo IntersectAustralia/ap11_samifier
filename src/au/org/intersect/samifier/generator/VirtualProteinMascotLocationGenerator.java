@@ -1,20 +1,33 @@
 package au.org.intersect.samifier.generator;
 
-import au.org.intersect.samifier.domain.*;
-import au.org.intersect.samifier.parser.*;
-import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Collections;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import au.org.intersect.samifier.domain.CodonTranslationTable;
+import au.org.intersect.samifier.domain.EqualProteinOLNMap;
+import au.org.intersect.samifier.domain.GeneInfo;
+import au.org.intersect.samifier.domain.Genome;
+import au.org.intersect.samifier.domain.GenomeConstant;
+import au.org.intersect.samifier.domain.GenomeNucleotides;
+import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.ProteinLocation;
+import au.org.intersect.samifier.domain.ProteinToOLNMap;
+import au.org.intersect.samifier.domain.TranslationTableParsingException;
+import au.org.intersect.samifier.parser.GenomeFileParsingException;
+import au.org.intersect.samifier.parser.GenomeParserImpl;
+import au.org.intersect.samifier.parser.MascotParsingException;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
+
 public class VirtualProteinMascotLocationGenerator implements LocationGenerator {
-    private static Logger LOG = Logger
-            .getLogger(VirtualProteinMascotLocationGenerator.class);
+    private static Logger LOG = Logger.getLogger(VirtualProteinMascotLocationGenerator.class);
     private static int NOT_FOUND = -1;
 
     private File genomeFile;

@@ -196,9 +196,8 @@ public class ResultsAnalyserOutputter {
         output.append(exonString + SEPARATOR); // / Change by Ignatius Pang
                                                // *%*%*%
 
-        if (DebuggingFlag.get_sbi_debug_flag() == 1) // / Change by Ignatius
+        if (DebuggingFlag.get_sbi_debug_flag() == 1) {// / Change by Ignatius
                                                      // Pang *%*%*%
-        {
             output.append(queryId + SEPARATOR);
             output.append(validatedSequence);
         } else {

@@ -82,16 +82,13 @@ public class PeptideSearchResultsParserImpl implements
         try {
             reader = new BufferedReader(new FileReader(resultsFile));
             String line;
-            int lineNumber = 0;
             while ((line = reader.readLine()) != null) {
-                lineNumber++;
                 if (peptidesSectionStarted) {
                     if (line.startsWith("--")) {
                         break;
                     }
                     results.addAll(getProteinsFromQueryLine(line));
-                } else if (line
-                        .startsWith("Content-Type: application/x-Mascot; name=\"peptides\"")) {
+                } else if (line.startsWith("Content-Type: application/x-Mascot; name=\"peptides\"")) {
                     peptidesSectionStarted = true;
                 }
             }
@@ -137,9 +134,9 @@ public class PeptideSearchResultsParserImpl implements
         for (String chromosome : chromosomes) {
             for (PeptideSearchResult res : searchResult) {
                 if (proteinIDToChromosome.containsKey(res.getProteinName())) {
-                    if (proteinIDToChromosome.get(res.getProteinName()).equals(
-                            chromosome))
+                    if (proteinIDToChromosome.get(res.getProteinName()).equals(chromosome)) {
                         result.add(res);
+                    }
                 }
             }
         }

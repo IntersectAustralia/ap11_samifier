@@ -1,23 +1,39 @@
 package au.org.intersect.samifier.runner;
 
-import au.org.intersect.samifier.domain.*;
-import au.org.intersect.samifier.filter.ConfidenceScoreFilter;
-import au.org.intersect.samifier.filter.PeptideSearchResultFilter;
-import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
-import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
-import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
-import au.org.intersect.samifier.parser.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
+import au.org.intersect.samifier.domain.BedLineOutputter;
+import au.org.intersect.samifier.domain.CodonTranslationTable;
+import au.org.intersect.samifier.domain.DebuggingFlag;
+import au.org.intersect.samifier.domain.Genome;
+import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.PeptideSequence;
+import au.org.intersect.samifier.domain.ProteinToOLNMap;
+import au.org.intersect.samifier.domain.SAMEntry;
+import au.org.intersect.samifier.domain.SAMEntryComparator;
+import au.org.intersect.samifier.filter.ConfidenceScoreFilter;
+import au.org.intersect.samifier.filter.PeptideSearchResultFilter;
+import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
+import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
+import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
+import au.org.intersect.samifier.parser.GenomeParserImpl;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
+import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
+import au.org.intersect.samifier.parser.ProteinToOLNParser;
+import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 
 public class SamifierRunner {
 

@@ -1,10 +1,10 @@
 package au.org.intersect.samifier.domain;
 
 public class NucleotideSequence {
-    public String sequence;
-    public String type;
-    public int startIndex;
-    public int stopIndex;
+    private String sequence;
+    private String type;
+    private int startIndex;
+    private int stopIndex;
 
     public NucleotideSequence(String sequence, String type, int startIndex,
             int stopIndex) {

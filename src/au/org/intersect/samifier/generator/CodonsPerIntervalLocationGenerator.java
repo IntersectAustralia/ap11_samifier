@@ -1,12 +1,16 @@
 package au.org.intersect.samifier.generator;
 
-import au.org.intersect.samifier.domain.GenomeConstant;
-import au.org.intersect.samifier.domain.ProteinLocation;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
+import au.org.intersect.samifier.domain.GenomeConstant;
+import au.org.intersect.samifier.domain.ProteinLocation;
 
 public class CodonsPerIntervalLocationGenerator implements LocationGenerator {
     private String interval;
