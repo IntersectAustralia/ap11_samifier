@@ -10,7 +10,8 @@ import java.io.File;
 public class CodonFinder {
     private static GenomeNucleotides nucleotides;
     private static CodonTranslationTable translationTable;
-
+    private CodonFinder() {
+    }
     public static void main(String[] args) throws Exception {
         try {
             File fastaFile = new File(args[0]);
@@ -39,15 +40,13 @@ public class CodonFinder {
 
     }
 
-    private static void printCodonRange(int startCodonPosition,
-            int endCodonPosition, int direction) throws UnknownCodonException {
+    private static void printCodonRange(int startCodonPosition, int endCodonPosition, int direction) throws UnknownCodonException {
         for (int codonPosition = startCodonPosition; codonPosition <= endCodonPosition; codonPosition += GenomeConstant.BASES_PER_CODON) {
             printCodonAt(codonPosition, direction);
         }
     }
 
-    private static void printCodonAt(int codonPosition, int direction)
-            throws UnknownCodonException {
+    private static void printCodonAt(int codonPosition, int direction) throws UnknownCodonException {
         String codon = nucleotides.codonAt(codonPosition, direction);
         System.out.print(codon);
         if (translationTable.isStartCodon(codon)) {

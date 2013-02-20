@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
 
 public class CodonTranslationTable {
     public static final String UNKNOWN_AMINO_ACID = "X";
@@ -19,7 +17,6 @@ public class CodonTranslationTable {
     private Map<String, String> codonMap;
     private Map<String, String> startCodonMap;
     private Set<String> stopCodons;
-    private boolean virtualProteinMode;
 
     public static CodonTranslationTable parseTableFile(File f)
             throws IOException, TranslationTableParsingException {
@@ -106,7 +103,7 @@ public class CodonTranslationTable {
     public String proteinToAminoAcidSequence(String nucleotideSequence)
             throws UnknownCodonException {
         int length = nucleotideSequence.length();
-        if (length < 3) {
+        if (length < GenomeConstant.BASES_PER_CODON) {
             throw new UnknownCodonException(nucleotideSequence
                     + " is not a known codon");
         }
@@ -115,8 +112,8 @@ public class CodonTranslationTable {
         int codonCount = 0;
         int startIndex = 0;
 
-        for (int i = startIndex; i < length; i += 3) {
-            if ((i + 3) > length) {
+        for (int i = startIndex; i < length; i += GenomeConstant.BASES_PER_CODON) {
+            if ((i + GenomeConstant.BASES_PER_CODON) > length) {
                 // TODO: log to error file about sequence length being
                 // non-multiple of 3 (i.e. this is not a full codon)
                 throw new UnknownCodonException(nucleotideSequence.substring(i,
@@ -124,7 +121,7 @@ public class CodonTranslationTable {
                         + " is not a known codon (at codon "
                         + codonCount + ")");
             }
-            codon = nucleotideSequence.substring(i, i + 3).toUpperCase();
+            codon = nucleotideSequence.substring(i, i + GenomeConstant.BASES_PER_CODON).toUpperCase();
             codonCount++;
             if (stopCodons.contains(codon)) {
                 aminoAcidSequence.append("*");

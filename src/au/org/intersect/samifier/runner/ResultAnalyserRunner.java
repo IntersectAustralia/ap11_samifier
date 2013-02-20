@@ -85,8 +85,9 @@ public class ResultAnalyserRunner {
             for (PeptideSearchResult peptideSearchResult : peptideSearchResults) {
                 PeptideSequence peptideSequence = sequenceGenerator
                         .getPeptideSequence(peptideSearchResult);
-                if (peptideSequence == null)
+                if (peptideSequence == null) {
                     continue;
+                }
                 ResultsAnalyserOutputter outputter;
                 outputter = new ResultsAnalyserOutputter(peptideSearchResult,
                         proteinToOLNMap, genome, peptideSequence,
@@ -99,8 +100,9 @@ public class ResultAnalyserRunner {
             for (PeptideSearchResult peptideSearchResult : peptideSearchResults) {
                 PeptideSequence peptideSequence = sequenceGenerator
                         .getPeptideSequence(peptideSearchResult);
-                if (peptideSequence == null)
+                if (peptideSequence == null) {
                     continue;
+                }
                 ResultsAnalyserOutputter outputter;
                 outputter = new ResultsAnalyserOutputter(peptideSearchResult,
                         proteinToOLNMap, genome, peptideSequence);
@@ -136,9 +138,9 @@ public class ResultAnalyserRunner {
         for (PeptideSearchResult peptideSearchResult : peptideSearchResults) {
             PeptideSequence peptideSequence = sequenceGenerator
                     .getPeptideSequence(peptideSearchResult);
-            if (peptideSequence == null
-                    || peptideSequence.getNucleotideSequence().isEmpty())
+            if (peptideSequence == null || peptideSequence.getNucleotideSequence().isEmpty()) {
                 continue;
+            }
 
             if (DebuggingFlag.get_sbi_debug_flag() == 1) {
                 CodonTranslationTable translationTable = CodonTranslationTable

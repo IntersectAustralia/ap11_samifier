@@ -87,9 +87,7 @@ public class ResultsAnalyserOutputter {
         this.strand = getStrand(geneInfo);
         this.frame = getFrame(geneInfo);
 
-        this.exons = new Integer(
-                numberOfExons(peptideSequence.getCigarString())).toString();
-        ;
+        this.exons = new Integer(numberOfExons(peptideSequence.getCigarString())).toString();
         this.exonString = getExonString(peptideSequence, geneInfo);
 
         this.queryId = peptideSearchResult.getId(); // / Change by Ignatius Pang
@@ -170,7 +168,7 @@ public class ResultsAnalyserOutputter {
     }
 
     private String getFrame(GeneInfo geneInfo) {
-        int offset = (geneInfo.getStart() - 1) % 3;
+        int offset = (geneInfo.getStart() - 1) % GenomeConstant.BASES_PER_CODON;
         return Integer.toString(offset);
     }
 

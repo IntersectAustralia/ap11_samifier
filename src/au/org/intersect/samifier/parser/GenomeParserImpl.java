@@ -91,8 +91,9 @@ public class GenomeParserImpl implements GenomeParser {
     }
 
     private int parseStrand(String direction) throws GenomeFileParsingException {
-        if (!STRAND_RE.matcher(direction).matches())
+        if (!STRAND_RE.matcher(direction).matches()) {
             throwParsingException("Invalid strand " + direction);
+        }
         return STRAND_FORWARD.equals(direction) ? 1 : -1;
     }
 
@@ -107,8 +108,9 @@ public class GenomeParserImpl implements GenomeParser {
         int start = Integer.parseInt(parts[START_PART]);
         int stop = Integer.parseInt(parts[STOP_PART]);
         String direction = parts[STRAND_PART];
-        if (start > stop)
+        if (start > stop) {
             throwParsingException("Start-stop invalid");
+        }
         return new GeneInfo(chromosome, extractId(parts[ATTRIBUTES_PART]),
                 start, stop, parseStrand(direction));
     }
@@ -119,8 +121,9 @@ public class GenomeParserImpl implements GenomeParser {
         int start = Integer.parseInt(parts[START_PART]);
         int stop = Integer.parseInt(parts[STOP_PART]);
         String direction = parts[STRAND_PART];
-        if (start > stop)
+        if (start > stop) {
             throwParsingException("Start-stop invalid");
+        }
         return new GeneSequence(extractParent(parts[ATTRIBUTES_PART]),
                 parseSequenceType(type), start, stop, parseStrand(direction));
     }
@@ -138,12 +141,15 @@ public class GenomeParserImpl implements GenomeParser {
             genome.addGene(gene);
         }
         GeneInfo gene = genome.getGene(sequence.getParentId());
-        if (gene.getDirection() != sequence.getDirection())
+        if (gene.getDirection() != sequence.getDirection()) {
             throwParsingException("A sequence in gene " + gene.getId() + " has inconsistent direction");
-        if (gene.getStart() > sequence.getStart())
+        }
+        if (gene.getStart() > sequence.getStart()) {
             throwParsingException("Start of sequence in gene " + gene.getId() + " overflows gene");
-        if (gene.getStop() < sequence.getStop())
+        }
+        if (gene.getStop() < sequence.getStop()) {
             throwParsingException("Stop of sequence in gene " + gene.getId() + " overflows gene");
+        }
         genome.getGene(sequence.getParentId()).addLocation(sequence);
     }
 

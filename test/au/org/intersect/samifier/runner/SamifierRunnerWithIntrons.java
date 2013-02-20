@@ -23,7 +23,7 @@ public class SamifierRunnerWithIntrons {
 	            SamifierRunner runner = new SamifierRunner(mascotFiles, genomeFile, mapFile, chromosomeDir, samFile, null, null);
 	            runner.run();
 	            
-	            List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected.sam"));
+	            //List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected.sam"));
 	            List<String> gotLines = FileUtils.readLines(samFile);
 	            //line 1 should contain: TTGTTCTCTCTA
 	            for (String line : gotLines) System.out.println(line);

@@ -105,8 +105,8 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             int peptideAbsoluteStart;
             int peptideAbsoluteStop;
 
-            int startOffset = (peptideSearchResult.getPeptideStart() - 1) * 3;
-            int stopOffset = (peptideSearchResult.getPeptideStop() - 1) * 3;
+            int startOffset = (peptideSearchResult.getPeptideStart() - 1) * GenomeConstant.BASES_PER_CODON;
+            int stopOffset = (peptideSearchResult.getPeptideStop() - 1) * GenomeConstant.BASES_PER_CODON;
 
             if (geneInfo.isForward()) {
                 peptideAbsoluteStart = virtualGeneStop - startOffset;

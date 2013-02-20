@@ -1,10 +1,14 @@
 package au.org.intersect.samifier.tool;
 
 import au.org.intersect.samifier.domain.CodonTranslationTable;
+import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.ProteinOutputter;
 import java.io.File;
 
 public class NucleotideToAminoacid {
+    private NucleotideToAminoacid() {
+        
+    }
     public static void main(String[] args) {
         try {
             File f = new File(args[0]);
@@ -21,7 +25,7 @@ public class NucleotideToAminoacid {
                     if (frame < -1) {
                         protein = protein.substring(Math.abs(frame) - 1);
                     }
-                    int modulo = protein.length() % 3;
+                    int modulo = protein.length() % GenomeConstant.BASES_PER_CODON;
                     if (modulo != 0) {
                         protein = protein.substring(0, protein.length()
                                 - modulo);
@@ -30,7 +34,7 @@ public class NucleotideToAminoacid {
                             .invertNucleotideSequence(protein);
                 }
             }
-            int modulo = protein.length() % 3;
+            int modulo = protein.length() % GenomeConstant.BASES_PER_CODON;
             if (modulo != 0) {
                 protein = protein.substring(0, protein.length() - modulo);
             }

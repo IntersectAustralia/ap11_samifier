@@ -95,8 +95,9 @@ public class DatabaseHelper {
         while (resultSet.next()) {
             StringBuilder sb = new StringBuilder();
             for (int c = 1; c <= cols; c++) {
-                if (c > 1)
+                if (c > 1) {
                     sb.append(DELIMITER);
+                }
                 sb.append(resultSet.getString(c));
             }
             collection.add(sb.toString());
