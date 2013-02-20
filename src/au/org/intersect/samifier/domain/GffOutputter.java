@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GffOutputter implements Outputter {
-    public String genomeFileName;
-    public Integer start;
-    public Integer end;
+    private String genomeFileName;
+    private Integer start;
+    private Integer end;
     private String glimmerScore;
     private String directionFlag;
     private String frame;
@@ -52,7 +52,8 @@ public class GffOutputter implements Outputter {
         column(output, Integer.toString(end));
         column(output, glimmerScore);
         column(output, directionFlag);
-        column(output, frame);
+        //column(output, frame);
+        column(output, "0"); // this is phase - we  currently don't use that
         ArrayList<String> attributes = new ArrayList<String>();
         attributes.add("Name=" + glimmerName);
         if (addParent) {
