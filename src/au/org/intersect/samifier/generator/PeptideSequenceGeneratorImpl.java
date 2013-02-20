@@ -69,25 +69,19 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
                 chromosomeFile, gene);
     }
 
-    public PeptideSequence getPeptideSequenceFromChromosomeFile(
-            PeptideSearchResult peptide, File chromosomeFile, GeneInfo gene)
+    public PeptideSequence getPeptideSequenceFromChromosomeFile(PeptideSearchResult peptide, File chromosomeFile, GeneInfo gene)
             throws PeptideSequenceGeneratorException {
         List<NucleotideSequence> sequenceParts;
         try {
             sequenceParts = extractSequenceParts(chromosomeFile, gene);
         } catch (FileNotFoundException e) {
-            throw new PeptideSequenceGeneratorException(
-                    "Chromosome file not found", e);
+            throw new PeptideSequenceGeneratorException("Chromosome file not found", e);
         } catch (IOException e) {
-            throw new PeptideSequenceGeneratorException(
-                    "Cannot open chromosome file", e);
+            throw new PeptideSequenceGeneratorException("Cannot open chromosome file", e);
         }
 
         if (sequenceParts.size() == 0) {
-            // throw new PeptideSequenceGeneratorException(gene.getId() + " in "
-            // + chromosomeFile.getName() + " seems empty", null);
-            LOG.warn(gene.getId() + " in " + chromosomeFile.getName()
-                    + " seems empty");
+            LOG.warn(gene.getId() + " in " + chromosomeFile.getName() + " seems empty");
             return null;
         }
 

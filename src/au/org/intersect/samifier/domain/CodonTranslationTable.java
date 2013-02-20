@@ -115,14 +115,6 @@ public class CodonTranslationTable {
         int codonCount = 0;
         int startIndex = 0;
 
-        // Start codon may be different
-        String startCodon = nucleotideSequence.substring(0, 3).toUpperCase();
-        /*
-         * if (!virtualProteinMode && startCodonMap.containsKey(startCodon)) {
-         * aminoAcidSequence.append(toStartAminoAcid(startCodon)); startIndex =
-         * 3; }
-         */
-
         for (int i = startIndex; i < length; i += 3) {
             if ((i + 3) > length) {
                 // TODO: log to error file about sequence length being

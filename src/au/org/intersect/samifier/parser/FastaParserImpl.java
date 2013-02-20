@@ -15,7 +15,6 @@ import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.NucleotideSequence;
 
 public class FastaParserImpl implements FastaParser {
-    // private HashMap<String, String> codes = new HashMap<String, String>();
     private String previousFile;
     private String previousCode;
 
@@ -31,11 +30,9 @@ public class FastaParserImpl implements FastaParser {
             String line = reader.readLine();
             StringBuffer buffer = new StringBuffer();
             while ((line = reader.readLine()) != null) {
-                // line = line.replace("\r", "").replace("\n", "");
                 buffer.append(line);
             }
             return buffer.toString().replace("\r", "").replace("\n", "");
-            // StringUtils.replace(buffer.toString();
         } finally {
             reader.close();
         }
@@ -55,12 +52,6 @@ public class FastaParserImpl implements FastaParser {
             previousFile = chromosomeFile.getName();
             previousCode = code;
         }
-        /*
-         * if (codes.containsKey(chromosomeFile.getName())) { code =
-         * codes.get(chromosomeFile.getName()); } else { code =
-         * readCode(chromosomeFile); codes.put(chromosomeFile.getName(), code);
-         * }
-         */
 
         List<NucleotideSequence> parts = new ArrayList<NucleotideSequence>();
         List<GeneSequence> locations = gene.getLocations();
@@ -76,12 +67,9 @@ public class FastaParserImpl implements FastaParser {
                 continue;
             }
 
-            StringBuilder sequence = new StringBuilder(code.substring(
-                    startIndex, stopIndex));
+            StringBuilder sequence = new StringBuilder(code.substring(startIndex, stopIndex));
 
-            String sequenceString = GenomeConstant.REVERSE_FLAG.equals(gene
-                    .getDirectionStr()) ? sequence.reverse().toString()
-                    : sequence.toString();
+            String sequenceString = GenomeConstant.REVERSE_FLAG.equals(gene.getDirectionStr()) ? sequence.reverse().toString() : sequence.toString();
             parts.add(new NucleotideSequence(sequenceString,
                     GeneSequence.CODING_SEQUENCE, location.getStart(), location
                             .getStop()));
