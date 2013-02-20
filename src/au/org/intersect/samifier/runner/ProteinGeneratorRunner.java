@@ -66,8 +66,7 @@ public class ProteinGeneratorRunner {
     private void generateGffFile(List<ProteinLocation> locations)
             throws IOException {
         String genomeFileName = genomeFile.getName();
-        GffOutputterGenerator outputterGenerator = new GffOutputterGenerator(
-                genomeFileName);
+        GffOutputterGenerator outputterGenerator = new GffOutputterGenerator(genomeFileName);
         ProteinLocationFileGenerator.generateFile(locations, gffWriter,
                 outputterGenerator, "##gff-version 3");
     }

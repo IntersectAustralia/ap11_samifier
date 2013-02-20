@@ -18,7 +18,7 @@ public class FastaParserImpl implements FastaParser {
     private String previousFile;
     private String previousCode;
 
-    public String readCode(File chromosomeFile) throws IOException {
+    public String readCode(File chromosomeFile) throws IOException, FastaParserException {
         if (!chromosomeFile.exists()) {
             throw new FileNotFoundException(chromosomeFile.getAbsolutePath()
                     + " not found");
@@ -28,6 +28,9 @@ public class FastaParserImpl implements FastaParser {
             reader = new BufferedReader(new FileReader(chromosomeFile));
             // Skip header of FASTA file
             String line = reader.readLine();
+            if (!line.startsWith(">")) {
+                throw new FastaParserException("Genome file not in FASTA format");
+            }
             StringBuffer buffer = new StringBuffer();
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);
@@ -41,7 +44,7 @@ public class FastaParserImpl implements FastaParser {
 
     @Override
     public List<NucleotideSequence> extractSequenceParts(File chromosomeFile,
-            GeneInfo gene) throws IOException {
+            GeneInfo gene) throws IOException, FastaParserException{
 
         String code;
         if (previousFile != null

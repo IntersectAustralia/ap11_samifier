@@ -8,8 +8,7 @@ import au.org.intersect.samifier.domain.GeneInfo;
 import au.org.intersect.samifier.domain.NucleotideSequence;
 
 public interface FastaParser {
-    String readCode(File chromosomeFile) throws IOException;
+    String readCode(File chromosomeFile) throws IOException, FastaParserException;
 
-    List<NucleotideSequence> extractSequenceParts(File chromosomeFile,
-            GeneInfo gene) throws IOException;
+    List<NucleotideSequence> extractSequenceParts(File chromosomeFile, GeneInfo gene) throws IOException, FastaParserException;
 }

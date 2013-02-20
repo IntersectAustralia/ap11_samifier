@@ -16,6 +16,7 @@ import au.org.intersect.samifier.domain.NucleotideSequence;
 import au.org.intersect.samifier.domain.PeptideSearchResult;
 import au.org.intersect.samifier.domain.PeptideSequence;
 import au.org.intersect.samifier.domain.ProteinToOLNMap;
+import au.org.intersect.samifier.parser.FastaParserException;
 import au.org.intersect.samifier.parser.FastaParserImpl;
 
 public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
@@ -74,6 +75,8 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
         List<NucleotideSequence> sequenceParts;
         try {
             sequenceParts = extractSequenceParts(chromosomeFile, gene);
+        } catch (FastaParserException e) {
+            throw new PeptideSequenceGeneratorException("Genome file not in FASTA format", e);
         } catch (FileNotFoundException e) {
             throw new PeptideSequenceGeneratorException("Chromosome file not found", e);
         } catch (IOException e) {
@@ -215,7 +218,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
     }
 
     protected List<NucleotideSequence> extractSequenceParts(
-            File chromosomeFile, GeneInfo gene) throws IOException {
+            File chromosomeFile, GeneInfo gene) throws IOException, FastaParserException {
         return fasta.extractSequenceParts(chromosomeFile, gene);
     }
 
