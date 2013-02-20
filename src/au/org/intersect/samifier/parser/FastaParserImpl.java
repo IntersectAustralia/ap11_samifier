@@ -20,8 +20,7 @@ public class FastaParserImpl implements FastaParser {
 
     public String readCode(File chromosomeFile) throws IOException, FastaParserException {
         if (!chromosomeFile.exists()) {
-            throw new FileNotFoundException(chromosomeFile.getAbsolutePath()
-                    + " not found");
+            throw new FileNotFoundException(chromosomeFile.getAbsolutePath() + " not found");
         }
         BufferedReader reader = null;
         try {
@@ -39,12 +38,11 @@ public class FastaParserImpl implements FastaParser {
         } finally {
             reader.close();
         }
-
     }
 
     @Override
     public List<NucleotideSequence> extractSequenceParts(File chromosomeFile,
-            GeneInfo gene) throws IOException, FastaParserException{
+            GeneInfo gene) throws IOException, FastaParserException {
 
         String code;
         if (previousFile != null
@@ -69,10 +67,8 @@ public class FastaParserImpl implements FastaParser {
                         location.getStart(), location.getStop()));
                 continue;
             }
-
             StringBuilder sequence = new StringBuilder(code.substring(startIndex, stopIndex));
-
-            String sequenceString = GenomeConstant.REVERSE_FLAG.equals(gene.getDirectionStr()) ? sequence.reverse().toString() : sequence.toString();
+            String sequenceString = gene.isForward() ? sequence.toString() : sequence.reverse().toString();
             //String sequenceString = sequence.toString();
             parts.add(new NucleotideSequence(sequenceString, GeneSequence.CODING_SEQUENCE, location.getStart(), location.getStop()));
         }

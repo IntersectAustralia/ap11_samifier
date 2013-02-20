@@ -45,8 +45,7 @@ public class ProteinGenerator {
         OptionBuilder.isRequired();
         Option databaseNameOpt = OptionBuilder.create("d");
         OptionBuilder.hasArg();
-        OptionBuilder
-                .withDescription("Filename to write the FASTA format file to");
+        OptionBuilder.withDescription("Filename to write the FASTA format file to");
         OptionBuilder.withArgName("Output File");
         OptionBuilder.isRequired();
         Option outputFileOpt = OptionBuilder.create("o");
