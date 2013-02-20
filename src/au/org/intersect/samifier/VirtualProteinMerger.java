@@ -68,6 +68,8 @@ public class VirtualProteinMerger {
             System.exit(1);
         } catch (Exception e) {
             System.err.println(e);
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("virtual_protein_merger", options, true);
             e.printStackTrace();
             System.exit(1);
         }

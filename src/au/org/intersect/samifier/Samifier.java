@@ -128,6 +128,8 @@ public class Samifier {
             System.exit(1);
         } catch (Exception e) {
             System.err.println(e);
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("samifier", options, true);
             e.printStackTrace();
             System.exit(1);
         }
