@@ -103,6 +103,13 @@ public class ProteinGenerator {
                 outputWriter.close();
                 throw new ParseException("Only one of -i or -g permitted");
             }
+            if (interval != null) {
+                int intInterval = Integer.parseInt(interval);
+                if (intInterval < 2) {
+                    outputWriter.close();
+                    throw new ParseException("Interval must be greater than  1");
+                }
+            }
             ProteinGeneratorRunner runner = new ProteinGeneratorRunner(
                     glimmerFilePath, genomeFile, interval, databaseName,
                     outputWriter, translationTableFile, gffWriter,

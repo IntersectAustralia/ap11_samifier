@@ -73,9 +73,8 @@ public class FastaParserImpl implements FastaParser {
             StringBuilder sequence = new StringBuilder(code.substring(startIndex, stopIndex));
 
             String sequenceString = GenomeConstant.REVERSE_FLAG.equals(gene.getDirectionStr()) ? sequence.reverse().toString() : sequence.toString();
-            parts.add(new NucleotideSequence(sequenceString,
-                    GeneSequence.CODING_SEQUENCE, location.getStart(), location
-                            .getStop()));
+            //String sequenceString = sequence.toString();
+            parts.add(new NucleotideSequence(sequenceString, GeneSequence.CODING_SEQUENCE, location.getStart(), location.getStop()));
         }
         if (GenomeConstant.REVERSE_FLAG.equals(gene.getDirectionStr())) {
             Collections.reverse(parts);

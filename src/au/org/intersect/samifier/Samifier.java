@@ -18,14 +18,12 @@ public class Samifier {
 
     public static void main(String[] args) {
         OptionBuilder.hasArgs();
-        OptionBuilder
-                .withDescription("Mascot search results file in txt format");
+        OptionBuilder.withDescription("Mascot search results file in txt format");
         OptionBuilder.withArgName("searchResultsFile");
         OptionBuilder.isRequired();
         Option resultsFile = OptionBuilder.create("r");
         OptionBuilder.hasArg();
-        OptionBuilder
-                .withDescription("File mapping protein identifier to ordered locus name");
+        OptionBuilder.withDescription("File mapping protein identifier to ordered locus name");
         OptionBuilder.withArgName("mappingFile");
         OptionBuilder.isRequired();
         Option mappingFile = OptionBuilder.create("m");
@@ -35,8 +33,7 @@ public class Samifier {
         OptionBuilder.isRequired();
         Option genomeFileOpt = OptionBuilder.create("g");
         OptionBuilder.hasArg();
-        OptionBuilder
-                .withDescription("Directory containing the chromosome files in FASTA format for the given genome");
+        OptionBuilder.withDescription("Directory containing the chromosome files in FASTA format for the given genome");
         OptionBuilder.withArgName("chromosomeDir");
         OptionBuilder.isRequired();
         Option chrDirOpt = OptionBuilder.create("c");
@@ -46,23 +43,20 @@ public class Samifier {
         OptionBuilder.withDescription("Filename to write the log into");
         Option logFile = OptionBuilder.create("l");
         OptionBuilder.hasArg();
-        OptionBuilder
-                .withDescription("Filename to write the SAM format file to");
+        OptionBuilder.withDescription("Filename to write the SAM format file to");
         OptionBuilder.withArgName("outputFile");
         OptionBuilder.isRequired();
         Option outputFile = OptionBuilder.create("o");
         OptionBuilder.isRequired(false);
         OptionBuilder.hasArg();
         OptionBuilder.withArgName("bedFile");
-        OptionBuilder
-                .withDescription("Filename to write IGV regions of interest (BED) file to");
+        OptionBuilder.withDescription("Filename to write IGV regions of interest (BED) file to");
         Option bedFile = OptionBuilder.create("b");
         OptionBuilder.withType(Number.class);
         OptionBuilder.hasArg();
         OptionBuilder.isRequired(false);
         OptionBuilder.withArgName("Confidence Score thresold");
-        OptionBuilder
-                .withDescription("Minimum confidence score for peptides to be included");
+        OptionBuilder.withDescription("Minimum confidence score for peptides to be included");
         Option score = OptionBuilder.create("s");
 
         Options options = new Options();

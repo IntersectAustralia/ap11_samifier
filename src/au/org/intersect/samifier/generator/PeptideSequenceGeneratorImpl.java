@@ -174,8 +174,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
             readCursor += part.getSequence().length();
         }
 
-        String peptideSequence = GenomeConstant.REVERSE_FLAG.equals(direction) ? nucleotideSequence
-                .reverse().toString() : nucleotideSequence.toString();
+        String peptideSequence = GenomeConstant.REVERSE_FLAG.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
         // When direction is reverse,
         // 5 17
         // |####----#####|
@@ -188,12 +187,8 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
         if (peptideSequence.length() == 0) {
             return null;
         }
-        int startIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene
-                .getStop() - gene.getStart() - absoluteStopIndex + 1)
-                : absoluteStartIndex;
-        int stopIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene
-                .getStop() - gene.getStart() - absoluteStartIndex + 1)
-                : absoluteStopIndex;
+        int startIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStopIndex + 1) : absoluteStartIndex;
+        int stopIndex = GenomeConstant.REVERSE_FLAG.equals(direction) ? (gene.getStop() - gene.getStart() - absoluteStartIndex + 1) : absoluteStopIndex;
         int bedStartIndex = gene.getStart() + startIndex - 1; // BED files are
                                                               // zero based (6
                                                               // in the
@@ -201,8 +196,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
         int bedStopIndex = gene.getStart() + stopIndex - 1; // BED files are
                                                             // zero based (15 in
                                                             // the example)
-        return new PeptideSequence(peptideSequence, cigar.toString(),
-                startIndex, bedStartIndex, bedStopIndex, gene);
+        return new PeptideSequence(peptideSequence, cigar.toString(), startIndex, bedStartIndex, bedStopIndex, gene);
     }
 
     private void updateCigar(StringBuilder cigar, int size, String type,
