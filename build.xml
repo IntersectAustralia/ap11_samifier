@@ -160,43 +160,28 @@
       <delete dir="${build.dir}"/>
       <delete dir="${dist}"/>
     </target>
-
     <macrodef name="inner-unittest">
       <sequential>
 
         <mkdir dir="${build.reports.dir}/unittest/xml" />
         <mkdir dir="${build.reports.dir}/unittest/html" />
 
-        <junit fork="true" forkmode="once" printsummary="withOutAndErr"
-            haltonerror="on">
+        <junit fork="yes" dir="${basedir}" printsummary="withOutAndErr" haltonerror="on">
+          <jvmarg value="-Duser.dir=${basedir}"/>
           <classpath>
+              
             <path refid="test.classpath" />
+            <pathelement location="${basedir}"/>
           </classpath>
+          <sysproperty key="basedir" value="${basedir}"/>
           <formatter type="plain" />
-          <batchtest todir="${build.reports.dir}/unittest">
+          <batchtest todir="${build.reports.dir}/unittest" fork="yes">
             <fileset dir="${test.dir}">
               <include name="**/*UnitTest.java" />
             </fileset>
           </batchtest>
-          <!--
-          <formatter type="xml" />
-          <batchtest todir="${build.reports.dir}/unittest/xml"
-            failureproperty="tests.failed">
-            <fileset dir="${test.dir}">
-              <include name="**/*UnitTest.java" />
-            </fileset>
-          </batchtest>
-          -->
         </junit>
 
-        <!--
-        <junitreport todir="${build.reports.dir}/unittest/xml">
-          <fileset dir="${build.reports.dir}/unittest/xml">
-            <include name="TEST-*.xml" />
-          </fileset>
-          <report format="frames" todir="${build.reports.dir}/unittest/html" />
-        </junitreport>
-        -->
-      </sequential>
+       </sequential>
     </macrodef>
 </project>
