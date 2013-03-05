@@ -53,6 +53,7 @@ public class DatabaseHelper {
         statement.execute("SHUTDOWN;");
     }
 
+    
     public synchronized void generateTables() throws SQLException {
         Statement statement = connection.createStatement();
         statement.execute("DROP TABLE Result IF EXISTS");
@@ -61,18 +62,17 @@ public class DatabaseHelper {
         query.append("proteinId varchar(255),");
         query.append("locusName varchar(255),");
         query.append("geneId varchar(255),");
-        query.append("score varchar(255),");
-        query.append("startPosition varchar(255),");
-        query.append("stopPosition varchar(255),");
-        query.append("lengthInAminoacids varchar(255),");
+        query.append("score numeric(255, 2),"); /// Change by Aidan
+        query.append("startPosition integer,"); /// Change by Aidan
+        query.append("stopPosition integer,"); /// Change by Aidan
+        query.append("lengthInAminoacids integer,"); /// Change by Aidan
         query.append("chromosomeId varchar(255),");
-        query.append("geneStart varchar(255),");
-        query.append("geneEnd varchar(255),");
+        query.append("geneStart integer,"); /// Change by Aidan
+        query.append("geneEnd integer,"); /// Change by Aidan
         query.append("strand varchar(255),");
         query.append("frame integer,");
-        query.append("exons varchar(255),");
-        query.append("exonString varchar(255),"); // / Change by Ignatius Pang
-                                                  // *%*%*%
+        query.append("exons integer,"); /// Change by Aidan
+        query.append("exonString varchar(255),"); /// Change by Ignatius Pang  *%*%*%
 
         if (DebuggingFlag.get_sbi_debug_flag() == 1) {// / Change by Ignatius
                                                       // Pang *%*%*%
