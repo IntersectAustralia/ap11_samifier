@@ -39,11 +39,14 @@ public class GlimmerFileLocationGenerator implements LocationGenerator {
             throws LocationGeneratorException, IOException {
         int lineCount = 0;
         List<ProteinLocation> proteinLocations = new ArrayList<ProteinLocation>();
+        boolean wasHeader = false;
         for (String line : FileUtils.readLines(glimmerFile)) {
             lineCount++;
             if (line.startsWith(">")) {
+                wasHeader = true;
                 continue;
             }
+            if (!wasHeader) continue;
             String[] columns = line.split("\\s+");
             if (columns.length < 5) {
                 throw new LocationGeneratorException(

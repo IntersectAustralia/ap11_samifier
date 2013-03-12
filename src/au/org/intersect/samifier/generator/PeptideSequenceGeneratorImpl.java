@@ -218,7 +218,9 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
 
     private File getChromosomeFile(GeneInfo gene) {
         // TODO: find the different chrormosome file extensions
-        return new File(chromosomeDirectory, gene.getChromosome() + ".fa");
+        File faExt = new File(chromosomeDirectory, gene.getChromosome() + ".fa");
+        if (faExt.exists()) return faExt;
+        return new File(chromosomeDirectory, gene.getChromosome() + ".faa");
     }
 
 }
