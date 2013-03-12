@@ -2,6 +2,7 @@ package au.org.intersect.samifier.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class GffOutputter implements Outputter {
     private String genomeFileName;
@@ -10,7 +11,7 @@ public class GffOutputter implements Outputter {
     private String glimmerScore;
     private String directionFlag;
     private String glimmerName;
-    private String virtualProteinName;
+    private Set<String> virtualProteinNames;
 
     public GffOutputter(ProteinLocation location,
             String genomeFileNameWithExtension) {
@@ -24,7 +25,7 @@ public class GffOutputter implements Outputter {
         }
         this.directionFlag = location.getDirection();
         this.glimmerName = location.getName();
-        this.virtualProteinName = location.getVirtualProteinName();
+        this.virtualProteinNames = location.getVirtualProteinNames();
     }
 
     @Override
@@ -59,8 +60,12 @@ public class GffOutputter implements Outputter {
         } else {
             attributes.add("ID=" + glimmerName);
         }
-        if (virtualProteinName != null && virtualProteinName.length() > 0) {
-            attributes.add("Virtual_protein=" + virtualProteinName);
+        if (virtualProteinNames.size() > 0) {
+            String virtualProteins = "";
+            for (String s:virtualProteinNames) {
+                virtualProteins += (virtualProteins == "" ? "" : ",") + s;
+            }
+            attributes.add("Virtual_protein=" + virtualProteins);
         }
         column(output, attributes);
         return output.toString();

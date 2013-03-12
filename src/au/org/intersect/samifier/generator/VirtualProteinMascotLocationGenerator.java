@@ -53,6 +53,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             throws LocationGeneratorException {
         try {
             List<ProteinLocation> locations = doGenerateLocations();
+            locations = mergeProteins(locations);
             Collections.sort(locations);
             for (int i = 0; i < locations.size(); i++) {
                 locations.get(i).setName("q" + i);
@@ -70,6 +71,20 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             throw new LocationGeneratorException("Error parsing genome file", e);
         }
 
+    }
+
+    private List<ProteinLocation> mergeProteins(List<ProteinLocation> locations) {
+        Map<Integer, ProteinLocation> proteinMap = new HashMap<Integer, ProteinLocation>();
+        for (ProteinLocation location : locations) {
+            ProteinLocation loc = proteinMap.get(location.getStop());
+            if (loc == null) {
+                proteinMap.put(location.getStop(), location);
+            } else {
+               loc.update(location);
+            }
+        }
+        ArrayList<ProteinLocation> proteinList = new ArrayList<ProteinLocation>(proteinMap.values());
+        return proteinList;
     }
 
     public List<ProteinLocation> doGenerateLocations()
@@ -119,12 +134,8 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             File geneFile = new File(chromosomeDir, geneInfo.getChromosome()
                     + ".faa");
             GenomeNucleotides genomeNucleotides = getGenomeNucleotides(geneFile);
-
-            int startPosition = searchStart(peptideSearchResult,
-                    peptideAbsoluteStart, genomeNucleotides, geneInfo);
-            int stopPosition = searchStop(peptideSearchResult,
-                    peptideAbsoluteStop, genomeNucleotides, geneInfo);
-
+            int startPosition = searchStart(peptideSearchResult, peptideAbsoluteStart, genomeNucleotides, geneInfo);
+            int stopPosition = searchStop(peptideSearchResult, peptideAbsoluteStop, genomeNucleotides, geneInfo, false);
             if (startPosition == NOT_FOUND || stopPosition == NOT_FOUND) {
                 continue;
             }
@@ -139,58 +150,65 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         return proteinLocations;
     }
 
-    private int searchStart(PeptideSearchResult peptideSearchResult,
-            int proteinStart, GenomeNucleotides genomeNucleotides,
-            GeneInfo geneInfo) {
+
+    private int searchStop(PeptideSearchResult peptideSearchResult, int peptideAbsoluteStart, GenomeNucleotides genomeNucleotides, GeneInfo geneInfo, boolean reverse) {
+        boolean reachedStop = false;
+        int endIterator = peptideAbsoluteStart;
+
+        int searchDirection = reverse ? geneInfo.getDirection() * (-1) : geneInfo.getDirection();
+        boolean isStopCodon = translationTable.isStopCodon(genomeNucleotides
+                .codonAt(endIterator, geneInfo.getDirection()));
+
+        while (!reachedStop && !isStopCodon) {
+            endIterator += incrementPosition(searchDirection);
+            isStopCodon = translationTable.isStopCodon(genomeNucleotides
+                    .codonAt(endIterator, geneInfo.getDirection()));
+            reachedStop = reachedEnd(endIterator, searchDirection, genomeNucleotides.getSize());
+        }
+
+        if (reachedStop && !isStopCodon) {
+            LOG.warn("Reached end of sequence without finding stop codon for peptide " + peptideSearchResult.getPeptideSequence());
+            //return searchDirection > 0  ? genomeNucleotides.getSize() : 0; 
+            return endIterator;
+        }
+
+        return endIterator;
+    }
+
+    private int searchStart(PeptideSearchResult peptideSearchResult, int peptideAbsoluteStart, GenomeNucleotides genomeNucleotides, GeneInfo geneInfo) {
+        //find last stop and search for start from there ..
+        int previousStop = searchStop(peptideSearchResult, peptideAbsoluteStart, genomeNucleotides, geneInfo, true);
         boolean reachedStart = false;
-        int startIterator = proteinStart;
+        int startIterator = previousStop;
         int direction = geneInfo.getDirection();
 
-        boolean isStartCodon = translationTable.isStartCodon(genomeNucleotides
-                .codonAt(startIterator, direction));
+        boolean isStartCodon = translationTable.isStartCodon(genomeNucleotides.codonAt(startIterator, direction));
 
         while (!reachedStart && !isStartCodon) {
-            startIterator += incrementStartPosition(geneInfo.getDirection());
+            startIterator += incrementPosition(geneInfo.getDirection());
             isStartCodon = translationTable.isStartCodon(genomeNucleotides
                     .codonAt(startIterator, direction));
-            reachedStart = reachedStart(startIterator, geneInfo.getDirection(),
-                    genomeNucleotides.getSize());
+            reachedStart = reachedStart(startIterator, geneInfo.getDirection(), peptideAbsoluteStart);
         }
 
         if (reachedStart && !isStartCodon) {
             LOG.error("Reached beginning of sequence without finding start codon for peptide "
                     + peptideSearchResult.getPeptideSequence());
-            return NOT_FOUND;
+            if (isStopOnEdge(previousStop, genomeNucleotides, geneInfo.isForward())) {
+                return previousStop;
+            } else {
+                return previousStop + (geneInfo.getDirection() * GenomeConstant.BASES_PER_CODON);
+            }
         }
 
         return startIterator;
     }
 
-    private int searchStop(PeptideSearchResult peptideSearchResult,
-            int proteinEnd, GenomeNucleotides genomeNucleotides,
-            GeneInfo geneInfo) {
-        boolean reachedStop = false;
-        int endIterator = proteinEnd;
-        int direction = geneInfo.getDirection();
-
-        boolean isStopCodon = translationTable.isStopCodon(genomeNucleotides
-                .codonAt(endIterator, direction));
-
-        while (!reachedStop && !isStopCodon) {
-            endIterator += incrementStopPosition(direction);
-            isStopCodon = translationTable.isStopCodon(genomeNucleotides
-                    .codonAt(endIterator, direction));
-            reachedStop = reachedEnd(endIterator, direction,
-                    genomeNucleotides.getSize());
+    private boolean isStopOnEdge(int previousStop, GenomeNucleotides genomeNucleotides, boolean forward) {
+        if (forward) {
+            return previousStop < GenomeConstant.BASES_PER_CODON;
         }
-
-        if (reachedStop && !isStopCodon) {
-            LOG.error("Reached end of sequence without finding stop codon for peptide "
-                    + peptideSearchResult.getPeptideSequence());
-            return NOT_FOUND;
-        }
-
-        return endIterator;
+        return previousStop > (genomeNucleotides.getSize() - GenomeConstant.BASES_PER_CODON);
     }
 
     private boolean reachedEnd(int position, int direction, int size) {
@@ -201,11 +219,11 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         }
     }
 
-    private boolean reachedStart(int position, int direction, int size) {
+    private boolean reachedStart(int position, int direction, int peptideStart) {
         if (direction == -1) {
-            return position + GenomeConstant.BASES_PER_CODON >= size;
+            return position + GenomeConstant.BASES_PER_CODON >= peptideStart;
         } else {
-            return position <= 0;
+            return position >= peptideStart;
         }
     }
 
@@ -218,11 +236,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         return genomeNucleotidesMap.get(geneFile.getName());
     }
 
-    private int incrementStartPosition(int direction) {
-        return direction * GenomeConstant.BASES_PER_CODON;
-    }
-
-    private int incrementStopPosition(int direction) {
+    private int incrementPosition(int direction) {
         return direction * GenomeConstant.BASES_PER_CODON;
     }
 

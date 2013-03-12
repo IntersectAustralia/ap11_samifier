@@ -1,32 +1,44 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class StringReplaceTest {
 
-    public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-        StringBuffer bigstr = new StringBuffer();
-        for (int i = 0; i < 10000000; i++) {
-            long time1 = System.currentTimeMillis();
-            long time2 = System.currentTimeMillis();
-            long time3 = System.currentTimeMillis();
-            long time4 = System.currentTimeMillis();
-            String res = "" + time1 + "\n" + time2 + "\n" + "\r" + time3 + "\n"
-                    + "\r" + time4 + "\n" + "\r";
-            // String myres = res.replace("\r", "").replace("\n", "");
-            // String myres = StringUtils.replace(res, "\r", "");
-            // myres = StringUtils.replace(myres, "\n", "");
-            bigstr.append(res);
-            if (res.equalsIgnoreCase("just test to avoid optimalization")) {
-                System.out.println("Testing testing");
-            }
-        }
-        // String ret = bigstr.toString().replace("\r", "").replace("\n","");
-        String ret = StringUtils.replace(bigstr.toString(), "\r", "");
-        ret = StringUtils.replace(ret, "\n", "");
-        System.out.println("It took : " + (System.currentTimeMillis() - start));
-        if (ret.equalsIgnoreCase("just test to avoid optimalization")) {
-            System.out.println("Testing testing");
+    public static void main(String[] args)  throws Exception {
+        File dir = new File("/Users/przemyslaw/Documents/intersect/ap11/ap11_samifier/test/resources/merger");
+        File[] items = dir.listFiles();
+        for (File item : items) {
+            if (item.isDirectory()) continue;
+            System.out.println(item.getName());
+            if (item.getName().endsWith(".faa")) processFaa(item); 
         }
 
+    }
+
+    private static void processFaa(File item) throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader(item));
+        String newFileName = item.getName().replaceAll(".faa", "_rev.faa");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(item.getParent() +"/"+ newFileName )));
+        String header = reader.readLine();
+        writer.write(header+"\n");
+        StringBuffer buff = new StringBuffer();
+        String line = reader.readLine();
+        
+        while (line != null) {
+            buff.append(line+"\n");
+            line = reader.readLine();
+        }
+        String out = buff.reverse().toString();
+        out = StringUtils.replaceChars(out, "ACGT", "TGCA");
+        writer.write(out);
+        writer.flush();
+        reader.close();
+        writer.close();
+        
     }
 }

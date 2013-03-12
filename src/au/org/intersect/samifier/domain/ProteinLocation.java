@@ -1,6 +1,8 @@
 package au.org.intersect.samifier.domain;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProteinLocation implements Comparable<ProteinLocation> {
     private String name;
@@ -12,7 +14,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
 
     private String frame;
 
-    private String virtualProteinName;
+    private Set<String> virtualProteinNames;
 
     public ProteinLocation(String name, int startIndex, int length,
             String direction, String frame) {
@@ -33,7 +35,10 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
         this.confidenceScore = confidenceScore;
         this.startIndex = startIndex;
         this.length = length;
-        this.virtualProteinName = virtualProteinName;
+        this.virtualProteinNames = new HashSet<String>();
+        if (virtualProteinName != null) {
+            virtualProteinNames.add(virtualProteinName);
+        }
     }
 
     public String getName() {
@@ -68,18 +73,32 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
         return frame;
     }
 
-    public String getVirtualProteinName() {
-        return virtualProteinName;
+    public Set<String> getVirtualProteinNames() {
+        return virtualProteinNames;
     }
 
     public String toString() {
         return name + ", startIndex=" + startIndex + ", length=" + length
                 + ", direction=" + direction;
     }
-
+    
+    public void update(ProteinLocation other) {
+        if (other.getStartIndex() < getStartIndex()) {
+            startIndex = other.getStartIndex();
+        }
+        virtualProteinNames.addAll(other.getVirtualProteinNames());
+    }
+    
     @Override
     public int compareTo(ProteinLocation o) {
         return getStartIndex() - o.getStartIndex();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (! (other instanceof ProteinLocation) ) return false;
+        ProteinLocation otherLocation = (ProteinLocation) other;
+        return this.toString().equals(other.toString());
     }
 
 }

@@ -109,7 +109,7 @@ public class SAMEntry {
         return tlen;
     }
 
-    public void getPeptideSequence(String peptideSequence) {
+    public void setPeptideSequence(String peptideSequence) {
         this.peptideSequence = peptideSequence;
     }
 

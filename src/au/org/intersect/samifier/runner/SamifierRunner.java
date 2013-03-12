@@ -145,9 +145,10 @@ public class SamifierRunner {
                         peptideStart, peptide.getCigarString(), peptide
                                 .getNucleotideSequence(), mapq));
             } else {
+                String sequnece = peptide.getNucleotideSequence();
+                String outputSequence = (peptide.getGeneInfo().getDirection() == -1) ? new StringBuilder(StringUtils.replaceChars(sequnece, "ACGT", "TGCA")).reverse().toString() : sequnece;
                 samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(),
-                        peptideStart, peptide.getCigarString(), peptide
-                                .getNucleotideSequence()));
+                        peptideStart, peptide.getCigarString(), outputSequence));
             }
 
             try {
@@ -197,7 +198,9 @@ public class SamifierRunner {
         // ////////////////////////////////////////////////
         // // Location to store SAM file headers ///
         // ////////////////////////////////////////////////
-
+        //reverse if needed
+        
+        
         for (SAMEntry samEntry : samEntries) {
             String chromosome = samEntry.getRname();
             if (!chromosome.equals(prevChromosome)) {

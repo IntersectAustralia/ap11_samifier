@@ -28,8 +28,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
     private File chromosomeDirectory;
     private FastaParserImpl fasta;
 
-    public PeptideSequenceGeneratorImpl(Genome genome,
-            ProteinToOLNMap proteinOLNMap, File chromosomeDirectory) {
+    public PeptideSequenceGeneratorImpl(Genome genome, ProteinToOLNMap proteinOLNMap, File chromosomeDirectory) {
         this.genome = genome;
         this.proteinOLNMap = proteinOLNMap;
         this.chromosomeDirectory = chromosomeDirectory;
@@ -174,7 +173,8 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
             readCursor += part.getSequence().length();
         }
 
-        String peptideSequence = GenomeConstant.REVERSE_FLAG.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
+        String peptideSequence = nucleotideSequence.toString(); 
+                //GenomeConstant.REVERSE_FLAG.equals(direction) ? nucleotideSequence.reverse().toString() : nucleotideSequence.toString();
         // When direction is reverse,
         // 5 17
         // |####----#####|

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class CodonTranslationTable {
     public static final String UNKNOWN_AMINO_ACID = "X";
+    public static final String START_AMINO_ACID = "M";
 
     private Map<String, String> codonMap;
     private Map<String, String> startCodonMap;
@@ -145,8 +146,16 @@ public class CodonTranslationTable {
         return parts[1].toUpperCase();
     }
 
-    public boolean isStartCodon(String codon) {
+    /*public boolean isStartCodon(String codon) {
         return startCodonMap.keySet().contains(codon);
+    }*/
+
+    public boolean isStartCodon(String codon) {
+        if (!codonMap.containsKey(codon)) return false;
+        if (codonMap.get(codon).equalsIgnoreCase(START_AMINO_ACID)) {
+            return true;
+        }
+        return false;
     }
 
     public boolean isStopCodon(String codon) {

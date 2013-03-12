@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import au.org.intersect.samifier.domain.GeneInfo;
 import au.org.intersect.samifier.domain.GeneSequence;
 import au.org.intersect.samifier.domain.GenomeConstant;
@@ -34,6 +36,7 @@ public class FastaParserImpl implements FastaParser {
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);
             }
+            reader.close();
             return buffer.toString().replace("\r", "").replace("\n", "");
         } finally {
             reader.close();
@@ -68,8 +71,12 @@ public class FastaParserImpl implements FastaParser {
                 continue;
             }
             StringBuilder sequence = new StringBuilder(code.substring(startIndex, stopIndex));
-            String sequenceString = gene.isForward() ? sequence.toString() : sequence.reverse().toString();
-            //String sequenceString = sequence.toString();
+            String sequenceString;
+            if (gene.isForward()) {
+                sequenceString = sequence.toString();
+            } else {
+                sequenceString = StringUtils.replaceChars(sequence.reverse().toString(), "ACGT", "TGCA");
+            }
             parts.add(new NucleotideSequence(sequenceString, GeneSequence.CODING_SEQUENCE, location.getStart(), location.getStop()));
         }
         if (GenomeConstant.REVERSE_FLAG.equals(gene.getDirectionStr())) {

@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class SamifierRunnerWithIntrons {
-	 @Test
+	    //@Test
 	    public void testCreateSAM()
 	    {
 	        try {
@@ -19,8 +19,9 @@ public class SamifierRunnerWithIntrons {
 	            File genomeFile = new File("test/resources/fasta/test_gff.gff");
 	            File chromosomeDir = new File("test/resources/fasta/");
 	            File samFile = File.createTempFile("out", "sam");
+	            String bedFile = "bed_file.bed";
 
-	            SamifierRunner runner = new SamifierRunner(mascotFiles, genomeFile, mapFile, chromosomeDir, samFile, null, null);
+	            SamifierRunner runner = new SamifierRunner(mascotFiles, genomeFile, mapFile, chromosomeDir, samFile, bedFile, null);
 	            runner.run();
 	            
 	            //List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected.sam"));
@@ -47,5 +48,29 @@ public class SamifierRunnerWithIntrons {
 	            e.printStackTrace();
 	        }
 	    }
+	 @Test
+	 public void testCreateSAMWithReverseGFF()
+     {
+         try {
+             String [] mascotFiles = {"test/resources/fasta/reverse/mascot_results.txt"};
+             File mapFile = new File("test/resources/fasta/reverse/test_accession.txt");
+             File genomeFile = new File("test/resources/fasta/reverse/test_gff.gff");
+             File chromosomeDir = new File("test/resources/fasta/reverse/");
+             File samFile = File.createTempFile("out", "sam");
 
+             SamifierRunner runner = new SamifierRunner(mascotFiles, genomeFile, mapFile, chromosomeDir, samFile, null, null);
+             runner.run();
+             
+             //List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected.sam"));
+             List<String> gotLines = FileUtils.readLines(samFile);
+             //line 1 should contain: TTGTTCTCTCTA
+             for (String line : gotLines) System.out.println(line);
+             
+         }
+         catch(Exception e)
+         {
+             fail("Unexpected exception: " + e.getMessage());
+             e.printStackTrace();
+         }
+     }
 }
