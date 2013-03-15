@@ -71,7 +71,7 @@ public class GenomeParserImpl implements GenomeParser {
                 if (GENE_RE.matcher(type).matches()) {
                     GeneInfo gene = parseGene(parts);
                     processGene(genome, gene);
-                } else if (SEQUENCE_RE.matcher(type).matches()) {
+                } else if (SEQUENCE_RE.matcher(type).find()) {
                     GeneSequence sequence = parseSequence(parts);
                     processSequence(genome, parts[CHROMOSOME_PART], sequence);
                 }
