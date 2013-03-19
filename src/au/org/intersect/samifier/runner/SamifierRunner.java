@@ -85,10 +85,8 @@ public class SamifierRunner {
         ProteinToOLNParser proteinToOLNParser = new ProteinToOLNParserImpl();
         proteinToOLNMap = proteinToOLNParser.parseMappingFile(mapFile);
 
-        PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(
-                proteinToOLNMap);
-        List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser
-                .parseResults(searchResultsPaths);
+        PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(proteinToOLNMap);
+        List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser.parseResults(searchResultsPaths);
 
         FileWriter bedWriter = null;
         if (bedfilePath != null) {
@@ -96,8 +94,7 @@ public class SamifierRunner {
         }
         FileWriter sam = new FileWriter(outfile);
         // sort serch result by proteins
-        peptideSearchResults = peptideSearchResultsParser
-                .sortResultsByChromosome(peptideSearchResults, proteinToOLNMap,
+        peptideSearchResults = peptideSearchResultsParser.sortResultsByChromosome(peptideSearchResults, proteinToOLNMap,
                         genome);
         createSAM(peptideSearchResults, sam, bedWriter);
     }
@@ -121,8 +118,7 @@ public class SamifierRunner {
                 continue;
             }
 
-            PeptideSequence peptide = sequenceGenerator
-                    .getPeptideSequence(result);
+            PeptideSequence peptide = sequenceGenerator.getPeptideSequence(result);
             if (peptide == null) {
                 continue;
             }
@@ -147,8 +143,9 @@ public class SamifierRunner {
             } else {
                 String sequnece = peptide.getNucleotideSequence();
                 String outputSequence = (peptide.getGeneInfo().getDirection() == -1) ? new StringBuilder(StringUtils.replaceChars(sequnece, "ACGT", "TGCA")).reverse().toString() : sequnece;
-                samEntries.add(new SAMEntry(resultName, peptide.getGeneInfo(),
-                        peptideStart, peptide.getCigarString(), outputSequence));
+                SAMEntry entry = new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), outputSequence);
+                entry.setChromosomeLength(sequenceGenerator.getFastaParser().getChromosomeLength(peptide.getGeneInfo().getChromosome()));
+                samEntries.add(entry);
             }
 
             try {
@@ -199,8 +196,19 @@ public class SamifierRunner {
         // // Location to store SAM file headers ///
         // ////////////////////////////////////////////////
         //reverse if needed
-        
-        
+        //writing header
+        ArrayList<String> chromosomes = new ArrayList<String>();
+        for (SAMEntry samEntry : samEntries) {
+            if (chromosomes.size() > 0 && chromosomes.get(chromosomes.size() - 1).equalsIgnoreCase(samEntry.getRname())) {
+                continue;
+            }
+            chromosomes.add(samEntry.getRname());
+        }
+        output.write("@HD\tVN:1.0\n");
+        for (String chromosome : chromosomes) {
+            output.write("@SQ\tSN:" + chromosome + "\tLN:" + ((sequenceGenerator.getFastaParser().getChromosomeLength(chromosome)) / 3)  + "\n");
+        }
+
         for (SAMEntry samEntry : samEntries) {
             String chromosome = samEntry.getRname();
             if (!chromosome.equals(prevChromosome)) {

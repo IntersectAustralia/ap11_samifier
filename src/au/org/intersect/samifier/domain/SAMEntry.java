@@ -16,6 +16,7 @@ public class SAMEntry {
     private int tlen = 0;
     private String peptideSequence;
     private String qual = "*";
+    private int chromosomeLength;
 
     public SAMEntry(String qname, GeneInfo gene, int pos, String cigarString,
             String peptideSequence) {
@@ -140,6 +141,14 @@ public class SAMEntry {
         out.append(qual);
         out.append(System.getProperty("line.separator"));
         return out.toString();
+    }
+
+    public int getChromosomeLength() {
+        return chromosomeLength;
+    }
+
+    public void setChromosomeLength(int chromosomeLength) {
+        this.chromosomeLength = chromosomeLength;
     }
 
 }

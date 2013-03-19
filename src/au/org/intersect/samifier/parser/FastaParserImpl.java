@@ -7,9 +7,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import au.org.intersect.samifier.domain.GeneInfo;
 import au.org.intersect.samifier.domain.GeneSequence;
@@ -19,8 +21,9 @@ import au.org.intersect.samifier.domain.NucleotideSequence;
 public class FastaParserImpl implements FastaParser {
     private String previousFile;
     private String previousCode;
+    private HashMap<String, Integer> chromosomeLength = new HashMap<String, Integer>();
 
-    public String readCode(File chromosomeFile) throws IOException, FastaParserException {
+    private String readCode(File chromosomeFile) throws IOException, FastaParserException {
         if (!chromosomeFile.exists()) {
             throw new FileNotFoundException(chromosomeFile.getAbsolutePath() + " not found");
         }
@@ -44,8 +47,7 @@ public class FastaParserImpl implements FastaParser {
     }
 
     @Override
-    public List<NucleotideSequence> extractSequenceParts(File chromosomeFile,
-            GeneInfo gene) throws IOException, FastaParserException {
+    public List<NucleotideSequence> extractSequenceParts(File chromosomeFile, GeneInfo gene) throws IOException, FastaParserException {
 
         String code;
         if (previousFile != null
@@ -53,6 +55,7 @@ public class FastaParserImpl implements FastaParser {
             code = previousCode;
         } else {
             code = readCode(chromosomeFile);
+            chromosomeLength.put(FilenameUtils.removeExtension(chromosomeFile.getName()) , code.length());
             previousFile = chromosomeFile.getName();
             previousCode = code;
         }
@@ -66,8 +69,7 @@ public class FastaParserImpl implements FastaParser {
             int stopIndex = location.getStop();
 
             if (!location.getSequenceType()) {
-                parts.add(new NucleotideSequence(null, GeneSequence.INTRON,
-                        location.getStart(), location.getStop()));
+                parts.add(new NucleotideSequence(null, GeneSequence.INTRON, location.getStart(), location.getStop()));
                 continue;
             }
             StringBuilder sequence = new StringBuilder(code.substring(startIndex, stopIndex));
@@ -84,5 +86,9 @@ public class FastaParserImpl implements FastaParser {
         }
 
         return parts;
+    }
+    @Override
+    public int getChromosomeLength(String chromosome) {
+        return chromosomeLength.get(chromosome);
     }
 }

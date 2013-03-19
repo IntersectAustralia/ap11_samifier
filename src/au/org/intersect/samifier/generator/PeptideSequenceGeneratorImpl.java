@@ -16,6 +16,7 @@ import au.org.intersect.samifier.domain.NucleotideSequence;
 import au.org.intersect.samifier.domain.PeptideSearchResult;
 import au.org.intersect.samifier.domain.PeptideSequence;
 import au.org.intersect.samifier.domain.ProteinToOLNMap;
+import au.org.intersect.samifier.parser.FastaParser;
 import au.org.intersect.samifier.parser.FastaParserException;
 import au.org.intersect.samifier.parser.FastaParserImpl;
 
@@ -26,13 +27,13 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
     private Genome genome;
     private ProteinToOLNMap proteinOLNMap;
     private File chromosomeDirectory;
-    private FastaParserImpl fasta;
+    private FastaParserImpl fastaParser;
 
     public PeptideSequenceGeneratorImpl(Genome genome, ProteinToOLNMap proteinOLNMap, File chromosomeDirectory) {
         this.genome = genome;
         this.proteinOLNMap = proteinOLNMap;
         this.chromosomeDirectory = chromosomeDirectory;
-        this.fasta = new FastaParserImpl();
+        this.fastaParser = new FastaParserImpl();
     }
 
     @Override
@@ -213,7 +214,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
 
     protected List<NucleotideSequence> extractSequenceParts(
             File chromosomeFile, GeneInfo gene) throws IOException, FastaParserException {
-        return fasta.extractSequenceParts(chromosomeFile, gene);
+        return fastaParser.extractSequenceParts(chromosomeFile, gene);
     }
 
     private File getChromosomeFile(GeneInfo gene) {
@@ -221,6 +222,11 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
         File faExt = new File(chromosomeDirectory, gene.getChromosome() + ".fa");
         if (faExt.exists()) return faExt;
         return new File(chromosomeDirectory, gene.getChromosome() + ".faa");
+    }
+
+    @Override
+    public FastaParser getFastaParser() {
+        return fastaParser;
     }
 
 }
