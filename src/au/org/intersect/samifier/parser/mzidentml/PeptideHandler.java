@@ -16,7 +16,7 @@ public class PeptideHandler extends DefaultHandler {
     }
 
     public void endElement(String uri, String name, String qName) {
-        if (PEPTIDE_SEQUENCE.equals(qName)) {
+        if (PEPTIDE_SEQUENCE.equalsIgnoreCase(qName)) {
             reader.storePeptide(peptideId, peptideSequence);
             reader.removeHandler();
         }

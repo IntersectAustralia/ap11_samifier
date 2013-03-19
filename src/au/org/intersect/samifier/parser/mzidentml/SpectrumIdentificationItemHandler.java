@@ -14,6 +14,8 @@ public class SpectrumIdentificationItemHandler extends DefaultHandler {
     private static final String ATTR_START = "start";
     private static final String ATTR_END = "end";
     private static final String ATTR_DB_SEQUENCE_REF = "DBSequence_Ref";
+    private static final String PEPTIDE_EVIDENCE_REF = "PeptideEvidenceRef";
+    private static final String ATTR_PEPTIDE_EVIDENCE_REF = "peptideEvidence_ref";
 
     private String peptideSequence;
     private String protein;
@@ -21,6 +23,7 @@ public class SpectrumIdentificationItemHandler extends DefaultHandler {
     private String id;
     private String start;
     private String end;
+    private String reference;
 
     private MzidReader reader;
 
@@ -40,9 +43,11 @@ public class SpectrumIdentificationItemHandler extends DefaultHandler {
             start = attrs.getValue(ATTR_START);
             end = attrs.getValue(ATTR_END);
         } else if (CV_PARAM.equals(qName)) {
-            if (attrs.getValue(ATTR_NAME).equals(MASCOT_SCORE)) {
+            if (attrs.getValue(ATTR_NAME).equalsIgnoreCase(MASCOT_SCORE)) {
                 confidenceScore = attrs.getValue(ATTR_VALUE);
             }
+        } else if (PEPTIDE_EVIDENCE_REF.equals(qName)) {
+            reference = attrs.getValue(ATTR_PEPTIDE_EVIDENCE_REF);
         }
     }
 
@@ -51,6 +56,8 @@ public class SpectrumIdentificationItemHandler extends DefaultHandler {
             if (id != null) {
                 reader.build(id, peptideSequence, protein, start, end,
                         confidenceScore);
+            } else if (reference != null) {
+                reader.addReference(reference, confidenceScore, peptideSequence);
             }
             reader.removeHandler();
         }
