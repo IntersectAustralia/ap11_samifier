@@ -8,7 +8,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
     private String name;
     private int startIndex;
     private int length;
-    private String direction;
+    private String direction; 
 
     private BigDecimal confidenceScore;
 
@@ -66,6 +66,9 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
     }
 
     public BigDecimal getConfidenceScore() {
+        if (virtualProteinNames.size() > 1) {
+            return confidenceScore.divide(new BigDecimal(virtualProteinNames.size()));
+        }
         return confidenceScore;
     }
 
@@ -86,6 +89,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
         if (other.getStartIndex() < getStartIndex()) {
             startIndex = other.getStartIndex();
         }
+        confidenceScore = confidenceScore.add(other.confidenceScore);
         virtualProteinNames.addAll(other.getVirtualProteinNames());
     }
     
@@ -96,7 +100,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
 
     @Override
     public boolean equals(Object other) {
-        if (! (other instanceof ProteinLocation) ) return false;
+        if (!(other instanceof ProteinLocation) ) return false;
         ProteinLocation otherLocation = (ProteinLocation) other;
         return this.toString().equals(other.toString());
     }
