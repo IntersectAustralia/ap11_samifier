@@ -37,9 +37,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
     }
 
     @Override
-    public List<PeptideSequence> getPeptideSequences(
-            List<PeptideSearchResult> peptideSearchResults)
-            throws PeptideSequenceGeneratorException {
+    public List<PeptideSequence> getPeptideSequences(List<PeptideSearchResult> peptideSearchResults) throws PeptideSequenceGeneratorException {
         List<PeptideSequence> peptideSequenceList = new ArrayList<PeptideSequence>();
         for (PeptideSearchResult searchResult : peptideSearchResults) {
             PeptideSequence sequence = getPeptideSequence(searchResult);
@@ -93,10 +91,8 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
 
         // Coordinates for the peptide are 1-based, so substract 1 so it
         // can be used with a 0-based string slice.
-        int relativeStart = (peptide.getPeptideStart() - 1)
-                * GenomeConstant.BASES_PER_CODON;
-        int relativeStop = peptide.getPeptideStop()
-                * GenomeConstant.BASES_PER_CODON - 1;
+        int relativeStart = (peptide.getPeptideStart() - 1) * GenomeConstant.BASES_PER_CODON;
+        int relativeStop = peptide.getPeptideStop() * GenomeConstant.BASES_PER_CODON - 1;
 
         int absoluteStartIndex = 0;
         int absoluteStopIndex = 0;
@@ -155,22 +151,17 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
             // part to process.
             if ((readCursor + sequenceSize) > relativeStop) {
                 substringEnd = relativeStop - readCursor + 1;
-                nucleotideSequence.append(part.getSequence().substring(
-                        substringStart, substringEnd));
+                nucleotideSequence.append(part.getSequence().substring(substringStart, substringEnd));
                 int partSize = substringEnd - substringStart;
                 absoluteStopIndex += partSize;
-                updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE,
-                        direction);
+                updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE, direction);
                 break;
             }
 
-            nucleotideSequence.append(part.getSequence().substring(
-                    substringStart, substringEnd));
+            nucleotideSequence.append(part.getSequence().substring(substringStart, substringEnd));
             int partSize = substringEnd - substringStart;
             absoluteStopIndex += partSize;
-            updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE,
-                    direction);
-            // readCursor = substringEnd;
+            updateCigar(cigar, partSize, GeneSequence.CODING_SEQUENCE, direction);
             readCursor += part.getSequence().length();
         }
 

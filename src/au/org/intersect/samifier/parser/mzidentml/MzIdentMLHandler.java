@@ -19,12 +19,10 @@ public class MzIdentMLHandler extends DefaultHandler {
         if (MZIDENTML.equals(qName)) {
             return;
         } else if (SEQUENCE_COLLECITON.equals(qName)) {
-            SequenceCollectionHandler sequenceHandler = new SequenceCollectionHandler(
-                    reader);
+            SequenceCollectionHandler sequenceHandler = new SequenceCollectionHandler(reader);
             reader.pushHandler(sequenceHandler);
         } else if (DATA_COLLECTION.equals(qName)) {
-            DataCollectionHandler dataHandler = new DataCollectionHandler(
-                    reader);
+            DataCollectionHandler dataHandler = new DataCollectionHandler(reader);
             reader.pushHandler(dataHandler);
         }
     }

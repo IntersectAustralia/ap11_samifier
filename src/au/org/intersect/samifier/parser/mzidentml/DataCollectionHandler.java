@@ -16,8 +16,7 @@ public class DataCollectionHandler extends DefaultHandler {
     public void startElement(String uri, String name, String qName,
             Attributes attrs) {
         if (ANALYSIS_DATA.equals(qName)) {
-            AnalysisDataHandler analysisHandler = new AnalysisDataHandler(
-                    reader);
+            AnalysisDataHandler analysisHandler = new AnalysisDataHandler(reader);
             reader.pushHandler(analysisHandler);
         }
     }

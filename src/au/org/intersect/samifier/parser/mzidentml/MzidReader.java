@@ -50,12 +50,7 @@ public class MzidReader {
     public List<PeptideSearchResult> run() {
         try {
             xmlReader.parse(inputSource);
-            if (peptideEvidenceMap.size() > 0) {
-                for (String key : peptideEvidenceMap.keySet()) {
-                    String[] params = peptideEvidenceMap.get(key);
-                    build(key, params[0], params[1], params[2]);
-                }
-            }
+            processEvidence();
             return results;
         } catch (Exception e) {
             System.out.println("Run exception thrown");
@@ -140,5 +135,15 @@ public class MzidReader {
        String [] params = {start, end, protein};
        peptideEvidenceMap.put(id, params);
 
+    }
+    
+    private void processEvidence(){
+        //in mzid 1.1 we have evidence entity that we need to process to get peptides 
+        if (peptideEvidenceMap.size() > 0) {
+            for (String key : peptideEvidenceMap.keySet()) {
+                String[] params = peptideEvidenceMap.get(key);
+                build(key, params[0], params[1], params[2]);
+            }
+        }
     }
 }
