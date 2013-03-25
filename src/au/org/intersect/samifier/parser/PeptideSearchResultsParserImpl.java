@@ -25,8 +25,9 @@ import au.org.intersect.samifier.parser.mzidentml.MzidReader;
 public class PeptideSearchResultsParserImpl implements
         PeptideSearchResultsParser {
 
-    private static Logger LOG = Logger
-            .getLogger(PeptideSearchResultsParserImpl.class);
+    private static Logger LOG = Logger.getLogger(PeptideSearchResultsParserImpl.class);
+    private static Pattern linePattern = Pattern.compile("^(q\\d+_p\\d+)=([^;]+);(.+)$");
+    private static Pattern proteinPartPattern = Pattern.compile("^\"([^\"]+)\":\\d\\:(\\d+)\\:(\\d+)\\:\\d$");
 
     private ProteinToOLNMap proteinToOLNMapping;
 
