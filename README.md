@@ -2,7 +2,9 @@ Samifier
 ========
 
   Tools to enable a nexus between proteomic and genomic analysis.
-  See http://intersectaustralia.github.com/ap11/ for details.
+  See https://github.com/IntersectAustralia/ap11_samifier/wiki for building,
+  deployment and user guide. For scientific background, see
+  http://intersectaustralia.github.com/ap11/ for details.
 
 Building
 ========
