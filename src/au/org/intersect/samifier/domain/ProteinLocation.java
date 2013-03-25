@@ -1,6 +1,7 @@
 package au.org.intersect.samifier.domain;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,7 +9,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
     private String name;
     private int startIndex;
     private int length;
-    private String direction; 
+    private String direction;
 
     private BigDecimal confidenceScore;
 
@@ -67,7 +68,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
 
     public BigDecimal getConfidenceScore() {
         if (virtualProteinNames.size() > 1) {
-            return confidenceScore.divide(new BigDecimal(virtualProteinNames.size()));
+            return confidenceScore.divide(new BigDecimal(virtualProteinNames.size()), 4, RoundingMode.HALF_UP);
         }
         return confidenceScore;
     }
@@ -84,7 +85,6 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
         return name + ", startIndex=" + startIndex + ", length=" + length
                 + ", direction=" + direction;
     }
-    
     public void update(ProteinLocation other) {
         if (other.getStartIndex() < getStartIndex()) {
             startIndex = other.getStartIndex();
@@ -92,12 +92,11 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
         confidenceScore = confidenceScore.add(other.confidenceScore);
         virtualProteinNames.addAll(other.getVirtualProteinNames());
     }
-    
+
     @Override
     public int compareTo(ProteinLocation o) {
         return getStartIndex() - o.getStartIndex();
     }
-
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof ProteinLocation) ) return false;

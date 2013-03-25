@@ -75,16 +75,6 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator {
             nameIndex++;
         }
 
-        // Reverse locations
-        /*
-         * for (int i=baseCount; i > 0; i -= basesPerInterval) { int start = i -
-         * basesPerInterval; addLocations(locations, start, nameIndex,
-         * basesPerInterval, baseCount, false, false); int halfIntervalStart =
-         * start - halfIntervalSize; int halfIntervalEnd = halfIntervalStart +
-         * basesPerInterval; if (halfIntervalEnd > 0) { addLocations(locations,
-         * halfIntervalStart, nameIndex, basesPerInterval, baseCount, false,
-         * true); } nameIndex++; }
-         */
         reader.close();
         return locations;
     }
@@ -98,27 +88,17 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator {
         for (int subIndex = 0; subIndex < 3; subIndex++) {
             int startIndex = start;
             if (oddNumberOfBases && isHalfInterval) {
-                startIndex += isForward ? -1 : 1;
+                startIndex += -1;
             }
 
             int endIndex = startIndex + basesPerInterval - 1;
-            // if (isForward)
-            // {
             startIndex += subIndex;
             endIndex += subIndex;
-            // }
-            // else
-            // {
-            // startIndex -= subIndex;
-            // endIndex -= subIndex;
-            // }
-
             // Ensure the start and end positions are a multiple of 3.
             // i.e. a full codon
             if (startIndex <= 0) {
                 int shiftFactor = endIndex % GenomeConstant.BASES_PER_CODON;
                 startIndex = 1 + shiftFactor;
-                // endIndex += shiftFactor;
             }
             if (endIndex > baseCount) {
                 int leftOverBases = (baseCount - startIndex + 1)
