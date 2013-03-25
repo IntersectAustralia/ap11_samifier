@@ -1,7 +1,6 @@
 package au.org.intersect.samifier.domain;
 
-public class PeptideSequence
-{
+public class PeptideSequence {
     private String nucleotideSequence;
     private String cigarString;
     private int startIndex;
@@ -14,9 +13,9 @@ public class PeptideSequence
 
     private GeneInfo geneInfo;
 
-
-    public PeptideSequence(String nucleotideSequence, String cigarString, int startIndex, int bedStartIndex, int bedStopIndex, GeneInfo geneInfo)
-    {
+    public PeptideSequence(String nucleotideSequence, String cigarString,
+            int startIndex, int bedStartIndex, int bedStopIndex,
+            GeneInfo geneInfo) {
         this.nucleotideSequence = nucleotideSequence;
         this.cigarString = cigarString;
         this.startIndex = startIndex;
@@ -25,35 +24,28 @@ public class PeptideSequence
         this.geneInfo = geneInfo;
     }
 
-    public String getNucleotideSequence()
-    {
+    public String getNucleotideSequence() {
         return nucleotideSequence;
     }
 
-    public String getCigarString()
-    {
+    public String getCigarString() {
         return cigarString;
     }
 
-    public int getStartIndex()
-    {
+    public int getStartIndex() {
         return startIndex;
     }
 
-    public int getBedStopIndex()
-    {
+    public int getBedStopIndex() {
         return bedStopIndex;
     }
 
-    public int getBedStartIndex()
-    {
+    public int getBedStartIndex() {
         return bedStartIndex;
     }
 
-    public String toString()
-    {
-        return "startIndex = " + startIndex + ", "
-             + "nucleotideSequence = " + nucleotideSequence + ", "
-             + "cigarString = " + cigarString;
+    public String toString() {
+        return "startIndex = " + startIndex + ", " + "nucleotideSequence = "
+                + nucleotideSequence + ", " + "cigarString = " + cigarString;
     }
 }

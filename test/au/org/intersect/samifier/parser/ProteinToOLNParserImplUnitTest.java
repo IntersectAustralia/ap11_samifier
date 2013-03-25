@@ -8,7 +8,6 @@ import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.Map;
 
 /**
  * * Tests {@link au.org.intersect.samifier.Samifier}

@@ -1,0 +1,7 @@
+ypd_id  uniprot_acc     sprot_id        sgd_id
+p0a.+1	P00549	prot1	S000000036
+p1a.+1	P232t3r	prot2	jhsdkjsahdkj
+p2a.+1	P232t3r	prot3	jhsdkjsahdkj
+p3a+1	P232t3r	prot4	jhsdkjsahdkj
+p4a+1	P232t3r	prot5	jhsdkjsahdk
+p5a+1	P232t3r	prot6	jhsdkjsahdkj

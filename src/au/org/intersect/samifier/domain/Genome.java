@@ -5,51 +5,41 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Genome
-{
+public class Genome {
 
     private Map<String, GeneInfo> genes;
 
-    public Genome()
-    {
+    public Genome() {
         genes = new HashMap<String, GeneInfo>();
     }
 
-    public void addGene(GeneInfo gene)
-    {
+    public void addGene(GeneInfo gene) {
         genes.put(gene.getId(), gene);
     }
 
-    public boolean hasGene(String orderedLocusName)
-    {
+    public boolean hasGene(String orderedLocusName) {
         return genes.containsKey(orderedLocusName);
     }
 
-    public GeneInfo getGene(String orderedLocusName)
-    {
+    public GeneInfo getGene(String orderedLocusName) {
         return genes.get(orderedLocusName);
     }
 
-    public Set<Map.Entry<String, GeneInfo>> getGeneEntries()
-    {
+    public Set<Map.Entry<String, GeneInfo>> getGeneEntries() {
         return genes.entrySet();
     }
 
-    public Collection<GeneInfo> getGenes()
-    {
+    public Collection<GeneInfo> getGenes() {
         return genes.values();
     }
 
-    public Set<String> getLocusNames()
-    {
+    public Set<String> getLocusNames() {
         return genes.keySet();
     }
 
-    public String toString()
-    {
+    public String toString() {
         StringBuffer out = new StringBuffer();
-        for (String orderedLocusName : genes.keySet())
-        {
+        for (String orderedLocusName : genes.keySet()) {
             GeneInfo geneInfo = genes.get(orderedLocusName);
             out.append(orderedLocusName);
             out.append(System.getProperty("line.separator"));

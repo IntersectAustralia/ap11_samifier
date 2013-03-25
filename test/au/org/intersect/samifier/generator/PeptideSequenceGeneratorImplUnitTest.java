@@ -146,9 +146,9 @@ public class PeptideSequenceGeneratorImplUnitTest
         PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 81, 85, dummyBigDecimal);
 
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
-        locations.add(new GeneSequence("G01", true, 87286, 87387, 1));
-        locations.add(new GeneSequence("G01", true, 87501, 87752, 1));
-        locations.add(new GeneSequence("G01", false, 87388, 87500, 1));
+        locations.add(new GeneSequence("G01", true, 87286, 87387, -1));
+        locations.add(new GeneSequence("G01", true, 87501, 87752, -1));
+        locations.add(new GeneSequence("G01", false, 87388, 87500, -1));
         File chromosomeDirectory = new File("test/resources/");
         GeneInfo gene = new GeneInfo("chrI", "G01", 87286, 87752, -1);
         gene.setLocations(locations);
@@ -169,7 +169,7 @@ public class PeptideSequenceGeneratorImplUnitTest
             fail("Unexpected exception: " + e.getMessage());
             e.printStackTrace();
         }
-        assertEquals("Peptide extracted should be GCTGAAATTGATGAT", "GCTGAAATTGATGAT", p.getNucleotideSequence());
+        assertEquals("Peptide extracted should be ATCATCAATTTCAGC", "ATCATCAATTTCAGC", p.getNucleotideSequence());
         assertEquals("Peptide cigar string should be 3M113N12M", "3M113N12M", p.getCigarString());
     }
 }

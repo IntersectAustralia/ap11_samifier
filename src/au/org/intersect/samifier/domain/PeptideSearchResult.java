@@ -5,8 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigDecimal;
 
-public class PeptideSearchResult
-{
+public class PeptideSearchResult {
     private String id;
     private String peptideSequence;
     private String proteinName;
@@ -14,76 +13,60 @@ public class PeptideSearchResult
     private int peptideStop;
     private BigDecimal confidenceScore;
 
-    public PeptideSearchResult(String id, String peptideSequence, String proteinName, int peptideStart, int peptideStop, BigDecimal confidenceScore)
-    {
-        this.id              = id;
+    public PeptideSearchResult(String id, String peptideSequence,
+            String proteinName, int peptideStart, int peptideStop,
+            BigDecimal confidenceScore) {
+        this.id = id;
         this.peptideSequence = peptideSequence;
-        this.proteinName     = proteinName;
-        this.peptideStart    = peptideStart;
-        this.peptideStop     = peptideStop;
+        this.proteinName = proteinName;
+        this.peptideStart = peptideStart;
+        this.peptideStop = peptideStop;
         this.confidenceScore = confidenceScore;
     }
 
-    public int hashCode()
-    {
-        return new HashCodeBuilder(17, 37).
-                append(id).
-                append(peptideSequence).
-                append(proteinName).
-                append(peptideStart).
-                append(peptideStop).
-                append(confidenceScore).
-                toHashCode();
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(id).append(peptideSequence)
+                .append(proteinName).append(peptideStart).append(peptideStop)
+                .append(confidenceScore).toHashCode();
     }
 
-    public boolean equals(Object obj)
-    {
-        if (obj instanceof PeptideSearchResult == false)
-        {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof PeptideSearchResult)) {
             return false;
         }
-        if (this == obj)
-        {
+        if (this == obj) {
             return true;
         }
         PeptideSearchResult rhs = (PeptideSearchResult) obj;
-        return new EqualsBuilder()
-                .append(id, rhs.id)
+        return new EqualsBuilder().append(id, rhs.id)
                 .append(peptideSequence, rhs.peptideSequence)
                 .append(proteinName, rhs.proteinName)
                 .append(peptideStart, rhs.peptideStart)
                 .append(peptideStop, rhs.peptideStop)
-                .append(confidenceScore, rhs.confidenceScore)
-                .isEquals();
+                .append(confidenceScore, rhs.confidenceScore).isEquals();
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public String getPeptideSequence()
-    {
+    public String getPeptideSequence() {
         return peptideSequence;
     }
 
-    public String getProteinName()
-    {
+    public String getProteinName() {
         return proteinName;
     }
 
-    public int getPeptideStart()
-    {
+    public int getPeptideStart() {
         return peptideStart;
     }
 
-    public int getPeptideStop()
-    {
+    public int getPeptideStop() {
         return peptideStop;
     }
 
-    public int getSequenceLength()
-    {
+    public int getSequenceLength() {
         return peptideSequence.length();
     }
 
@@ -91,14 +74,15 @@ public class PeptideSearchResult
         return confidenceScore;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return "id    = " + id + System.getProperty("line.separator")
-             + "name  = " + proteinName + System.getProperty("line.separator")
-             + "start = " + peptideStart + System.getProperty("line.separator")
-             + "stop  = " + peptideStop + System.getProperty("line.separator")
-             + "score = " + confidenceScore + System.getProperty("line.separator")
-             + "sequence = " + System.getProperty("line.separator")
-             + peptideSequence;
+                + "name  = " + proteinName
+                + System.getProperty("line.separator") + "start = "
+                + peptideStart + System.getProperty("line.separator")
+                + "stop  = " + peptideStop
+                + System.getProperty("line.separator") + "score = "
+                + confidenceScore + System.getProperty("line.separator")
+                + "sequence = " + System.getProperty("line.separator")
+                + peptideSequence;
     }
 }

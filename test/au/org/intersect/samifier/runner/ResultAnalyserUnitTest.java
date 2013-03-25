@@ -35,7 +35,7 @@ public class ResultAnalyserUnitTest
             List<String> expectedLines = FileUtils.readLines(new File("test/resources/expected_results_analysis.txt"));
             List<String> gotLines = FileUtils.readLines(resultAnalysisFile);
             assertEquals(expectedLines.size(), gotLines.size());
-
+            for(String line : gotLines) System.out.println(line);
             for (int cnt = 0; cnt < expectedLines.size(); cnt++)
             {
                 String expected = expectedLines.get(cnt);
