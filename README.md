@@ -22,20 +22,20 @@ Converts a search result from the Mascot protein search engine (or compatible)
 into SAM format, so it can be displayed in a genomics viewer.
 
     $ java -jar dist/samifier.jar 
-    usage: samifier [-b <bedFile>] -c <chromosomeDir> -g <genomeFile> [-l
-           <logFile>] -m <mappingFile> -o <outputFile> -r <searchResultsFile>
+    usage: samifier  -r <searchResultsFile> -c <chromosomeDir> -g <genomeFile>   
+           -m <mappingFile> -o <outputFile> [-l <logFile>] [-b <bedFile>]
            [-s <Confidence Score thresold>]
-     -b <bedFile>                     Filename to write IGV regions of
-                                      interest (BED) file to
+     -r <searchResultsFile>           Mascot search results file in txt format           
      -c <chromosomeDir>               Directory containing the chromosome
                                       files in FASTA format for the given
                                       genome
-     -g <genomeFile>                  Genome file in gff format
-     -l <logFile>                     Filename to write the log into
      -m <mappingFile>                 File mapping protein identifier to
-                                      ordered locus name
-     -o <outputFile>                  Filename to write the SAM format file to
-     -r <searchResultsFile>           Mascot search results file in txt format
+                                      ordered locus name                                      
+     -g <genomeFile>                  Genome file in gff format
+     -o <outputFile>                  Filename to write the SAM format file to     
+     -l <logFile>                     Filename to write the log into
+     -b <bedFile>                     Filename to write IGV regions of
+                                      interest (BED) file to
      -s <Confidence Score thresold>   Minimum confidence score for peptides to
                                       be included
 
