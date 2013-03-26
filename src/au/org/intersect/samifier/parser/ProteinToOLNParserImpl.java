@@ -29,7 +29,7 @@ public class ProteinToOLNParserImpl implements ProteinToOLNParser {
             reader = new BufferedReader(new FileReader(mappingFile));
 
             // Skip header line
-            String line = reader.readLine();
+            String line;
             int lineNumber = 1;
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
