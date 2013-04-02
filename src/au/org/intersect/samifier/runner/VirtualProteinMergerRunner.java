@@ -29,15 +29,12 @@ public class VirtualProteinMergerRunner {
     }
 
     public void run() throws Exception {
-        LocationGenerator locationGenerator = new VirtualProteinMascotLocationGenerator(
+        VirtualProteinMascotLocationGenerator locationGenerator = new VirtualProteinMascotLocationGenerator(
                 searchResultsPaths, translationTableFile, genomeFile,
                 chromosomeDir);
         List<ProteinLocation> locations = locationGenerator.generateLocations();
         Collections.sort(locations);
-        String genomeFileName = genomeFile.getName();
-        GffOutputterGenerator outputterGenerator = new GffOutputterGenerator(
-                genomeFileName);
-        ProteinLocationFileGenerator.generateFile(locations, outputFile,
-                outputterGenerator, "##gff-version 3");
+        GffOutputterGenerator outputterGenerator = new GffOutputterGenerator(genomeFile.getName());
+        ProteinLocationFileGenerator.generateFile(locations, outputFile, outputterGenerator, "##gff-version 3");
     }
 }

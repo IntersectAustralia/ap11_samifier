@@ -10,21 +10,13 @@ public class GffOutputterUnitTest
     {
     }
 
+
+    
     @Test
     public void testGffOutputWithGenomeFileWithoutExtension()
     {
         ProteinLocation proteinLocation = new ProteinLocation("a",1,2,"+", "1");
-        GffOutputter gffOutputter = new GffOutputter(proteinLocation,"test");
-        String lineFeed = System.getProperty("line.separator");
-        String firstLine = gffOutputter.getOutput().split(lineFeed)[0];
-        String firstToken = firstLine.split("\t")[0];
-        assertEquals("test", firstToken);
-    }
-
-    @Test
-    public void testGffOutputWithGenomeFileWithExtension()
-    {
-        ProteinLocation proteinLocation = new ProteinLocation("a",1,2,"+", "1");
+        proteinLocation.setChromosome("test");
         GffOutputter gffOutputter = new GffOutputter(proteinLocation,"test.txt");
         String lineFeed = System.getProperty("line.separator");
         String firstLine = gffOutputter.getOutput().split(lineFeed)[0];
@@ -36,6 +28,7 @@ public class GffOutputterUnitTest
     public void testGffWholeOutput()
     {
         ProteinLocation proteinLocation = new ProteinLocation("glimmer_name",1,2,"+", "1");
+        proteinLocation.setChromosome("test");
         GffOutputter gffOutputter = new GffOutputter(proteinLocation,"test");
         String lineFeed = System.getProperty("line.separator");
 
