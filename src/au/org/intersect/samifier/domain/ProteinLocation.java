@@ -10,7 +10,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
     private int startIndex;
     private int length;
     private String direction;
-
+    private String chromosome;
     private BigDecimal confidenceScore;
 
     private String frame;
@@ -24,12 +24,12 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
 
     public ProteinLocation(String name, int startIndex, int length,
             String direction, String frame, BigDecimal confidenceScore) {
-        this(name, startIndex, length, direction, frame, null, null);
+        this(name, startIndex, length, direction, frame, null, null, null);
     }
 
     public ProteinLocation(String name, int startIndex, int length,
             String direction, String frame, BigDecimal confidenceScore,
-            String virtualProteinName) {
+            String virtualProteinName, String chromosome) {
         this.name = name;
         this.direction = direction;
         this.frame = frame;
@@ -37,6 +37,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
         this.startIndex = startIndex;
         this.length = length;
         this.virtualProteinNames = new HashSet<String>();
+        this.chromosome = chromosome;
         if (virtualProteinName != null) {
             virtualProteinNames.add(virtualProteinName);
         }
@@ -93,15 +94,21 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
         virtualProteinNames.addAll(other.getVirtualProteinNames());
     }
 
+    public String getChromosome() {
+        return chromosome;
+    }
     @Override
     public int compareTo(ProteinLocation o) {
         return getStartIndex() - o.getStartIndex();
     }
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof ProteinLocation) ) return false;
-        ProteinLocation otherLocation = (ProteinLocation) other;
+        if (!(other instanceof ProteinLocation)) return false;
         return this.toString().equals(other.toString());
+    }
+
+    public void setChromosome(String chromosome) {
+        this.chromosome = chromosome;
     }
 
 }

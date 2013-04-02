@@ -81,6 +81,7 @@ public class GenomeParserImpl implements GenomeParser {
                 reader.close();
             }
         }
+        genome.verify();
         return genome;
     }
 
