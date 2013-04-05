@@ -124,7 +124,7 @@ public class PeptideSearchResultsParserImpl implements
             String proteinID = proteinToOLNMap.getOLN(res.getProteinName());
             GeneInfo genInfo = genome.getGene(proteinID);
             if (genInfo == null) {
-                LOG.warn("No gen location for " + res.getProteinName());
+                LOG.warn("No gene location for " + res.getProteinName());
                 continue;
             }
             String chromosome = genInfo.getChromosome();

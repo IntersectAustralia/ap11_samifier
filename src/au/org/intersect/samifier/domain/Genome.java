@@ -30,7 +30,46 @@ public class Genome {
     }
 
     public GeneInfo getGene(String orderedLocusName) {
-        return genes.get(orderedLocusName);
+        if (hasGene(orderedLocusName)) {
+            return genes.get(orderedLocusName);
+        } else if (hasVirtualProtein(orderedLocusName)) {
+            return getGeneForVirtualProtein(orderedLocusName);
+        }
+        return null;
+    }
+
+    private boolean hasVirtualProtein(String orderedLocusName) {
+        for (GeneInfo genInfo : genes.values()) {
+            if (genInfo.hasVirtualProtein(orderedLocusName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private GeneInfo getGeneForVirtualProtein(String orderedLocusName) {
+        for (GeneInfo geneInfo : genes.values()) {
+            if (geneInfo.hasVirtualProtein(orderedLocusName)) {
+                if (verifySimpleGene(geneInfo)) {
+                    VirtualProtein vp = geneInfo.getVirtualProtein(orderedLocusName);
+                    GeneInfo newGene = new GeneInfo(geneInfo.getChromosome(), geneInfo.getId(), vp.getStartOffset(), vp.getEndOffset(), geneInfo.getDirection());
+                    newGene.addLocation(new GeneSequence(geneInfo.getId(), true, vp.getStartOffset(), vp.getEndOffset(), geneInfo.getDirection()));
+                    return newGene;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    private boolean verifySimpleGene(GeneInfo geneInfo) {
+        if (geneInfo.getLocations().size() == 1) {
+            GeneSequence sequence = geneInfo.getLocations().get(0);
+            if (geneInfo.getStart() == sequence.getStart() && geneInfo.getStop() == sequence.getStop()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Set<Map.Entry<String, GeneInfo>> getGeneEntries() {

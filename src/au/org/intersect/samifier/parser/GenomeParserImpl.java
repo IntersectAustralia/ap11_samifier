@@ -3,12 +3,16 @@ package au.org.intersect.samifier.parser;
 import au.org.intersect.samifier.domain.GeneInfo;
 import au.org.intersect.samifier.domain.GeneSequence;
 import au.org.intersect.samifier.domain.Genome;
+import au.org.intersect.samifier.domain.VirtualProtein;
+
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +26,9 @@ public class GenomeParserImpl implements GenomeParser {
     public static final Pattern SEQUENCE_RE = Pattern.compile("(" + CODING_SEQUENCE + "|" + INTRON + ")");
     private static final Pattern ID_ATTRIBUTE_RE = Pattern.compile(".*Name=([^_;]+).*");
     private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^_;]+).*");
-
+    private static final Pattern VIRTUAL_PROTEIN_ATTRIBUTE_RE = Pattern.compile(".*Virtual_protein=([^_;]+).*");
+    private static final Pattern BRACKETS = Pattern.compile("\\((.*?)\\)");
+    
     private String genomeFileName;
     private int lineNumber = 0;
     private String line;
@@ -112,8 +118,30 @@ public class GenomeParserImpl implements GenomeParser {
         if (start > stop) {
             throwParsingException("Start-stop invalid");
         }
-        return new GeneInfo(chromosome, extractId(parts[ATTRIBUTES_PART]),
-                start, stop, parseStrand(direction));
+        //parse virtual genes
+        
+        return new GeneInfo(chromosome, extractId(parts[ATTRIBUTES_PART]), start, stop, parseStrand(direction), parseVirtualProteins(parts[ATTRIBUTES_PART]));
+    }
+
+    private List<VirtualProtein> parseVirtualProteins(String attributes) {
+        List<VirtualProtein> virtualProteins = new ArrayList<VirtualProtein>();
+        Matcher m = VIRTUAL_PROTEIN_ATTRIBUTE_RE.matcher(attributes);
+        if (!(m.matches())) {
+            return virtualProteins;
+        }
+        String vProteinsString =  m.group(1);
+        String[] vProteinArray = vProteinsString.split(",");
+        for (String vp : vProteinArray) {
+            Matcher matcher = BRACKETS.matcher(vp);
+            if (matcher.find()) {
+                String[] offsets = matcher.group(1).split("-");
+                int startOffset =  Integer.parseInt(offsets[0]);
+                int endOffset =  Integer.parseInt(offsets[1]);
+                String name = vp.replaceAll(BRACKETS.pattern(), "");
+                virtualProteins.add(new VirtualProtein(name, startOffset, endOffset));
+            }
+        }
+        return virtualProteins;
     }
 
     protected GeneSequence parseSequence(String[] parts)
@@ -125,8 +153,7 @@ public class GenomeParserImpl implements GenomeParser {
         if (start > stop) {
             throwParsingException("Start-stop invalid");
         }
-        return new GeneSequence(extractParent(parts[ATTRIBUTES_PART]),
-                parseSequenceType(type), start, stop, parseStrand(direction));
+        return new GeneSequence(extractParent(parts[ATTRIBUTES_PART]), parseSequenceType(type), start, stop, parseStrand(direction), parseVirtualProteins(parts[ATTRIBUTES_PART]));
     }
 
     private void processGene(Genome genome, GeneInfo gene) {
@@ -138,7 +165,7 @@ public class GenomeParserImpl implements GenomeParser {
         if (!genome.hasGene(sequence.getParentId())) {
             GeneInfo gene = new GeneInfo(chromosome, sequence.getParentId(),
                     sequence.getStart(), sequence.getStop(),
-                    sequence.getDirection());
+                    sequence.getDirection(), sequence.getVirtualProteins());
             genome.addGene(gene);
         }
         GeneInfo gene = genome.getGene(sequence.getParentId());

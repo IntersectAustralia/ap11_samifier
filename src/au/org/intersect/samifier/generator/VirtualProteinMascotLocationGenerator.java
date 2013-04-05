@@ -143,7 +143,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             proteinLocations
                     .add(new ProteinLocation("?", startPosition, Math.abs(stopPosition - startPosition), 
                             geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(), 
-                            peptideSearchResult.getProteinName(), geneInfo.getChromosome()));
+                            peptideSearchResult.getProteinName() + "(" + virtualGeneStart +"-" + virtualGeneStop + ")", geneInfo.getChromosome()));
         }
         return proteinLocations;
     }

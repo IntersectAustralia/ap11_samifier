@@ -1,5 +1,6 @@
 package au.org.intersect.samifier.domain;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class GeneSequence {
@@ -14,9 +15,14 @@ public class GeneSequence {
     private int start;
     private int stop;
     private int direction;
+    private List<VirtualProtein> virtualProteins;
 
-    public GeneSequence(String parentId, boolean codingSequence, int start,
-            int stop, int direction) {
+    public GeneSequence(String parentId, boolean codingSequence, int start, int stop, int direction, List<VirtualProtein> virtualProteins) {
+        this(parentId, codingSequence, start, stop, direction);
+        this.virtualProteins = virtualProteins;
+    }
+    
+    public GeneSequence(String parentId, boolean codingSequence, int start, int stop, int direction) {
         setParentId(parentId);
         setSequenceType(codingSequence);
         setStart(start);
@@ -62,6 +68,14 @@ public class GeneSequence {
 
     public int getDirection() {
         return direction;
+    }
+
+    public List<VirtualProtein> getVirtualProteins() {
+        return virtualProteins;
+    }
+
+    public void setVirtualProteins(List<VirtualProtein> virtualProteins) {
+        this.virtualProteins = virtualProteins;
     }
 
 }

@@ -4,7 +4,9 @@ import au.org.intersect.samifier.Samifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GeneInfo {
     private String chromosome;
@@ -13,28 +15,35 @@ public class GeneInfo {
     private int stop;
     private int direction;
     private List<GeneSequence> locations;
+    private Map<String, VirtualProtein> virtualProteins;
 
     public GeneInfo() {
         // locations = new TreeSet(new GeneSequenceComparator());
         locations = new ArrayList<GeneSequence>();
     }
 
-    public GeneInfo(String chromosome, String id, int start, int stop,
-            int direction) {
+    public GeneInfo(String chromosome, String id, int start, int stop, int direction) {
+        this(chromosome, id, start, stop, direction, null);
+    }
+    public GeneInfo(String chromosome, String id, int start, int stop, int direction, List<VirtualProtein> virtualProteins) {
         // this(chromosome, start, direction, new TreeSet(new
         // GeneSequenceComparator()));
-        this(chromosome, id, start, stop, direction,
-                new ArrayList<GeneSequence>());
+        this(chromosome, id, start, stop, direction, new ArrayList<GeneSequence>(), virtualProteins);
     }
 
-    public GeneInfo(String chromosome, String id, int start, int stop,
-            int direction, List<GeneSequence> locations) {
+    private GeneInfo(String chromosome, String id, int start, int stop, int direction, List<GeneSequence> locations, List<VirtualProtein> virtualProteins) {
         setChromosome(chromosome);
         setId(id);
         setStart(start);
         setStop(stop);
         setDirection(direction);
         this.locations = locations;
+        if (virtualProteins != null && virtualProteins.size() > 0 ) {
+            this.virtualProteins = new HashMap<String, VirtualProtein>();
+            for (VirtualProtein vp: virtualProteins) {
+                this.virtualProteins.put(vp.getName(), vp);
+            }
+        }
     }
 
     public void setChromosome(String chromosome) {
@@ -109,5 +118,14 @@ public class GeneInfo {
 
     public boolean isForward() {
         return getDirection() == 1;
+    }
+
+    public boolean hasVirtualProtein(String orderedLocusName) {
+        if (virtualProteins == null) return false;
+        return virtualProteins.containsKey(orderedLocusName);
+    }
+
+    public VirtualProtein getVirtualProtein(String vpName) {
+        return virtualProteins.get(vpName);
     }
 }
