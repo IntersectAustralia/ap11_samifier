@@ -131,8 +131,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
                 peptideAbsoluteStop = virtualGeneStart + stopOffset;
             }
 
-            File geneFile = new File(chromosomeDir, geneInfo.getChromosome()
-                    + ".faa");
+            File geneFile = getChromosomeFile(chromosomeDir, geneInfo.getChromosome());
             GenomeNucleotides genomeNucleotides = getGenomeNucleotides(geneFile);
             int startPosition = searchStart(peptideSearchResult, peptideAbsoluteStart, genomeNucleotides, geneInfo);
             int stopPosition = searchStop(peptideSearchResult, peptideAbsoluteStop, genomeNucleotides, geneInfo, false);
@@ -238,4 +237,10 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         return direction * GenomeConstant.BASES_PER_CODON;
     }
 
+    private File getChromosomeFile(File chromosomeDir, String chromosome) {
+        // TODO: find the different chrormosome file extensions
+        File faExt = new File(chromosomeDir, chromosome + ".fa");
+        if (faExt.exists()) return faExt;
+        return new File(chromosomeDir, chromosome + ".faa");
+    }
 }
