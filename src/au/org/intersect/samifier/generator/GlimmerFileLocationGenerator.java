@@ -3,6 +3,7 @@ package au.org.intersect.samifier.generator;
 import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.ProteinLocation;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.List;
 public class GlimmerFileLocationGenerator implements LocationGenerator {
 
     private String glimmerFilePath;
+    private String chromosome;
 
     public GlimmerFileLocationGenerator(String glimmerFilePath) {
         this.glimmerFilePath = glimmerFilePath;
@@ -44,6 +46,7 @@ public class GlimmerFileLocationGenerator implements LocationGenerator {
             lineCount++;
             if (line.startsWith(">")) {
                 wasHeader = true;
+                parseHeader(line);
                 continue;
             }
             if (!wasHeader) continue;
@@ -62,11 +65,11 @@ public class GlimmerFileLocationGenerator implements LocationGenerator {
             BigDecimal confidenceScore = new BigDecimal(columns[4]);
 
             if (direction.equals(GenomeConstant.FORWARD_FLAG)) {
-                proteinLocations.add(new ProteinLocation(name, firstIndex, secondIndex - firstIndex + 1, direction, frame, confidenceScore));
+                proteinLocations.add(new ProteinLocation(name, firstIndex, secondIndex - firstIndex + 1, direction, frame, confidenceScore, null, chromosome));
             } else if (direction.startsWith(GenomeConstant.REVERSE_FLAG)) {
                 proteinLocations.add(new ProteinLocation(name, secondIndex,
                         firstIndex - secondIndex + 1,
-                        GenomeConstant.REVERSE_FLAG, frame, confidenceScore));
+                        GenomeConstant.REVERSE_FLAG, frame, confidenceScore, null, chromosome));
             } else {
                 throw new LocationGeneratorException(
                         "Unexpected value for direction (4th column) at line: "
@@ -74,6 +77,11 @@ public class GlimmerFileLocationGenerator implements LocationGenerator {
             }
         }
         return proteinLocations;
+    }
+
+    private void parseHeader(String line) {
+        String[] parts = line.split("\\|");
+        chromosome = FilenameUtils.removeExtension(parts[3]);
     }
 
 }
