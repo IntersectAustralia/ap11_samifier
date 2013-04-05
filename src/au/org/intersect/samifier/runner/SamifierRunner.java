@@ -93,9 +93,8 @@ public class SamifierRunner {
             bedWriter = new FileWriter(bedfilePath);
         }
         FileWriter sam = new FileWriter(outfile);
-        // sort serch result by proteins
-        peptideSearchResults = peptideSearchResultsParser.sortResultsByChromosome(peptideSearchResults, proteinToOLNMap,
-                        genome);
+        // sort search result by proteins
+        peptideSearchResults = peptideSearchResultsParser.sortResultsByChromosome(peptideSearchResults, proteinToOLNMap, genome);
         createSAM(peptideSearchResults, sam, bedWriter);
     }
 
@@ -141,9 +140,10 @@ public class SamifierRunner {
                         peptideStart, peptide.getCigarString(), peptide
                                 .getNucleotideSequence(), mapq));
             } else {
+                int mapq = result.getConfidenceScore().round(new MathContext(0)).intValue();
                 String sequnece = peptide.getNucleotideSequence();
                 String outputSequence = (peptide.getGeneInfo().getDirection() == -1) ? new StringBuilder(StringUtils.replaceChars(sequnece, "ACGT", "TGCA")).reverse().toString() : sequnece;
-                SAMEntry entry = new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), outputSequence);
+                SAMEntry entry = new SAMEntry(resultName, peptide.getGeneInfo(), peptideStart, peptide.getCigarString(), outputSequence, mapq);
                 entry.setChromosomeLength(sequenceGenerator.getFastaParser().getChromosomeLength(peptide.getGeneInfo().getChromosome()));
                 samEntries.add(entry);
             }

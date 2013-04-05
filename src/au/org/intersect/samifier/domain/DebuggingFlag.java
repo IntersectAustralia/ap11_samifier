@@ -18,7 +18,7 @@ public class DebuggingFlag {
     // field, which denotes mapping quality.
     // / Value of 1 means use Mascot score, any other value debugging flag value
     // will make MAPQ = 255.
-    private static int use_mascot_score = 1;
+    private static int use_mascot_score = 0;
 
     public static int get_use_mascot_score_flag() {
         return use_mascot_score;
