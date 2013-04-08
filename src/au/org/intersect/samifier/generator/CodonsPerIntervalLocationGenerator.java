@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import au.org.intersect.samifier.domain.GenomeConstant;
@@ -14,6 +15,7 @@ import au.org.intersect.samifier.domain.ProteinLocation;
 
 public class CodonsPerIntervalLocationGenerator implements LocationGenerator {
     private String interval;
+    private String chromosome;
     private File genomeFile;
 
     public CodonsPerIntervalLocationGenerator(String interval, File genomeFile) {
@@ -25,6 +27,7 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator {
     public List<ProteinLocation> generateLocations()
             throws LocationGeneratorException {
         int codonsPerInterval = Integer.parseInt(interval);
+        chromosome = FilenameUtils.removeExtension(genomeFile.getName());
         try {
             return createLocations(genomeFile, codonsPerInterval);
         } catch (IOException e) {
@@ -116,7 +119,7 @@ public class CodonsPerIntervalLocationGenerator implements LocationGenerator {
             String frame = Integer.toString(subIndex + 1);
             locations.add(new ProteinLocation(name, startIndex, length,
                     isForward ? GenomeConstant.FORWARD_FLAG
-                            : GenomeConstant.REVERSE_FLAG, frame));
+                            : GenomeConstant.REVERSE_FLAG, frame, null, null, chromosome));
         }
     }
 
