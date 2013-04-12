@@ -99,7 +99,12 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
     }
     @Override
     public int compareTo(ProteinLocation o) {
-        return getStartIndex() - o.getStartIndex();
+        int c;
+        c = getChromosome().compareTo(o.getChromosome());
+        if (c == 0) {
+            c = getStartIndex() - o.getStartIndex();
+        }
+        return c;
     }
     @Override
     public boolean equals(Object other) {

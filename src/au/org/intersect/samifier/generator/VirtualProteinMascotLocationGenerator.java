@@ -140,9 +140,9 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             }
 
             proteinLocations
-                    .add(new ProteinLocation("?", startPosition, Math.abs(stopPosition - startPosition), 
-                            geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(), 
-                            peptideSearchResult.getProteinName() + "(" + virtualGeneStart +"-" + virtualGeneStop + ")", geneInfo.getChromosome()));
+                    .add(new ProteinLocation("?", startPosition, Math.abs(stopPosition - startPosition),
+                            geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(),
+                            peptideSearchResult.getProteinName() + "(" + virtualGeneStart + "-" + virtualGeneStop + ")", geneInfo.getChromosome()));
         }
         return proteinLocations;
     }
@@ -165,7 +165,6 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
 
         if (reachedStop && !isStopCodon) {
             LOG.warn("Reached end of sequence without finding stop codon for peptide " + peptideSearchResult.getPeptideSequence());
-            //return searchDirection > 0  ? genomeNucleotides.getSize() : 0; 
             return endIterator;
         }
 

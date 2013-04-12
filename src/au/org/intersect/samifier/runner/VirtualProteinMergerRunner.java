@@ -7,7 +7,6 @@ import java.util.List;
 
 import au.org.intersect.samifier.domain.GffOutputterGenerator;
 import au.org.intersect.samifier.domain.ProteinLocation;
-import au.org.intersect.samifier.generator.LocationGenerator;
 import au.org.intersect.samifier.generator.VirtualProteinMascotLocationGenerator;
 import au.org.intersect.samifier.util.ProteinLocationFileGenerator;
 

@@ -3,8 +3,6 @@ package au.org.intersect.samifier.domain;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,12 +102,12 @@ public class Genome {
             List <GeneSequence> newEntries = new ArrayList<GeneSequence>();
             for (GeneSequence sequence : genInfo.getLocations()) {
                 if (sequence.getStart() < start) {
-                    String errorMessage = "Gene " + genInfo.getId() + " in chromosome " +  genInfo.getChromosome() + " has overlaping part at position (" + sequence.getStart() +","+ start + "). Cannot continue.";
+                    String errorMessage = "Gene " + genInfo.getId() + " in chromosome " +  genInfo.getChromosome() + " has overlaping part at position (" + sequence.getStart() + "," + start + "). Cannot continue.";
                     LOG.error(errorMessage);
                     throw new GenomeFileParsingException(errorMessage);
                 }
                 if (sequence.getStart() != start) {
-                    LOG.warn("Gene " + genInfo.getId() + " in chromosome " +  genInfo.getChromosome() + " has missing part at position (" + start +","+(sequence.getStart() - 1)+ "). Assuming non coding sequence.");
+                    LOG.warn("Gene " + genInfo.getId() + " in chromosome " +  genInfo.getChromosome() + " has missing part at position (" + start + "," + (sequence.getStart() - 1) + "). Assuming non coding sequence.");
                     GeneSequence seq = new GeneSequence(sequence.getParentId(), false, start, sequence.getStart() - 1, sequence.getDirection());
                     newEntries.add(seq);
                 }

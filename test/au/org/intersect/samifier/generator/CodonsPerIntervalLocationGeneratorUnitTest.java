@@ -2,6 +2,8 @@ package au.org.intersect.samifier.generator;
 
 import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.ProteinLocation;
+import au.org.intersect.samifier.parser.FastaParserImpl;
+
 import org.junit.Test;
 
 import java.io.File;
@@ -17,7 +19,7 @@ public class CodonsPerIntervalLocationGeneratorUnitTest
     {
         try {
             File genomeFile = new File("test/resources/protein_generator/test_genome_short.faa");
-            CodonsPerIntervalLocationGenerator locationGenerator = new CodonsPerIntervalLocationGenerator("20", genomeFile);
+            CodonsPerIntervalLocationGenerator locationGenerator = new CodonsPerIntervalLocationGenerator("20", new FastaParserImpl(genomeFile));
 
             List<ProteinLocation> locations = locationGenerator.generateLocations();
             for (ProteinLocation loc : locations)

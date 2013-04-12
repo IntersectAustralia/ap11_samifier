@@ -1,90 +1,89 @@
 package au.org.intersect.samifier.generator;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.ProteinLocation;
+import au.org.intersect.samifier.parser.FastaParser;
+import au.org.intersect.samifier.parser.FastaParserException;
 
 public class CodonsPerIntervalLocationGenerator implements LocationGenerator {
     private String interval;
-    private String chromosome;
-    private File genomeFile;
-
-    public CodonsPerIntervalLocationGenerator(String interval, File genomeFile) {
+    //private File genomeFile;
+    private FastaParser fastaParser;
+    public CodonsPerIntervalLocationGenerator(String interval, FastaParser fastaParser) {
         this.interval = interval;
-        this.genomeFile = genomeFile;
+        this.fastaParser = fastaParser;
     }
 
     @Override
     public List<ProteinLocation> generateLocations()
             throws LocationGeneratorException {
         int codonsPerInterval = Integer.parseInt(interval);
-        chromosome = FilenameUtils.removeExtension(genomeFile.getName());
+        
         try {
-            return createLocations(genomeFile, codonsPerInterval);
+            
+            List<String> allChromosomes = fastaParser.scanForChromosomes();
+            //chromosome = FilenameUtils.removeExtension(genomeFile.getName());
+            List<ProteinLocation> locations = new ArrayList<ProteinLocation>();
+            for (String chromosome : allChromosomes) {
+                locations.addAll(createLocations(fastaParser.getChromosomeLength(chromosome), codonsPerInterval, chromosome));
+            }
+            Collections.sort(locations);
+            return locations;
         } catch (IOException e) {
             throw new LocationGeneratorException(
                     "Could not generate locations as codons per interval", e);
+        } catch (FastaParserException ex) {
+            throw new LocationGeneratorException(
+                    "Could not generate locations as codons per interval", ex);
         }
     }
 
-    public List<ProteinLocation> createLocations(File genomeFile,
-            int codonsPerInterval) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(genomeFile));
-        int baseCount = 0;
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            if (line.matches("^>.*$")) {
-                continue;
-            }
-
-            baseCount += StringUtils.chomp(line).length();
-        }
-
+    public List<ProteinLocation> createLocations(int chromosomeLength, int codonsPerInterval, String chromosome) throws IOException {
+        boolean createHalfInterval = true;
         int basesPerInterval = codonsPerInterval
                 * GenomeConstant.BASES_PER_CODON;
-        if (basesPerInterval >= baseCount) {
+        if (basesPerInterval >= chromosomeLength) {
             // TODO: log this to error file
-            reader.close();
-            return null;
+           // reader.close();
+            basesPerInterval = chromosomeLength / GenomeConstant.BASES_PER_CODON;
+            basesPerInterval = basesPerInterval * GenomeConstant.BASES_PER_CODON;
+            createHalfInterval = false;
+            
         }
 
         List<ProteinLocation> locations = new ArrayList<ProteinLocation>();
         int nameIndex = 0;
         int halfIntervalSize = basesPerInterval / 2;
-        int lastCodonStartPosition = baseCount - GenomeConstant.BASES_PER_CODON;
+        int lastCodonStartPosition = chromosomeLength - GenomeConstant.BASES_PER_CODON;
 
         // Forward locations
-        for (int i = 1; i <= baseCount; i += basesPerInterval) {
-            addLocations(locations, i, nameIndex, basesPerInterval, baseCount,
-                    true, false);
-            addLocations(locations, i, nameIndex, basesPerInterval, baseCount,
-                    false, false);
+        for (int i = 1; i <= chromosomeLength; i += basesPerInterval) {
+            addLocations(locations, i, nameIndex, basesPerInterval, chromosomeLength,
+                    true, false, chromosome);
+            addLocations(locations, i, nameIndex, basesPerInterval, chromosomeLength,
+                    false, false, chromosome);
             int halfIntervalStart = i + halfIntervalSize;
-            if (halfIntervalStart <= lastCodonStartPosition) {
+            if (createHalfInterval && halfIntervalStart <= lastCodonStartPosition) {
                 addLocations(locations, halfIntervalStart, nameIndex,
-                        basesPerInterval, baseCount, true, true);
+                        basesPerInterval, chromosomeLength, true, true, chromosome);
                 addLocations(locations, halfIntervalStart, nameIndex,
-                        basesPerInterval, baseCount, false, true);
+                        basesPerInterval, chromosomeLength, false, true, chromosome);
             }
             nameIndex++;
         }
 
-        reader.close();
+        //reader.close();
         return locations;
     }
 
     private void addLocations(List<ProteinLocation> locations, int start,
             int nameIndex, int basesPerInterval, int baseCount,
-            boolean isForward, boolean isHalfInterval) throws IOException {
+            boolean isForward, boolean isHalfInterval, String chromosome) throws IOException {
         boolean oddNumberOfBases = basesPerInterval % 2 == 1;
 
         // 3 frame translation (see http://en.wikipedia.org/wiki/Reading_frame)

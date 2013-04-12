@@ -81,7 +81,8 @@ public class GlimmerFileLocationGenerator implements LocationGenerator {
 
     private void parseHeader(String line) {
         String[] parts = line.split("\\|");
-        chromosome = FilenameUtils.removeExtension(parts[3]);
+        if (parts.length < 2) return;
+        chromosome = parts[3];
     }
 
 }

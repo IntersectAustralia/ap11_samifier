@@ -39,7 +39,7 @@ public class ProteinLocationFileGenerator {
                 System.exit(-1);
             } finally {
                 if (writer != null) {
-                    writer.close();
+                    writer.flush();
                 }
             }
         }

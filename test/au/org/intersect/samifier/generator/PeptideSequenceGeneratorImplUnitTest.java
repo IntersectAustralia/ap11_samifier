@@ -18,7 +18,7 @@ public class PeptideSequenceGeneratorImplUnitTest
     @Test
     public void testExtractSequenceParts()
     {
-        File chromosomeFile = new File("test/resources/chrI.fa");
+        //File chromosomeFile = new File("test/resources/chrI.fa");
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence("G01", true, 71, 79, 1));
         locations.add(new GeneSequence("G01", false, 80, 141, 1));
@@ -27,8 +27,8 @@ public class PeptideSequenceGeneratorImplUnitTest
         gene.setLocations(locations);
         List<NucleotideSequence> parts = null;
         try {
-            PeptideSequenceGeneratorImpl sequenceGenerator = new PeptideSequenceGeneratorImpl(null, null, null);
-            parts = sequenceGenerator.extractSequenceParts(chromosomeFile, gene);
+            PeptideSequenceGeneratorImpl sequenceGenerator = new PeptideSequenceGeneratorImpl(null, null, new File("test/resources/"));
+            parts = sequenceGenerator.extractSequenceParts(gene);
         }
         catch(Exception e)
         {
@@ -48,7 +48,7 @@ public class PeptideSequenceGeneratorImplUnitTest
     @Test
     public void testExtractSequencePartsForShortSequences()
     {
-        File chromosomeFile = new File("test/resources/chrI.fa");
+        //File chromosomeFile = new File("test/resources/chrI.fa");
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence("G01", true, 1, 9, 1));
         locations.add(new GeneSequence("G01", false, 10, 11, 1));
@@ -57,8 +57,8 @@ public class PeptideSequenceGeneratorImplUnitTest
         gene.setLocations(locations);
         List<NucleotideSequence> parts = null;
         try {
-            PeptideSequenceGeneratorImpl sequenceGenerator = new PeptideSequenceGeneratorImpl(null, null, null);
-            parts = sequenceGenerator.extractSequenceParts(chromosomeFile, gene);
+            PeptideSequenceGeneratorImpl sequenceGenerator = new PeptideSequenceGeneratorImpl(null, null, new File("test/resources/"));
+            parts = sequenceGenerator.extractSequenceParts(gene);
         }
         catch(Exception e)
         {

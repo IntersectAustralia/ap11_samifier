@@ -29,6 +29,7 @@ import au.org.intersect.samifier.filter.PeptideSearchResultFilter;
 import au.org.intersect.samifier.generator.PeptideSequenceGenerator;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorException;
 import au.org.intersect.samifier.generator.PeptideSequenceGeneratorImpl;
+import au.org.intersect.samifier.parser.FastaParserException;
 import au.org.intersect.samifier.parser.GenomeParserImpl;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParser;
 import au.org.intersect.samifier.parser.PeptideSearchResultsParserImpl;
@@ -100,7 +101,7 @@ public class SamifierRunner {
 
     public void createSAM(List<PeptideSearchResult> peptideSearchResults,
             Writer output, Writer bedWriter)
-            throws PeptideSequenceGeneratorException, IOException {
+            throws PeptideSequenceGeneratorException, IOException, FastaParserException {
         LOG.debug("creating sam file");
         List<SAMEntry> samEntries = new ArrayList<SAMEntry>();
         PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(

@@ -1,11 +1,12 @@
 package au.org.intersect.samifier.runner;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import au.org.intersect.samifier.domain.AccessionOutputterGenerator;
 import au.org.intersect.samifier.domain.CodonTranslationTable;
@@ -16,11 +17,15 @@ import au.org.intersect.samifier.domain.UnknownCodonException;
 import au.org.intersect.samifier.generator.CodonsPerIntervalLocationGenerator;
 import au.org.intersect.samifier.generator.GlimmerFileLocationGenerator;
 import au.org.intersect.samifier.generator.LocationGenerator;
+import au.org.intersect.samifier.parser.FastaParser;
+import au.org.intersect.samifier.parser.FastaParserException;
+import au.org.intersect.samifier.parser.FastaParserImpl;
 import au.org.intersect.samifier.util.ProteinLocationFileGenerator;
 
 public class ProteinGeneratorRunner {
 
     private String glimmerFilePath;
+    private FastaParser fastaParser;
     private File genomeFile;
     private String interval;
     private String databaseName;
@@ -31,7 +36,7 @@ public class ProteinGeneratorRunner {
 
     public ProteinGeneratorRunner(String glimmerFilePath, File genomeFile,
             String interval, String databaseName, Writer outputWriter,
-            File translationTableFile, Writer gffWriter, Writer accessionWriter) {
+            File translationTableFile, Writer gffWriter, Writer accessionWriter) throws FastaParserException{
         this.glimmerFilePath = glimmerFilePath;
         this.genomeFile = genomeFile;
         this.interval = interval;
@@ -40,6 +45,7 @@ public class ProteinGeneratorRunner {
         this.translationTableFile = translationTableFile;
         this.gffWriter = gffWriter;
         this.accessionWriter = accessionWriter;
+        this.fastaParser = new FastaParserImpl(genomeFile);
     }
 
     public void run() throws Exception {
@@ -58,7 +64,7 @@ public class ProteinGeneratorRunner {
                     glimmerFilePath);
         } else {
             locationGenerator = new CodonsPerIntervalLocationGenerator(
-                    interval, genomeFile);
+                    interval, fastaParser);
         }
         return locationGenerator;
     }
@@ -80,26 +86,42 @@ public class ProteinGeneratorRunner {
 
     public void generateProteinsFile(List<ProteinLocation> locations,
             CodonTranslationTable table) throws IOException,
-            UnknownCodonException {
-        StringBuilder genomeString = readGenomeFile(genomeFile);
-        ProteinOutputterGenerator outputterGenerator = new ProteinOutputterGenerator(
+            UnknownCodonException, FastaParserException {
+        //check for contig
+        //divide by chromosome
+        Map<String, List<ProteinLocation>> locationByChromosome = new HashMap<String, List<ProteinLocation>>();
+        for (ProteinLocation location : locations) {
+            String chromosome = location.getChromosome();
+            List<ProteinLocation> list = locationByChromosome.get(chromosome);
+            if (list == null) {
+                list = new ArrayList<ProteinLocation>();
+            }
+            list .add(location);
+            locationByChromosome.put(chromosome, list);
+        }
+        if (locationByChromosome.keySet().size() > 1) {
+            for (String chromosome : locationByChromosome.keySet()) {
+                for (ProteinLocation location : locationByChromosome.get(chromosome)) {
+                    location.setName(chromosome + "_" + location.getName());
+                }
+            }
+        }
+        for (String chromosome : locationByChromosome.keySet()) {
+            StringBuilder genomeString = readGenomeFile(chromosome);
+            List<ProteinLocation> locationForChromosome = locationByChromosome.get(chromosome);
+            ProteinOutputterGenerator outputterGenerator = new ProteinOutputterGenerator(
                 databaseName, genomeString, table);
-        ProteinLocationFileGenerator.generateFile(locations, outputWriter,
+            ProteinLocationFileGenerator.generateFile(locationForChromosome, outputWriter,
                 outputterGenerator);
+        }
+        if (outputWriter != null) {
+            outputWriter.close();
+        }
     }
 
-    private StringBuilder readGenomeFile(File genomeFile) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(genomeFile));
-        StringBuilder sequence = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (line.matches("^>.*$")) {
-                continue;
-            }
-            sequence.append(line);
-        }
-        reader.close();
-        return sequence;
+    private StringBuilder readGenomeFile(String chromosome) throws IOException, FastaParserException{
+        return new StringBuilder(fastaParser.readCode(chromosome));
     }
+
 
 }

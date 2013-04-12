@@ -29,11 +29,10 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
     private File chromosomeDirectory;
     private FastaParserImpl fastaParser;
 
-    public PeptideSequenceGeneratorImpl(Genome genome, ProteinToOLNMap proteinOLNMap, File chromosomeDirectory) {
+    public PeptideSequenceGeneratorImpl(Genome genome, ProteinToOLNMap proteinOLNMap, File chromosomeDirectory){ 
         this.genome = genome;
         this.proteinOLNMap = proteinOLNMap;
         this.chromosomeDirectory = chromosomeDirectory;
-        this.fastaParser = new FastaParserImpl();
     }
 
     @Override
@@ -62,17 +61,14 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
             return null;
         }
 
-        File chromosomeFile = getChromosomeFile(gene);
-
-        return getPeptideSequenceFromChromosomeFile(peptideSearchResult,
-                chromosomeFile, gene);
+        return getPeptideSequenceFromChromosomeFile(peptideSearchResult, gene);
     }
 
-    public PeptideSequence getPeptideSequenceFromChromosomeFile(PeptideSearchResult peptide, File chromosomeFile, GeneInfo gene)
+    private PeptideSequence getPeptideSequenceFromChromosomeFile(PeptideSearchResult peptide, GeneInfo gene)
             throws PeptideSequenceGeneratorException {
         List<NucleotideSequence> sequenceParts;
         try {
-            sequenceParts = extractSequenceParts(chromosomeFile, gene);
+            sequenceParts = extractSequenceParts(gene);
         } catch (FastaParserException e) {
             throw new PeptideSequenceGeneratorException("Genome file not in FASTA format", e);
         } catch (FileNotFoundException e) {
@@ -82,7 +78,7 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
         }
 
         if (sequenceParts.size() == 0) {
-            LOG.warn(gene.getId() + " in " + chromosomeFile.getName() + " seems empty");
+            LOG.warn(gene.getId() + " in " + gene.getChromosome() + " seems empty");
             return null;
         }
 
@@ -203,16 +199,11 @@ public class PeptideSequenceGeneratorImpl implements PeptideSequenceGenerator {
         }
     }
 
-    protected List<NucleotideSequence> extractSequenceParts(
-            File chromosomeFile, GeneInfo gene) throws IOException, FastaParserException {
-        return fastaParser.extractSequenceParts(chromosomeFile, gene);
-    }
-
-    private File getChromosomeFile(GeneInfo gene) {
-        // TODO: find the different chrormosome file extensions
-        File faExt = new File(chromosomeDirectory, gene.getChromosome() + ".fa");
-        if (faExt.exists()) return faExt;
-        return new File(chromosomeDirectory, gene.getChromosome() + ".faa");
+    protected List<NucleotideSequence> extractSequenceParts(GeneInfo gene) throws IOException, FastaParserException {
+        if (fastaParser == null) {
+            fastaParser = new FastaParserImpl(chromosomeDirectory);
+        }
+        return fastaParser.extractSequenceParts(gene);
     }
 
     @Override
