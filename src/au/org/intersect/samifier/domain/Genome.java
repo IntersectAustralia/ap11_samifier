@@ -50,8 +50,8 @@ public class Genome {
             if (geneInfo.hasVirtualProtein(orderedLocusName)) {
                 if (verifySimpleGene(geneInfo)) {
                     VirtualProtein vp = geneInfo.getVirtualProtein(orderedLocusName);
-                    GeneInfo newGene = new GeneInfo(geneInfo.getChromosome(), geneInfo.getId(), vp.getStartOffset(), vp.getEndOffset(), geneInfo.getDirection());
-                    newGene.addLocation(new GeneSequence(geneInfo.getId(), true, vp.getStartOffset(), vp.getEndOffset(), geneInfo.getDirection()));
+                    GeneInfo newGene = new GeneInfo(geneInfo.getChromosome(), geneInfo.getId(), vp.getStartOffset() + 1 , vp.getEndOffset() + 1, geneInfo.getDirection());
+                    newGene.addLocation(new GeneSequence(geneInfo.getId(), true, vp.getStartOffset() + 1 , vp.getEndOffset() + 1 , geneInfo.getDirection()));
                     return newGene;
                 }
             }

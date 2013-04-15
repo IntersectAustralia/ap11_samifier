@@ -14,6 +14,7 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
     private BigDecimal confidenceScore;
 
     private String frame;
+    private String peptideAbsoluteStartStop;
 
     private Set<String> virtualProteinNames;
 
@@ -114,6 +115,14 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
 
     public void setChromosome(String chromosome) {
         this.chromosome = chromosome;
+    }
+
+    public void setAbsoluteStartStop(String peptideAbsoluteStartStop) {
+        this.peptideAbsoluteStartStop = peptideAbsoluteStartStop;
+    }
+    
+    public String getAbsoluteStartStop() {
+        return peptideAbsoluteStartStop;
     }
 
 }

@@ -53,6 +53,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             throws LocationGeneratorException {
         try {
             List<ProteinLocation> locations = doGenerateLocations();
+            locations = removeDuplicates(locations);
             locations = mergeProteins(locations);
             Collections.sort(locations);
             for (int i = 0; i < locations.size(); i++) {
@@ -71,20 +72,6 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             throw new LocationGeneratorException("Error parsing genome file", e);
         }
 
-    }
-
-    private List<ProteinLocation> mergeProteins(List<ProteinLocation> locations) {
-        Map<Integer, ProteinLocation> proteinMap = new HashMap<Integer, ProteinLocation>();
-        for (ProteinLocation location : locations) {
-            ProteinLocation loc = proteinMap.get(location.getStop());
-            if (loc == null) {
-                proteinMap.put(location.getStop(), location);
-            } else {
-               loc.update(location);
-            }
-        }
-        ArrayList<ProteinLocation> proteinList = new ArrayList<ProteinLocation>(proteinMap.values());
-        return proteinList;
     }
 
     public List<ProteinLocation> doGenerateLocations()
@@ -138,15 +125,42 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             if (startPosition == NOT_FOUND || stopPosition == NOT_FOUND) {
                 continue;
             }
-
-            proteinLocations
-                    .add(new ProteinLocation("?", startPosition, Math.abs(stopPosition - startPosition),
-                            geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(),
-                            peptideSearchResult.getProteinName() + "(" + virtualGeneStart + "-" + virtualGeneStop + ")", geneInfo.getChromosome()));
+            ProteinLocation loc = new ProteinLocation("?", startPosition, Math.abs(stopPosition - startPosition),
+                    geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(),
+                    peptideSearchResult.getProteinName() + "(" + virtualGeneStart + "-" + virtualGeneStop + ")", geneInfo.getChromosome());
+            loc.setAbsoluteStartStop((virtualGeneStart + startOffset) + "_" + (virtualGeneStart + stopOffset));
+            proteinLocations.add(loc);
         }
         return proteinLocations;
     }
 
+    private List<ProteinLocation> mergeProteins(List<ProteinLocation> locations) {
+        Map<Integer, ProteinLocation> proteinMap = new HashMap<Integer, ProteinLocation>();
+        for (ProteinLocation location : locations) {
+            ProteinLocation loc = proteinMap.get(location.getStop());
+            if (loc == null) {
+                proteinMap.put(location.getStop(), location);
+            } else {
+               loc.update(location);
+            }
+        }
+        ArrayList<ProteinLocation> proteinList = new ArrayList<ProteinLocation>(proteinMap.values());
+        return proteinList;
+    }
+    private List<ProteinLocation> removeDuplicates(List<ProteinLocation> locations) {
+        Map<String, ProteinLocation> uniqueLocation = new HashMap<String, ProteinLocation>();
+        for (ProteinLocation loc : locations) {
+            ProteinLocation propetinOnList = uniqueLocation.get(loc.getAbsoluteStartStop());
+            if (propetinOnList == null) {
+                uniqueLocation.put(loc.getAbsoluteStartStop(), loc);
+            } else {
+                if (loc.getStartIndex() < propetinOnList.getStartIndex()) {
+                    uniqueLocation.put(loc.getAbsoluteStartStop(), loc);
+                }
+            }
+        }
+        return new ArrayList<ProteinLocation>(uniqueLocation.values());
+    }
 
     private int searchStop(PeptideSearchResult peptideSearchResult, int peptideAbsoluteStart, GenomeNucleotides genomeNucleotides, GeneInfo geneInfo, boolean reverse) {
         boolean reachedStop = false;

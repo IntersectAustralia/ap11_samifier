@@ -115,6 +115,9 @@
              basedir="${build.classes.dir}"
              includes="**/*Translation*.class,**/UnknownCodonException.class">
             <zipgroupfileset dir="${lib.dir}" includes="**/*.jar" excludes="junit*"/>
+            <fileset dir="${src.dir}/resources">
+                <include name="**/log4j.properties"/>
+            </fileset>
             <fileset dir=".">
                 <include name="LICENSE"/>
             </fileset>
@@ -129,6 +132,9 @@
              basedir="${build.classes.dir}"
              excludes="**/Test.class" >
             <zipgroupfileset dir="${lib.dir}" includes="**/*.jar" excludes="junit*"/>
+            <fileset dir="${src.dir}/resources">
+                <include name="**/log4j.properties"/>
+            </fileset>
             <fileset dir=".">
                 <include name="LICENSE"/>
             </fileset>
@@ -143,6 +149,9 @@
              basedir="${build.classes.dir}"
              excludes="**/Test.class" >
             <zipgroupfileset dir="${lib.dir}" includes="**/*.jar" excludes="junit*"/>
+            <fileset dir="${src.dir}/resources">
+                <include name="**/log4j.properties"/>
+            </fileset>
             <fileset dir=".">
                 <include name="LICENSE"/>
             </fileset>
