@@ -111,11 +111,11 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             int stopOffset = (peptideSearchResult.getPeptideStop() - 1) * GenomeConstant.BASES_PER_CODON;
 
             if (geneInfo.isForward()) {
-                peptideAbsoluteStart = virtualGeneStop - startOffset;
-                peptideAbsoluteStop = virtualGeneStop - stopOffset;
-            } else {
                 peptideAbsoluteStart = virtualGeneStart + startOffset;
                 peptideAbsoluteStop = virtualGeneStart + stopOffset;
+            } else {
+                peptideAbsoluteStart = virtualGeneStop - startOffset;
+                peptideAbsoluteStop = virtualGeneStop - stopOffset;
             }
 
             File geneFile = getChromosomeFile(chromosomeDir, geneInfo.getChromosome());
@@ -128,7 +128,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             ProteinLocation loc = new ProteinLocation("?", startPosition, Math.abs(stopPosition - startPosition),
                     geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(),
                     peptideSearchResult.getProteinName() + "(" + virtualGeneStart + "-" + virtualGeneStop + ")", geneInfo.getChromosome());
-            loc.setAbsoluteStartStop((virtualGeneStart + startOffset) + "_" + (virtualGeneStart + stopOffset));
+            loc.setAbsoluteStartStop(peptideAbsoluteStart + "_" + Math.abs(stopOffset - startOffset));
             proteinLocations.add(loc);
         }
         return proteinLocations;
