@@ -22,7 +22,7 @@ import au.org.intersect.samifier.parser.ProteinToOLNParserImpl;
 import au.org.intersect.samifier.reporter.DatabaseHelper;
 
 public class ResultAnalyserRunner {
-    private File searchResultsFile;
+    private String[] searchResultsPaths;
     private File genomeFile;
     private File proteinToOLNMapFile;
     private File outputFile;
@@ -31,10 +31,10 @@ public class ResultAnalyserRunner {
 
     private static DatabaseHelper hsqldb;
 
-    public ResultAnalyserRunner(File searchResultsFile, File genomeFile,
+    public ResultAnalyserRunner(String[] searchResultsPaths, File genomeFile,
             File proteinToOLNMapFile, File outputFile, File chromosomeDir,
             File translationTableFile) throws Exception {
-        this.searchResultsFile = searchResultsFile;
+        this.searchResultsPaths = searchResultsPaths;
         this.genomeFile = genomeFile;
         this.proteinToOLNMapFile = proteinToOLNMapFile;
         this.outputFile = outputFile;
@@ -42,10 +42,10 @@ public class ResultAnalyserRunner {
         this.translationTableFile = translationTableFile;
     }
 
-    public ResultAnalyserRunner(File searchResultsFile, File genomeFile,
+    public ResultAnalyserRunner(String[] searchResultsPaths, File genomeFile,
             File proteinToOLNMapFile, File outputFile, File chromosomeDir)
             throws Exception {
-        this.searchResultsFile = searchResultsFile;
+        this.searchResultsPaths = searchResultsPaths;
         this.genomeFile = genomeFile;
         this.proteinToOLNMapFile = proteinToOLNMapFile;
         this.outputFile = outputFile;
@@ -69,7 +69,7 @@ public class ResultAnalyserRunner {
         PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(
                 proteinToOLNMap);
         List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser
-                .parseResults(searchResultsFile);
+                .parseResults(searchResultsPaths);
         peptideSearchResults = peptideSearchResultsParser
                 .sortResultsByChromosome(peptideSearchResults, proteinToOLNMap,
                         genome);
@@ -127,7 +127,7 @@ public class ResultAnalyserRunner {
         PeptideSearchResultsParser peptideSearchResultsParser = new PeptideSearchResultsParserImpl(
                 proteinToOLNMap);
         List<PeptideSearchResult> peptideSearchResults = peptideSearchResultsParser
-                .parseResults(searchResultsFile);
+                .parseResults(searchResultsPaths);
         PeptideSequenceGenerator sequenceGenerator = new PeptideSequenceGeneratorImpl(
                 genome, proteinToOLNMap, chromosomeDir);
         peptideSearchResults = peptideSearchResultsParser

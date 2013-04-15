@@ -21,7 +21,7 @@ public class ResultAnalyserUnitTest
     {
         try
         {
-            File mascotFile = new File("test/resources/test_mascot_search_results.txt");
+            String[] mascotFile = {"test/resources/test_mascot_search_results.txt"};
             File mapFile = new File("test/resources/test_accession.txt");
             File genomeFile = new File("test/resources/test_genome.gff");
             File chromosomeDir = new File("test/resources/");
@@ -55,7 +55,7 @@ public class ResultAnalyserUnitTest
     {
         try
         {
-            File mascotFile = new File("test/resources/test_mascot_search_results.txt");
+            String[] mascotFile = {"test/resources/test_mascot_search_results.txt"};
             File mapFile = new File("test/resources/test_accession.txt");
             File genomeFile = new File("test/resources/test_genome.gff");
             File chromosomeDir = new File("test/resources/");
@@ -95,7 +95,7 @@ public class ResultAnalyserUnitTest
     {
         try
         {
-            File mascotFile = new File("test/resources/test_mascot_search_results.txt");
+            String[] mascotFile = {"test/resources/test_mascot_search_results.txt"};
             File mapFile = new File("test/resources/test_accession.txt");
             File genomeFile = new File("test/resources/test_genome.gff");
             File chromosomeDir = new File("test/resources/");

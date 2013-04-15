@@ -87,7 +87,7 @@ public class ResultsAnalyser {
         CommandLineParser parser = new GnuParser();
         try {
             CommandLine line = parser.parse(options, args);
-            File searchResultsFile = new File(line.getOptionValue("r"));
+            String[] searchResultsPaths = line.getOptionValues("r");
             File genomeFile = new File(line.getOptionValue("g"));
             File mapFile = new File(line.getOptionValue("m"));
             File outfile = new File(line.getOptionValue("o"));
@@ -105,7 +105,7 @@ public class ResultsAnalyser {
             if (DebuggingFlag.get_sbi_debug_flag() == 1) {
                 File translationTableFile = new File(line.getOptionValue("t"));
                 ResultAnalyserRunner analyser = new ResultAnalyserRunner(
-                        searchResultsFile, genomeFile, mapFile, outfile,
+                        searchResultsPaths, genomeFile, mapFile, outfile,
                         chromosomeDir, translationTableFile);
                 if (sqlQuery == null && repId == null) {
                     analyser.run();
@@ -119,7 +119,7 @@ public class ResultsAnalyser {
                 }
             } else {
                 ResultAnalyserRunner analyser = new ResultAnalyserRunner(
-                        searchResultsFile, genomeFile, mapFile, outfile,
+                        searchResultsPaths, genomeFile, mapFile, outfile,
                         chromosomeDir);
                 if (sqlQuery == null && repId == null) {
                     analyser.run();
