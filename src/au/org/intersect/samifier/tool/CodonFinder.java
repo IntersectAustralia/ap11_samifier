@@ -4,8 +4,12 @@ import au.org.intersect.samifier.domain.CodonTranslationTable;
 import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.GenomeNucleotides;
 import au.org.intersect.samifier.domain.UnknownCodonException;
+import au.org.intersect.samifier.parser.FastaParser;
+import au.org.intersect.samifier.parser.FastaParserImpl;
 
 import java.io.File;
+
+import org.apache.commons.io.FilenameUtils;
 
 public class CodonFinder {
     private static GenomeNucleotides nucleotides;
@@ -17,7 +21,8 @@ public class CodonFinder {
             File fastaFile = new File(args[0]);
             File translationTableFile = new File(args[1]);
             int direction = "+".equals(args[2]) ? 1 : -1;
-            nucleotides = new GenomeNucleotides(fastaFile);
+            FastaParser parser = new FastaParserImpl(fastaFile);
+            nucleotides = new GenomeNucleotides(parser.readCode(FilenameUtils.getBaseName(fastaFile.getName())));
             translationTable = CodonTranslationTable
                     .parseTableFile(translationTableFile);
 

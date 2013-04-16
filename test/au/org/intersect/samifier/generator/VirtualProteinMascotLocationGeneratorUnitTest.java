@@ -24,7 +24,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
     }
     @Test
     public void testForwardWithProperStart(){
-        ProteinLocation expectedLocation = new ProteinLocation("q0", 36, 105, "+", "0");
+        ProteinLocation expectedLocation = new ProteinLocation("q0", 37, 108, "+", "0");
         List<ProteinLocation> expectedArray = new ArrayList<ProteinLocation>();
         expectedArray.add(expectedLocation);
         String [] mascotFiles = {"test/resources/merger/test_mascot_search_results.txt"};
@@ -46,7 +46,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
     //test with no start and no end for start
     @Test
     public void testForwardWithNoStart(){
-        ProteinLocation expectedLocation = new ProteinLocation("q0", 0, 141, "+", "0");
+        ProteinLocation expectedLocation = new ProteinLocation("q0", 139, 6, "+", "0");
         List<ProteinLocation> expectedArray = new ArrayList<ProteinLocation>();
         expectedArray.add(expectedLocation);
         String [] mascotFiles = {"test/resources/merger/test_mascot_search_results.txt"};
@@ -70,7 +70,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
     //test with no end for start
     @Test
     public void testForwardNoEndForStart(){
-        ProteinLocation expectedLocation = new ProteinLocation("q0", 36, 105, "+", "0");
+        ProteinLocation expectedLocation = new ProteinLocation("q0", 37, 108, "+", "0");
         List<ProteinLocation> expectedArray = new ArrayList<ProteinLocation>();
         expectedArray.add(expectedLocation);
         String [] mascotFiles = {"test/resources/merger/test_mascot_search_results.txt"};
@@ -92,7 +92,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
     //test with no start -> end is in place
     @Test
     public void testForwardNoStartProperEnd(){
-        ProteinLocation expectedLocation = new ProteinLocation("q0", 33, 108, "+", "0");
+        ProteinLocation expectedLocation = new ProteinLocation("q0", 139, 6, "+", "0");
         List<ProteinLocation> expectedArray = new ArrayList<ProteinLocation>();
         expectedArray.add(expectedLocation);
         String [] mascotFiles = {"test/resources/merger/test_mascot_search_results.txt"};
@@ -114,7 +114,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
     //test with no markers
     @Test
     public void testForwardNoMarkers(){
-        ProteinLocation expectedLocation = new ProteinLocation("q0", 0, 141, "+", "0");
+        ProteinLocation expectedLocation = new ProteinLocation("q0", 139, 3, "+", "0");
         List<ProteinLocation> expectedArray = new ArrayList<ProteinLocation>();
         expectedArray.add(expectedLocation);
         String [] mascotFiles = {"test/resources/merger/test_mascot_search_results.txt"};

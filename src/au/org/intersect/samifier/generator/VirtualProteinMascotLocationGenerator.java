@@ -20,6 +20,9 @@ import au.org.intersect.samifier.domain.PeptideSearchResult;
 import au.org.intersect.samifier.domain.ProteinLocation;
 import au.org.intersect.samifier.domain.ProteinToOLNMap;
 import au.org.intersect.samifier.domain.TranslationTableParsingException;
+import au.org.intersect.samifier.parser.FastaParser;
+import au.org.intersect.samifier.parser.FastaParserException;
+import au.org.intersect.samifier.parser.FastaParserImpl;
 import au.org.intersect.samifier.parser.GenomeFileParsingException;
 import au.org.intersect.samifier.parser.GenomeParserImpl;
 import au.org.intersect.samifier.parser.MascotParsingException;
@@ -34,6 +37,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
     private File translationTableFile;
     private File chromosomeDir;
     private String[] searchResultsPaths;
+    private FastaParser fastaParser;
 
     private Genome genome;
     private ProteinToOLNMap proteinToOLNMap;
@@ -52,6 +56,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
     public List<ProteinLocation> generateLocations()
             throws LocationGeneratorException {
         try {
+            this.fastaParser = new FastaParserImpl(chromosomeDir);
             List<ProteinLocation> locations = doGenerateLocations();
             locations = removeDuplicates(locations);
             locations = mergeProteins(locations);
@@ -70,13 +75,15 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             throw new LocationGeneratorException("Error parsing genome file", e);
         } catch (IOException e) {
             throw new LocationGeneratorException("Error parsing genome file", e);
+        } catch (FastaParserException e) {
+            throw new LocationGeneratorException("Error parsing sequence file", e);
         }
 
     }
 
     public List<ProteinLocation> doGenerateLocations()
             throws GenomeFileParsingException, MascotParsingException,
-            IOException, TranslationTableParsingException {
+            IOException, TranslationTableParsingException, FastaParserException {
         List<ProteinLocation> proteinLocations = new ArrayList<ProteinLocation>();
         System.out.println("Generating locations");
         GenomeParserImpl genomeParser = new GenomeParserImpl();
@@ -118,20 +125,26 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
                 peptideAbsoluteStop = virtualGeneStop - stopOffset;
             }
 
-            File geneFile = getChromosomeFile(chromosomeDir, geneInfo.getChromosome());
-            GenomeNucleotides genomeNucleotides = getGenomeNucleotides(geneFile);
+            GenomeNucleotides genomeNucleotides = getGenomeNucleotides(geneInfo.getChromosome());
             int startPosition = searchStart(peptideSearchResult, peptideAbsoluteStart, genomeNucleotides, geneInfo);
             int stopPosition = searchStop(peptideSearchResult, peptideAbsoluteStop, genomeNucleotides, geneInfo, false);
             if (startPosition == NOT_FOUND || stopPosition == NOT_FOUND) {
                 continue;
             }
-            ProteinLocation loc = new ProteinLocation("?", startPosition, Math.abs(stopPosition - startPosition),
+            ProteinLocation loc = new ProteinLocation("?", getStartPosition(startPosition, stopPosition) , Math.abs(stopPosition - startPosition),
                     geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(),
                     peptideSearchResult.getProteinName() + "(" + virtualGeneStart + "-" + virtualGeneStop + ")", geneInfo.getChromosome());
             loc.setAbsoluteStartStop(peptideAbsoluteStart + "_" + Math.abs(stopOffset - startOffset));
             proteinLocations.add(loc);
         }
         return proteinLocations;
+    }
+
+    private int getStartPosition(int startPosition, int stopPosition) {
+        if (startPosition > stopPosition) {
+            return stopPosition + 2;
+        }
+        return startPosition + 1;
     }
 
     private List<ProteinLocation> mergeProteins(List<ProteinLocation> locations) {
@@ -182,7 +195,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             return endIterator;
         }
 
-        return endIterator;
+        return endIterator += incrementPosition(searchDirection);
     }
 
     private int searchStart(PeptideSearchResult peptideSearchResult, int peptideAbsoluteStart, GenomeNucleotides genomeNucleotides, GeneInfo geneInfo) {
@@ -198,7 +211,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             startIterator += incrementPosition(geneInfo.getDirection());
             isStartCodon = translationTable.isStartCodon(genomeNucleotides
                     .codonAt(startIterator, direction));
-            reachedStart = reachedStart(startIterator, geneInfo.getDirection(), peptideAbsoluteStart);
+            reachedStart = reachedStart(startIterator, geneInfo.getDirection(), genomeNucleotides.getSize());
         }
 
         if (reachedStart && !isStartCodon) {
@@ -229,31 +242,23 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         }
     }
 
-    private boolean reachedStart(int position, int direction, int peptideStart) {
+    private boolean reachedStart(int position, int direction, int size) {
         if (direction == -1) {
-            return position + GenomeConstant.BASES_PER_CODON >= peptideStart;
+            return position + GenomeConstant.BASES_PER_CODON >= size;
         } else {
-            return position >= peptideStart;
+            return position <= 0;
         }
     }
 
-    private GenomeNucleotides getGenomeNucleotides(File geneFile)
-            throws IOException {
-        if (!genomeNucleotidesMap.containsKey(geneFile.getName())) {
-            genomeNucleotidesMap.put(geneFile.getName(), new GenomeNucleotides(
-                    geneFile));
+    private GenomeNucleotides getGenomeNucleotides(String gene)
+            throws FastaParserException, IOException {
+        if (!genomeNucleotidesMap.containsKey(gene)) {
+            genomeNucleotidesMap.put(gene, new GenomeNucleotides(fastaParser.readCode(gene)));
         }
-        return genomeNucleotidesMap.get(geneFile.getName());
+        return genomeNucleotidesMap.get(gene);
     }
 
     private int incrementPosition(int direction) {
         return direction * GenomeConstant.BASES_PER_CODON;
-    }
-
-    private File getChromosomeFile(File chromosomeDir, String chromosome) {
-        // TODO: find the different chrormosome file extensions
-        File faExt = new File(chromosomeDir, chromosome + ".fa");
-        if (faExt.exists()) return faExt;
-        return new File(chromosomeDir, chromosome + ".faa");
     }
 }
