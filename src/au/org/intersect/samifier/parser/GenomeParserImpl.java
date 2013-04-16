@@ -24,8 +24,10 @@ public class GenomeParserImpl implements GenomeParser {
     public static final String CODING_SEQUENCE = "CDS";
     public static final String INTRON = "intron";
     public static final Pattern SEQUENCE_RE = Pattern.compile("(" + CODING_SEQUENCE + "|" + INTRON + ")");
-    private static final Pattern ID_ATTRIBUTE_RE = Pattern.compile(".*Name=([^_;]+).*");
-    private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^_;]+).*");
+    //private static final Pattern ID_ATTRIBUTE_RE = Pattern.compile(".*Name=([^_;]+).*");
+    private static final Pattern ID_ATTRIBUTE_RE = Pattern.compile(".*Name=([^;]+).*");
+    private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^;]+).*");
+    //private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^_;]+).*");
     private static final Pattern VIRTUAL_PROTEIN_ATTRIBUTE_RE = Pattern.compile(".*Virtual_protein=([^_;]+).*");
     private static final Pattern BRACKETS = Pattern.compile("\\((.*?)\\)");
     
@@ -195,7 +197,7 @@ public class GenomeParserImpl implements GenomeParser {
             throws GenomeFileParsingException {
         Matcher m = PARENT_ATTRIBUTE_RE.matcher(attributes);
         if (m.matches()) {
-            return m.group(1);
+            return m.group(1).replace("_mRNA", "");
         }
         throwParsingException("Attribute Parent not found");
         return null; // make compiler happy
