@@ -215,7 +215,7 @@ public class FastaParserImpl implements FastaParser {
     }
 
     private String cleanCode(String fastCode) throws FastaParserException {
-        String clean = fastCode.replace("\r", "").replace("\n", "").replace(">", "");
+        String clean = fastCode.replace("\r", "").replace("\n", "");
         /*Matcher matcher = ALLOWED_CHARS_IN_FASTA_SEQUENCE.matcher(clean);
         if (matcher.find()) {
             System.err.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -238,16 +238,6 @@ public class FastaParserImpl implements FastaParser {
             reader = new RandomAccessFile(contigInfo.getFastaFile(), "r");
             reader.seek(contigInfo.startOffset);
             int read = reader.read(buffer);
-            /*System.err.println("************************************************************************************");
-            System.err.println("************************************************************************************");
-            System.err.println("************************************************************************************");
-            System.err.println("buffer size = " + buffer.length);
-            System.err.println("read = " + read);
-            System.err.println("chromosoem = " + chromosome);
-            System.err.println("Actual Code = " + new String(buffer));
-            System.err.println("************************************************************************************");
-            System.err.println("************************************************************************************");
-            System.err.println("************************************************************************************");*/
             if (read != buffer.length) {
                 throw new FastaParserException("Wrong sequence for chromosome: " + chromosome);
             }

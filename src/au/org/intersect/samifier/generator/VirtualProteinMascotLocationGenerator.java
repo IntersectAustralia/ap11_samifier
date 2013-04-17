@@ -185,14 +185,15 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
 
         while (!reachedStop && !isStopCodon) {
             endIterator += incrementPosition(searchDirection);
-            isStopCodon = translationTable.isStopCodon(genomeNucleotides
-                    .codonAt(endIterator, geneInfo.getDirection()));
             reachedStop = reachedEnd(endIterator, searchDirection, genomeNucleotides.getSize());
+            if (!reachedStop) {
+                isStopCodon = translationTable.isStopCodon(genomeNucleotides.codonAt(endIterator, geneInfo.getDirection()));
+            }
         }
 
         if (reachedStop && !isStopCodon) {
             LOG.warn("Reached end of sequence without finding stop codon for peptide " + peptideSearchResult.getPeptideSequence());
-            return endIterator;
+            return endIterator -= incrementPosition(searchDirection);
         }
 
         return endIterator += incrementPosition(searchDirection);
@@ -209,9 +210,10 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
 
         while (!reachedStart && !isStartCodon) {
             startIterator += incrementPosition(geneInfo.getDirection());
-            isStartCodon = translationTable.isStartCodon(genomeNucleotides
-                    .codonAt(startIterator, direction));
             reachedStart = reachedStart(startIterator, geneInfo.getDirection(), genomeNucleotides.getSize());
+            if (!reachedStart) {
+                isStartCodon = translationTable.isStartCodon(genomeNucleotides.codonAt(startIterator, direction));
+            }
         }
 
         if (reachedStart && !isStartCodon) {
@@ -235,19 +237,17 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
     }
 
     private boolean reachedEnd(int position, int direction, int size) {
-        if (direction == -1) {
-            return position <= 0;
-        } else {
-            return position + GenomeConstant.BASES_PER_CODON >= size;
+        if (((position - GenomeConstant.BASES_PER_CODON) < 0) || ((position + GenomeConstant.BASES_PER_CODON) > size)) {
+            return true;
         }
+        return false;
     }
 
     private boolean reachedStart(int position, int direction, int size) {
-        if (direction == -1) {
-            return position + GenomeConstant.BASES_PER_CODON >= size;
-        } else {
-            return position <= 0;
+        if (((position - GenomeConstant.BASES_PER_CODON) < 0) || ((position + GenomeConstant.BASES_PER_CODON) > size)) {
+            return true;
         }
+        return false;
     }
 
     private GenomeNucleotides getGenomeNucleotides(String gene)

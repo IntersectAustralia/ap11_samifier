@@ -17,7 +17,6 @@ public class GenomeNucleotides {
 
     public String codonAt(int position, int direction) {
         int increment = direction;
-
         StringBuilder codon = new StringBuilder();
         codon.append(nucleotideAt(position));
         codon.append(nucleotideAt(position + increment));
