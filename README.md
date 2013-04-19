@@ -5,6 +5,11 @@ Samifier
   See https://github.com/IntersectAustralia/ap11_samifier/wiki for building,
   deployment and user guide. For scientific background, see
   http://intersectaustralia.github.com/ap11/ for details.
+  
+  The code is licensed under the GNU GPL v3 license - see LICENSE.txt
+
+  The documentation (contained in the Github wiki and this README) is licensed under [Creative Commons Attribution-Share Alike](http://creativecommons.org/licenses/by-sa/2.5/au/)
+
 
 Building
 ========
