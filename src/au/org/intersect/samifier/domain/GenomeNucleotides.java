@@ -21,14 +21,14 @@ public class GenomeNucleotides {
         codon.append(nucleotideAt(position));
         codon.append(nucleotideAt(position + increment));
         codon.append(nucleotideAt(position + 2 * increment));
-        return direction  > 0 ? codon.toString() : invertNucleotideSequence(codon.toString()); 
+        return direction  > 0 ? codon.toString() : invertNucleotideSequence(codon.toString());
     }
 
 
     public int getSize() {
         return genomeNucleotides.length();
     }
-    
+
     private String invertNucleotideSequence(String sequence) {
         return StringUtils.replaceChars(sequence, "ACGT", "TGCA");
     }
