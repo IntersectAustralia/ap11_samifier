@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,13 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             locations = removeDuplicates(locations);
             locations = mergeProteins(locations);
             Collections.sort(locations);
+            Iterator<ProteinLocation> setIterator = locations.iterator();
+            while (setIterator.hasNext()) {
+                ProteinLocation currentElement = setIterator.next();
+                if (currentElement.getLength() < 2) {
+                    setIterator.remove();
+                }
+            }
             for (int i = 0; i < locations.size(); i++) {
                 locations.get(i).setName("q" + i);
             }
