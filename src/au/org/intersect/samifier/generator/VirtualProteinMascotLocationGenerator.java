@@ -2,6 +2,7 @@ package au.org.intersect.samifier.generator;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,8 @@ import au.org.intersect.samifier.domain.PeptideSearchResult;
 import au.org.intersect.samifier.domain.ProteinLocation;
 import au.org.intersect.samifier.domain.ProteinToOLNMap;
 import au.org.intersect.samifier.domain.TranslationTableParsingException;
+import au.org.intersect.samifier.filter.ConfidenceScoreFilter;
+import au.org.intersect.samifier.filter.PeptideSearchResultFilter;
 import au.org.intersect.samifier.parser.FastaParser;
 import au.org.intersect.samifier.parser.FastaParserException;
 import au.org.intersect.samifier.parser.FastaParserImpl;
@@ -39,6 +42,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
     private File chromosomeDir;
     private String[] searchResultsPaths;
     private FastaParser fastaParser;
+    private PeptideSearchResultFilter peptideFilter;
 
     private Genome genome;
     private ProteinToOLNMap proteinToOLNMap;
@@ -46,11 +50,14 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
     private CodonTranslationTable translationTable;
 
     public VirtualProteinMascotLocationGenerator(String[] searchResultsPaths,
-            File translationTableFile, File genomeFile, File chromosomeDir) {
+            File translationTableFile, File genomeFile, File chromosomeDir, BigDecimal confidenceScore) {
         this.searchResultsPaths = searchResultsPaths;
         this.genomeFile = genomeFile;
         this.chromosomeDir = chromosomeDir;
         this.translationTableFile = translationTableFile;
+        if (confidenceScore != null) {
+            peptideFilter = new ConfidenceScoreFilter(confidenceScore);
+        }
     }
 
     @Override
@@ -114,6 +121,9 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
                 System.err.println(peptideSearchResult.getProteinName()
                         + " not found in the genome");
                 continue;
+            }
+            if (peptideFilter != null && (!peptideFilter.accepts(peptideSearchResult))){
+                    continue;
             }
 
             int virtualGeneStart = geneInfo.getStart() - 1;

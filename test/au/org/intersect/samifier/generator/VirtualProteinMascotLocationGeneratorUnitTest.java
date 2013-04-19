@@ -31,7 +31,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
         File genomeFile = new File("test/resources/merger/virtual_protein_proper_start.gff");
         File chromosomeDir = new File("test/resources/merger/");
         File translationTableFile = new File("test/resources/merger/bacterial_translation_table.txt");
-        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir);
+        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir, null);
         
         try {
             List<ProteinLocation> locations = generator.generateLocations();
@@ -53,7 +53,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
         File genomeFile = new File("test/resources/merger/virtual_protein.gff");
         File chromosomeDir = new File("test/resources/merger/");
         File translationTableFile = new File("test/resources/merger/bacterial_translation_table.txt");
-        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir);
+        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir, null);
         
         try {
             List<ProteinLocation> locations = generator.generateLocations();
@@ -77,7 +77,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
         File genomeFile = new File("test/resources/merger/virtual_protein_no_end_for_start.gff");
         File chromosomeDir = new File("test/resources/merger/");
         File translationTableFile = new File("test/resources/merger/bacterial_translation_table.txt");
-        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir);
+        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir, null);
         
         try {
             List<ProteinLocation> locations = generator.generateLocations();
@@ -99,7 +99,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
         File genomeFile = new File("test/resources/merger/virtual_protein_no_start_proper_end.gff");
         File chromosomeDir = new File("test/resources/merger/");
         File translationTableFile = new File("test/resources/merger/bacterial_translation_table.txt");
-        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir);
+        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir, null);
         
         try {
             List<ProteinLocation> locations = generator.generateLocations();
@@ -121,7 +121,7 @@ public class VirtualProteinMascotLocationGeneratorUnitTest {
         File genomeFile = new File("test/resources/merger/virtual_protein_no_markers.gff");
         File chromosomeDir = new File("test/resources/merger/");
         File translationTableFile = new File("test/resources/merger/bacterial_translation_table.txt");
-        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir);
+        generator = new VirtualProteinMascotLocationGenerator(mascotFiles, translationTableFile, genomeFile, chromosomeDir, null);
         
         try {
             List<ProteinLocation> locations = generator.generateLocations();

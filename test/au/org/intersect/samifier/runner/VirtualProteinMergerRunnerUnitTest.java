@@ -21,7 +21,7 @@ public class VirtualProteinMergerRunnerUnitTest
 
             StringWriter out = new StringWriter();
 
-            VirtualProteinMergerRunner analyser = new VirtualProteinMergerRunner(mascotFiles, translationTableFile, genomeFile, chromosomeDir, out);
+            VirtualProteinMergerRunner analyser = new VirtualProteinMergerRunner(mascotFiles, translationTableFile, genomeFile, chromosomeDir, out, null);
             analyser.run();
             System.out.println(out.toString());
         }

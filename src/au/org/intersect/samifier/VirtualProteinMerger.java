@@ -3,6 +3,7 @@ package au.org.intersect.samifier;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -48,6 +49,13 @@ public class VirtualProteinMerger {
         OptionBuilder.withArgName("outputFile");
         OptionBuilder.isRequired();
         Option outputFile = OptionBuilder.create("o");
+        
+        OptionBuilder.withType(Number.class);
+        OptionBuilder.hasArg();
+        OptionBuilder.isRequired(false);
+        OptionBuilder.withArgName("Confidence Score thresold");
+        OptionBuilder.withDescription("Minimum confidence score for peptides to be included");
+        Option score = OptionBuilder.create("s");
 
         Options options = new Options();
         options.addOption(resultsFile);
@@ -55,6 +63,7 @@ public class VirtualProteinMerger {
         options.addOption(chrDirOpt);
         options.addOption(genomeFileOpt);
         options.addOption(outputFile);
+        options.addOption(score);
 
         CommandLineParser parser = new GnuParser();
         try {
@@ -65,10 +74,15 @@ public class VirtualProteinMerger {
             File chromosomeDir = new File(line.getOptionValue("c"));
             File outfile = new File(line.getOptionValue("o"));
             Writer outputWriter = new FileWriter(outfile);
-
+            String confidenceScoreOption = line.getOptionValue("s");
+            BigDecimal confidenceScore = null;
+            if (confidenceScoreOption != null) {
+                confidenceScore = new BigDecimal(confidenceScoreOption);
+            }
+            
             VirtualProteinMergerRunner virtualProteinMergerRunner = new VirtualProteinMergerRunner(
                     searchResultsPaths, translationTableFile, genomeFile,
-                    chromosomeDir, outputWriter);
+                    chromosomeDir, outputWriter, confidenceScore);
             virtualProteinMergerRunner.run();
         } catch (ParseException pe) {
             HelpFormatter formatter = new HelpFormatter();
