@@ -152,7 +152,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             ProteinLocation loc = new ProteinLocation("?", getStartPosition(startPosition, stopPosition) , Math.abs(stopPosition - startPosition),
                     geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(),
                     peptideSearchResult.getProteinName() + "(" + virtualGeneStart + "-" + virtualGeneStop + ")", geneInfo.getChromosome());
-            loc.setAbsoluteStartStop(peptideAbsoluteStart + "_" + Math.abs(stopOffset - startOffset));
+            loc.setAbsoluteStartStop(getStartPosition(startPosition, stopPosition) + "_" + Math.abs(stopOffset - startOffset));
             proteinLocations.add(loc);
         }
         return proteinLocations;
@@ -193,6 +193,8 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         return new ArrayList<ProteinLocation>(uniqueLocation.values());
     }
 
+    
+    
     private int searchStop(PeptideSearchResult peptideSearchResult, int peptideAbsoluteStart, GenomeNucleotides genomeNucleotides, GeneInfo geneInfo, boolean reverse) {
         boolean reachedStop = false;
         int endIterator = peptideAbsoluteStart;
@@ -214,7 +216,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             return endIterator -= incrementPosition(searchDirection);
         } 
         
-        if (isStopOnEdge(endIterator, genomeNucleotides, !reverse)) {
+        if (isStopOnEdge(endIterator, genomeNucleotides)) {
             return endIterator;
         }
 
@@ -227,14 +229,11 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         boolean reachedStart = false;
         int startIterator = previousStop;
         int direction = geneInfo.getDirection();
-        if (startIterator == 610) {
-            System.out.println("We have a winner");
-        }
         boolean isStartCodon = translationTable.isStartCodon(genomeNucleotides.codonAt(startIterator, direction));
 
         while (!reachedStart && !isStartCodon) {
             startIterator += incrementPosition(geneInfo.getDirection());
-            reachedStart = reachedEdge(startIterator, geneInfo.getDirection(), genomeNucleotides.getSize());
+            reachedStart = reachedEdge(startIterator, geneInfo.getDirection(), genomeNucleotides.getSize()) || reachedPeptideStart(startIterator, peptideAbsoluteStart, geneInfo.getDirection());
             if (!reachedStart) {
                 isStartCodon = translationTable.isStartCodon(genomeNucleotides.codonAt(startIterator, direction));
             }
@@ -243,7 +242,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         if (reachedStart && !isStartCodon) {
             LOG.error("Reached beginning of sequence without finding start codon for peptide "
                     + peptideSearchResult.getPeptideSequence());
-            if (isStopOnEdge(previousStop, genomeNucleotides, geneInfo.isForward())) {
+            if (isStopOnEdge(previousStop, genomeNucleotides)) {
                 return previousStop;
             } else {
                 return previousStop + (geneInfo.getDirection() * GenomeConstant.BASES_PER_CODON);
@@ -252,17 +251,20 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
 
         return startIterator;
     }
-    
-    private boolean isStopOnEdge(int previousStop, GenomeNucleotides genomeNucleotides, boolean forward) {
-        if (forward) {
-            return previousStop < GenomeConstant.BASES_PER_CODON;
+    private boolean reachedPeptideStart(int startIterator, int peptideAbsoluteStart, int direction) {
+        if (direction > 0) {
+            return startIterator > peptideAbsoluteStart;
         }
-        return previousStop > (genomeNucleotides.getSize() - GenomeConstant.BASES_PER_CODON);
+        return startIterator < peptideAbsoluteStart;
     }
 
-   
+    private boolean isStopOnEdge(int previousStop, GenomeNucleotides genomeNucleotides) {
+        //if (forward) {
+        return ((previousStop <= GenomeConstant.BASES_PER_CODON) || (previousStop >= (genomeNucleotides.getSize() - GenomeConstant.BASES_PER_CODON)));
+    }
+
     private boolean reachedEdge(int position, int direction, int size) {
-        if (((position - GenomeConstant.BASES_PER_CODON) < 0) || ((position + GenomeConstant.BASES_PER_CODON) > size)) {
+        if (((position - GenomeConstant.BASES_PER_CODON) <= 0) || ((position + GenomeConstant.BASES_PER_CODON) >= size)) {
             return true;
         }
         return false;
