@@ -28,7 +28,7 @@ public class GenomeParserImpl implements GenomeParser {
     private static final Pattern ID_ATTRIBUTE_RE = Pattern.compile(".*Name=([^;]+).*");
     private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^;]+).*");
     //private static final Pattern PARENT_ATTRIBUTE_RE = Pattern.compile(".*Parent=([^_;]+).*");
-    private static final Pattern VIRTUAL_PROTEIN_ATTRIBUTE_RE = Pattern.compile(".*Virtual_protein=([^_;]+).*");
+    private static final Pattern VIRTUAL_PROTEIN_ATTRIBUTE_RE = Pattern.compile(".*Virtual_protein=([^;]+).*");
     private static final Pattern BRACKETS = Pattern.compile("\\((.*?)\\)");
     
     private String genomeFileName;

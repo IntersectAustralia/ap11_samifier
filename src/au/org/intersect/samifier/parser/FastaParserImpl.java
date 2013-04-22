@@ -74,6 +74,9 @@ public class FastaParserImpl implements FastaParser {
                 parts.add(new NucleotideSequence(null, GeneSequence.INTRON, location.getStart(), location.getStop()));
                 continue;
             }
+            if (code.length() < startIndex || code.length() < stopIndex) {
+                continue;
+            }
             StringBuilder sequence = new StringBuilder(code.substring(startIndex, stopIndex));
             String sequenceString;
             if (gene.isForward()) {
