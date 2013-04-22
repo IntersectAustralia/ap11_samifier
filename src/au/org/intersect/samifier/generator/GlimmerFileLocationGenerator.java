@@ -65,8 +65,14 @@ public class GlimmerFileLocationGenerator implements LocationGenerator {
             BigDecimal confidenceScore = new BigDecimal(columns[4]);
 
             if (direction.equals(GenomeConstant.FORWARD_FLAG)) {
+                if (firstIndex > secondIndex) {
+                    throw new LocationGeneratorException("Error in line : " + line);
+                }
                 proteinLocations.add(new ProteinLocation(name, firstIndex, secondIndex - firstIndex + 1, direction, frame, confidenceScore, null, chromosome));
             } else if (direction.startsWith(GenomeConstant.REVERSE_FLAG)) {
+                if (secondIndex > firstIndex) {
+                    throw new LocationGeneratorException("Error in line : " + line);
+                }
                 proteinLocations.add(new ProteinLocation(name, secondIndex,
                         firstIndex - secondIndex + 1,
                         GenomeConstant.REVERSE_FLAG, frame, confidenceScore, null, chromosome));
