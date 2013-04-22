@@ -60,7 +60,7 @@ public class GenomeParserImpl implements GenomeParser {
 
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
-                if (line.matches("^\\s*#")) {
+                if (line.startsWith("##")){
                     continue;
                 }
                 // chromosome, source, type, start, stop, score, strand, phase,
