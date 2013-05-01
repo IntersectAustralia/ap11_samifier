@@ -195,7 +195,7 @@
     </macrodef>
    <macrodef name="git">
 		<attribute name="command" />
-		<attribute name="dir" default="dist/" />
+		<attribute name="dir" default="" />
 		<element name="args" optional="true" />
 		<sequential>
 			<echo message="git @{command}" />
@@ -212,7 +212,7 @@
 		<echo message="Commiting all changes with message ${commit-message}" />-->
 		<git command="add">
 			<args>
-				<arg value="" />
+				<arg value="dist/" />
 			</args>
 		</git>
 		<git command="commit">
