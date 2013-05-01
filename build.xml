@@ -207,9 +207,9 @@
 	</macrodef>
  
 	<target name="version" description="Commits all changes to version git">
-		<input message="Commit message" addproperty="commit-message" />
+		<!--<input message="Commit message" addproperty="commit-message" />
 		
-		<echo message="Commiting all changes with message ${commit-message}" />
+		<echo message="Commiting all changes with message ${commit-message}" />-->
 		<git command="add">
 			<args>
 				<arg value="." />
@@ -217,7 +217,8 @@
 		</git>
 		<git command="commit">
 			<args>
-				<arg value="-am ${commit-message}" />
+				<!--<arg value="-am ${commit-message}" />-->
+				<arg value="-am Publish latest binary"/>
 			</args>
 		</git>
 		<git command="push" />
