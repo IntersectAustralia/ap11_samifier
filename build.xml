@@ -210,7 +210,9 @@
 		<!--<input message="Commit message" addproperty="commit-message" />
 		
 		<echo message="Commiting all changes with message ${commit-message}" />-->
-		<git command="add">
+		<git command="pull">
+                </git>
+                <git command="add">
 			<args>
 				<arg value="dist/" />
 			</args>
