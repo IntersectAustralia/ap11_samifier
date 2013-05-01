@@ -223,7 +223,7 @@
 		<git command="commit">
 			<args>
 				<!--<arg value="-am ${commit-message}" />-->
-				<arg value="-am Publish latest binary"/>
+				<arg value="-m Publish latest binary"/>
 			</args>
 		</git>
 		<git command="push" >
