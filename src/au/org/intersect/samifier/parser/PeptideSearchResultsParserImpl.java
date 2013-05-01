@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -18,6 +19,7 @@ import org.apache.log4j.Logger;
 import au.org.intersect.samifier.domain.GeneInfo;
 import au.org.intersect.samifier.domain.Genome;
 import au.org.intersect.samifier.domain.PeptideSearchResult;
+import au.org.intersect.samifier.domain.ProteinLocation;
 import au.org.intersect.samifier.domain.ProteinToOLNMap;
 import au.org.intersect.samifier.parser.mzidentml.MzIdentMLHandler;
 import au.org.intersect.samifier.parser.mzidentml.MzidReader;
@@ -53,7 +55,14 @@ public class PeptideSearchResultsParserImpl implements
             LOG.debug("Processing: " + searchResultFile.getAbsolutePath());
             peptideSearchResults.addAll(parseResults(searchResultFile));
         }
-        
+        //remove all peptides with "X"
+        Iterator<PeptideSearchResult> setIterator = peptideSearchResults.iterator();
+        while (setIterator.hasNext()) {
+            PeptideSearchResult currentElement = setIterator.next();
+            if (currentElement.getPeptideSequence().contains("X")) {
+                setIterator.remove();
+            }
+        }
         return peptideSearchResults;
     }
 
