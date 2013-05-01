@@ -53,6 +53,7 @@ public class PeptideSearchResultsParserImpl implements
             LOG.debug("Processing: " + searchResultFile.getAbsolutePath());
             peptideSearchResults.addAll(parseResults(searchResultFile));
         }
+        
         return peptideSearchResults;
     }
 
