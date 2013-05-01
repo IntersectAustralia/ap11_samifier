@@ -225,7 +225,7 @@
 		</git>
 		<git command="push" >
                    <args>
-                      <arg value="--force"/>
+                      <arg value=""/>
                    </args>
                 </git>
 	</target>
