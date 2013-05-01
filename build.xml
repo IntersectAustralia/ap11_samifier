@@ -198,7 +198,7 @@
 		<attribute name="dir" default="" />
 		<element name="args" optional="true" />
 		<sequential>
-			<echo message="git @{command}" />
+			<echo message="git @{command}" @{args} />
 			<exec executable="git" dir="@{dir}">
 				<arg value="@{command}" />
 				<args/>
@@ -223,7 +223,7 @@
 		</git>
 		<git command="push" >
                    <args>
-                      <arg value=""/>
+                      <arg value=" origin master"/>
                    </args>
                 </git>
 	</target>
