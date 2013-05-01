@@ -223,6 +223,10 @@
 				<arg value="-am Publish latest binary"/>
 			</args>
 		</git>
-		<git command="push" />
+		<git command="push" >
+                   <args>
+                      <arg value="--force"/>
+                   </args>
+                </git>
 	</target>
 </project>
