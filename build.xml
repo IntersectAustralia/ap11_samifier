@@ -212,7 +212,7 @@
 		<echo message="Commiting all changes with message ${commit-message}" />-->
                 <git command="add">
 			<args>
-				<arg value="dist/" />
+				<arg value="." />
 			</args>
 		</git>
 		<git command="commit">
