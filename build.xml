@@ -223,7 +223,7 @@
 		</git>
 		<git command="push" >
                    <args>
-                      <arg value=" origin master"/>
+                      <arg value=""/>
                    </args>
                 </git>
 	</target>
