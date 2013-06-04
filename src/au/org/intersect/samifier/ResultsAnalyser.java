@@ -16,9 +16,12 @@ import org.apache.commons.cli.ParseException;
 import au.org.intersect.samifier.reporter.DatabaseHelper;
 import au.org.intersect.samifier.runner.ResultAnalyserRunner;
 
-public class ResultsAnalyser {
+public class ResultsAnalyser implements Version {
     public static void main(String... args) {
-
+        if (args.length == 1 && args[0].equalsIgnoreCase("-v")) {
+            System.out.println("Version = " + VERSION);
+            System.exit(0);
+        }
         OptionBuilder.hasArg();
         OptionBuilder
                 .withDescription("Mascot search results file in txt format");
@@ -134,10 +137,12 @@ public class ResultsAnalyser {
             }
 
         } catch (ParseException pe) {
+            System.err.println("Version = " + VERSION);
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("result_analyser", options, true);
             System.exit(1);
         } catch (Exception e) {
+            System.err.println("Version = " + VERSION);
             System.err.println(e);
             e.printStackTrace();
             System.exit(1);

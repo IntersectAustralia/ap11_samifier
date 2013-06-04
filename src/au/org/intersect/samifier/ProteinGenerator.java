@@ -14,12 +14,16 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-public class ProteinGenerator {
+public class ProteinGenerator implements Version {
 
     private ProteinGenerator() {
     }
 
     public static void main(String[] args) {
+        if (args.length == 1 && args[0].equalsIgnoreCase("-v")) {
+            System.out.println("Version = " + VERSION);
+            System.exit(0);
+        }
         OptionBuilder.hasArg();
         OptionBuilder.withArgName("Translation Table File");
         OptionBuilder
@@ -115,9 +119,11 @@ public class ProteinGenerator {
                     accessionWriter);
             runner.run();
         } catch (ParseException pe) {
+            System.err.println("Version = " + VERSION);
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("protein_generator", options, true);
         } catch (Exception e) {
+            System.err.println("Version = " + VERSION);
             System.err.println(e);
             e.printStackTrace();
         }

@@ -16,8 +16,12 @@ import org.apache.commons.cli.ParseException;
 
 import au.org.intersect.samifier.runner.VirtualProteinMergerRunner;
 
-public class VirtualProteinMerger {
+public class VirtualProteinMerger implements Version {
     public static void main(String[] args) {
+        if (args.length == 1 && args[0].equalsIgnoreCase("-v")) {
+            System.out.println("Version = " + VERSION);
+            System.exit(0);
+        }
         OptionBuilder.hasArgs();
         OptionBuilder
                 .withDescription("Mascot search results file in txt format");
@@ -85,11 +89,13 @@ public class VirtualProteinMerger {
                     chromosomeDir, outputWriter, confidenceScore);
             virtualProteinMergerRunner.run();
         } catch (ParseException pe) {
+            System.err.println("Version = " + VERSION);
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("virtual_protein_merger", options, true);
             System.exit(1);
         } catch (Exception e) {
             System.err.println(e);
+            System.err.println("Version = " + VERSION);
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("virtual_protein_merger", options, true);
             e.printStackTrace();

@@ -19,11 +19,15 @@ import org.apache.log4j.PatternLayout;
 import au.org.intersect.samifier.domain.DebuggingFlag;
 import au.org.intersect.samifier.runner.SamifierRunner;
 
-public class Samifier {
+public class Samifier implements Version {
 
     public static final int SAM_REVERSE_FLAG = 0x10;
 
     public static void main(String[] args) {
+        if (args.length == 1 && args[0].equalsIgnoreCase("-v")) {
+            System.out.println("Version = " + VERSION);
+            System.exit(0);
+        }
         OptionBuilder.hasArgs();
         OptionBuilder.withDescription("Mascot search results file in txt format");
         OptionBuilder.withArgName("searchResultsFile");
@@ -123,11 +127,13 @@ public class Samifier {
 
         } catch (ParseException pe) {
             System.err.println(pe);
+            System.err.println("Version = " + VERSION);
             // System.err.println(pe.getMessage());
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("samifier", options, true);
             System.exit(1);
         } catch (Exception e) {
+            System.err.println("Version = " + VERSION);
             System.err.println(e);
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("samifier", options, true);
