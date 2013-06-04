@@ -99,9 +99,13 @@ public class PeptideSearchResultsParserImpl implements
                         break;
                     }
                     results.addAll(getProteinsFromQueryLine(line));
-                } else if (line.startsWith("Content-Type: application/x-Mascot; name=\"peptides\"")) {
+                } else if (line.startsWith("Content-Type: application/x-Mascot; name=\"peptides\"") ||
+                           line.startsWith("Content-Type: application/x-Mascot; name=peptides")) {
                     peptidesSectionStarted = true;
                 }
+            }
+            if (!peptidesSectionStarted) {
+                throw new MascotParsingException(new Exception("Peptide section not found in file"));
             }
         } catch (Exception e) {
             throw new MascotParsingException(e);
