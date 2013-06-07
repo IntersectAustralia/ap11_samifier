@@ -26,6 +26,7 @@ public class MzidReader {
     private Map<String, String> peptideMap;
     private Map<String, String[]> peptideReferenceMap;
     private Map<String, String[]> peptideEvidenceMap;
+    private String fileName;
 
     private List<PeptideSearchResult> results;
     private static Logger LOG = Logger.getLogger(MzidReader.class);
@@ -36,7 +37,7 @@ public class MzidReader {
         results = new ArrayList<PeptideSearchResult>();
         peptideReferenceMap = new HashMap<String, String[]>();
         peptideEvidenceMap = new HashMap<String, String[]>();
-
+        fileName = resultsFile.getName();
         try {
             inputSource = new InputSource(new FileReader(resultsFile));
             xmlReader = XMLReaderFactory.createXMLReader();
@@ -99,9 +100,7 @@ public class MzidReader {
     public void build(String id, String peptideSequence, String protein,
             String start, String end, String confidenceScore) {
         BigDecimal score = new BigDecimal(confidenceScore);
-        PeptideSearchResult searchResult = new PeptideSearchResult(id,
-                peptideSequence, protein, Integer.parseInt(start),
-                Integer.parseInt(end), score);
+        PeptideSearchResult searchResult = new PeptideSearchResult(fileName, id, peptideSequence, protein, Integer.parseInt(start), Integer.parseInt(end), score);
         results.add(searchResult);
     }
 
@@ -111,7 +110,7 @@ public class MzidReader {
             LOG.warn("No peptide ref for id " + id);
             return;
         }
-        PeptideSearchResult searchResult = new PeptideSearchResult(id, params[0], protein, Integer.parseInt(start), Integer.parseInt(end), new BigDecimal(params[1]));
+        PeptideSearchResult searchResult = new PeptideSearchResult(fileName, id, params[0], protein, Integer.parseInt(start), Integer.parseInt(end), new BigDecimal(params[1]));
         results.add(searchResult);
     }
 

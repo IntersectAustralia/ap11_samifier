@@ -73,13 +73,16 @@ public class DatabaseHelper {
         query.append("frame integer,");
         query.append("exons integer,"); /// Change by Aidan
         query.append("exonString varchar(255),"); /// Change by Ignatius Pang  *%*%*%
-
+        query.append("queryId varchar(255), ");
+        query.append("peptide_sequence varchar(255), ");
+        query.append("filename varchar(255), ");
         if (DebuggingFlag.get_sbi_debug_flag() == 1) {// / Change by Ignatius
                                                       // Pang *%*%*%
-            query.append("queryId varchar(255),");
-            query.append("validatedSequence varchar(255)");
+            
+            query.append("comments varchar(255), ");
+            query.append("validatedSequence varchar(255), ");
         } else {
-            query.append("queryId varchar(255)");
+            query.append("comments varchar(255)");
         }
 
         query.append(");");

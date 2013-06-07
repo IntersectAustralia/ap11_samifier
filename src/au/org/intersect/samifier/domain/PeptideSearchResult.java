@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.math.BigDecimal;
 
 public class PeptideSearchResult {
+    private String fileName;
     private String id;
     private String peptideSequence;
     private String proteinName;
@@ -13,7 +14,7 @@ public class PeptideSearchResult {
     private int peptideStop;
     private BigDecimal confidenceScore;
 
-    public PeptideSearchResult(String id, String peptideSequence,
+    public PeptideSearchResult(String fileName, String id, String peptideSequence,
             String proteinName, int peptideStart, int peptideStop,
             BigDecimal confidenceScore) {
         this.id = id;
@@ -22,6 +23,7 @@ public class PeptideSearchResult {
         this.peptideStart = peptideStart;
         this.peptideStop = peptideStop;
         this.confidenceScore = confidenceScore;
+        this.fileName = fileName;
     }
 
     public int hashCode() {
@@ -84,5 +86,13 @@ public class PeptideSearchResult {
                 + confidenceScore + System.getProperty("line.separator")
                 + "sequence = " + System.getProperty("line.separator")
                 + peptideSequence;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

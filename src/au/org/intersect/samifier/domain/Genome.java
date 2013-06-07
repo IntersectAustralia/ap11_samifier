@@ -52,6 +52,9 @@ public class Genome {
                     VirtualProtein vp = geneInfo.getVirtualProtein(orderedLocusName);
                     GeneInfo newGene = new GeneInfo(geneInfo.getChromosome(), geneInfo.getId(), vp.getStartOffset() , vp.getEndOffset(), geneInfo.getDirection());
                     newGene.addLocation(new GeneSequence(geneInfo.getId(), true, vp.getStartOffset(), vp.getEndOffset() , geneInfo.getDirection()));
+                    newGene.setFromVirtualProtein(true);
+                    newGene.setComments(orderedLocusName + "(" + vp.getStartOffset() + "-" + vp.getEndOffset() + ")");
+                    newGene.setOriginalGeneId(vp.getGeneId());
                     return newGene;
                 }
             }

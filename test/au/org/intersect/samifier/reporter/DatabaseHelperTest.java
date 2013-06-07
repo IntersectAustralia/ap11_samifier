@@ -54,7 +54,10 @@ public class DatabaseHelperTest {
     			+ "\nframe"
     			+ "\nexons"
     			+ "\nexonString"
-                + "\nqueryid";
+                + "\nqueryid"
+                + "\nPEPTIDE_SEQUENCE"
+                + "\nFILENAME"
+                + "\nCOMMENTS";
     	expectedString = expectedString.toUpperCase();
     	DatabaseHelper db = new DatabaseHelper();
     	db.printTableDetails(ps);

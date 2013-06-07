@@ -78,7 +78,7 @@ public class PeptideSequenceGeneratorImplUnitTest
     @Test
     public void testGetPeptideSequenceCrossingAnIntronForward()
     {
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 33, 36, dummyBigDecimal);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null, "test", "HP", "DummyProtein", 33, 36, dummyBigDecimal);
 
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence("olnDummy", true, 87286, 87387, 1));
@@ -111,7 +111,7 @@ public class PeptideSequenceGeneratorImplUnitTest
     @Test
     public void testGetPeptideSequenceWithinCodingSequence()
     {
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 3, 6, dummyBigDecimal);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null, "test", "HP", "DummyProtein", 3, 6, dummyBigDecimal);
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence("olnDummy", true, 87286, 87387, 1));
         locations.add(new GeneSequence("olnDummy", true, 87501, 87752, 1));
@@ -143,7 +143,7 @@ public class PeptideSequenceGeneratorImplUnitTest
     @Test
     public void testGetPeptideSequenceCrossingAnIntronReverse()
     {
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult("test", "HP", "DummyProtein", 81, 85, dummyBigDecimal);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null, "test", "HP", "DummyProtein", 81, 85, dummyBigDecimal);
 
         List<GeneSequence> locations = new ArrayList<GeneSequence>();
         locations.add(new GeneSequence("G01", true, 87286, 87387, -1));

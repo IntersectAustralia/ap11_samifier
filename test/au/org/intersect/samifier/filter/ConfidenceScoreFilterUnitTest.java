@@ -23,7 +23,7 @@ public class ConfidenceScoreFilterUnitTest
     public void testConfidenceScoreEqual()
     {
         BigDecimal confidenceScore = new BigDecimal("10.20");
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null,null,null,0,0, confidenceScore);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null, null,null,null,0,0, confidenceScore);
 
         assertTrue(filter.accepts(peptideSearchResult));
     }
@@ -33,7 +33,7 @@ public class ConfidenceScoreFilterUnitTest
     public void testConfidenceScoreGreater()
     {
         BigDecimal confidenceScore = new BigDecimal("11.20");
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null,null,null,0,0, confidenceScore);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null, null,null,null,0,0, confidenceScore);
 
         assertTrue(filter.accepts(peptideSearchResult));
     }
@@ -43,7 +43,7 @@ public class ConfidenceScoreFilterUnitTest
     public void testConfidenceScoreSmaller()
     {
         BigDecimal confidenceScore = new BigDecimal("1.20");
-        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null,null,null,0,0, confidenceScore);
+        PeptideSearchResult peptideSearchResult = new PeptideSearchResult(null, null,null,null,0,0, confidenceScore);
 
         assertFalse(filter.accepts(peptideSearchResult));
     }

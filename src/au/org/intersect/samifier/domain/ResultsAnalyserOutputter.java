@@ -23,48 +23,22 @@ public class ResultsAnalyserOutputter {
     private String exonString;
     private String queryId; // / Change by Ignatius Pang *%*%*%
     private String validatedSequence; // / Change by Ignatius Pang *%*%*%
-    private CodonTranslationTable translationTable; // / Change by Ignatius Pang
-                                                    // *%*%*%
+    private String peptideSequnce;
+    private String fileName;
+    private String comments;
 
     public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult,
             ProteinToOLNMap proteinToOLNMap, Genome genome,
-            PeptideSequence peptideSequence) {
-        this.proteinId = peptideSearchResult.getProteinName();
-        this.locusName = proteinToOLNMap.getOLN(peptideSearchResult
-                .getProteinName());
-        // This one needs to be confirmed
-        this.geneId = proteinToOLNMap.getOLN(peptideSearchResult
-                .getProteinName());
-        this.score = peptideSearchResult.getConfidenceScore().toString();
-        this.startPosition = Integer.toString(peptideSearchResult
-                .getPeptideStart());
-        this.stopPosition = Integer.toString(peptideSearchResult
-                .getPeptideStop());
-        this.lengthInAminoacids = Integer.toString(peptideSearchResult
-                .getSequenceLength());
-
-        GeneInfo geneInfo = genome.getGene(locusName);
-
-        this.chromosomeId = geneInfo.getChromosome();
-        this.geneStart = new Integer(geneInfo.getStart()).toString();
-        this.geneEnd = new Integer(geneInfo.getStop()).toString();
-        this.strand = getStrand(geneInfo);
-        this.frame = getFrame(geneInfo);
-
-        this.exons = new Integer(
-                numberOfExons(peptideSequence.getCigarString())).toString();
-        this.exonString = getExonString(peptideSequence, geneInfo);
-
-        this.queryId = peptideSearchResult.getId(); // / Change by Ignatius Pang
-                                                    // *%*%*%
-
+            PeptideSequence peptideSequence) throws UnknownCodonException {
+        this(peptideSearchResult, proteinToOLNMap, genome, peptideSequence, null);
     }
 
     public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult,
             ProteinToOLNMap proteinToOLNMap, Genome genome,
             PeptideSequence peptideSequence,
-            CodonTranslationTable translationTable)
-            throws UnknownCodonException {
+            CodonTranslationTable translationTable) throws UnknownCodonException {
+        this.peptideSequnce = peptideSearchResult.getPeptideSequence();
+        this.fileName = peptideSearchResult.getFileName();
         this.proteinId = peptideSearchResult.getProteinName();
         this.locusName = proteinToOLNMap.getOLN(peptideSearchResult
                 .getProteinName());
@@ -91,38 +65,40 @@ public class ResultsAnalyserOutputter {
         this.exonString = getExonString(peptideSequence, geneInfo);
 
         this.queryId = peptideSearchResult.getId(); // / Change by Ignatius Pang
-                                                    // *%*%*%
-
-        // / Change by Ignatius Pang *%*%*%
-        this.translationTable = translationTable;
-
-        String nucleotideString = peptideSequence.getNucleotideSequence();
-        int direction = peptideSequence.getGeneInfo().getDirection(); // getDirection()
-                                                                      // == 1
-                                                                      // ? "+"
-                                                                      // :
-                                                                      // "-";
-        String mascotPeptideString = peptideSearchResult.getPeptideSequence();
-        String predictedAminoAcidSequence = new String("");
-
-        if (direction != 1) {
-            StringBuilder invertedReversedSequence = new StringBuilder(
-                    StringUtils.replaceChars(nucleotideString, "ACGT", "TGCA"))
-                    .reverse();
-            predictedAminoAcidSequence = translationTable
-                    .proteinToAminoAcidSequence(invertedReversedSequence
-                            .toString());
-        } else {
-            predictedAminoAcidSequence = translationTable
-                    .proteinToAminoAcidSequence(nucleotideString);
+        if (geneInfo.isFromVirtualProtein()) {
+            GeneInfo newInfo = genome.getGene(geneInfo.getOriginalGeneId());
+            this.proteinId = newInfo.getId();
+            this.locusName = newInfo.getId();
+            this.geneId = newInfo.getId();
+            this.geneStart = Integer.toString(newInfo.getStart());
+            this.geneEnd = Integer.toString(newInfo.getStop());
+            comments = geneInfo.getComments();
         }
-
-        if (predictedAminoAcidSequence.equals(mascotPeptideString)) {
-            this.validatedSequence = new String("True");
-        } else {
-            this.validatedSequence = new String("False");
+        if (translationTable != null) {
+            String nucleotideString = peptideSequence.getNucleotideSequence();
+            int direction = peptideSequence.getGeneInfo().getDirection(); // getDirection()// == 1 ? "+" : "-";
+            String mascotPeptideString = peptideSearchResult.getPeptideSequence();
+            String predictedAminoAcidSequence = new String("");
+            if (direction != 1) {
+                StringBuilder invertedReversedSequence = new StringBuilder(
+                        StringUtils.replaceChars(nucleotideString, "ACGT", "TGCA"))
+                        .reverse();
+                predictedAminoAcidSequence = translationTable
+                        .proteinToAminoAcidSequence(invertedReversedSequence
+                                .toString());
+            } else {
+                predictedAminoAcidSequence = translationTable
+                        .proteinToAminoAcidSequence(nucleotideString);
+            }
+            if (predictedAminoAcidSequence.equals(mascotPeptideString)) {
+                this.validatedSequence = new String("True");
+            } else {
+                this.validatedSequence = new String("False");
+            }
         }
-
+        //if gene is build based on vp we'll reverse that process and put vp data in comments
+        
+        
     }
 
     private String getExonString(PeptideSequence peptideSequence,
@@ -193,15 +169,17 @@ public class ResultsAnalyserOutputter {
         output.append(exons + SEPARATOR);
         output.append(exonString + SEPARATOR); // / Change by Ignatius Pang
                                                // *%*%*%
-
+        output.append(queryId + SEPARATOR);
+        output.append(peptideSequnce + SEPARATOR);
+        output.append(fileName + SEPARATOR);
         if (DebuggingFlag.get_sbi_debug_flag() == 1) {// / Change by Ignatius
                                                      // Pang *%*%*%
-            output.append(queryId + SEPARATOR);
+            output.append(comments + SEPARATOR);
             output.append(validatedSequence);
         } else {
-            output.append(queryId); // / Change by Ignatius Pang *%*%*%
+            output.append(comments); // / Change by Ignatius Pang *%*%*%
         }
-
+        //
         return output.toString();
     }
 
@@ -210,11 +188,10 @@ public class ResultsAnalyserOutputter {
         output.append("INSERT INTO " + TABLENAME + " (");
 
         if (DebuggingFlag.get_sbi_debug_flag() == 1) {
-            output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,strand,frame,exons,exonString,queryId,validatedSequence) ");
+            output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,strand,frame,exons,exonString,queryId,peptide_sequence,filename,comments,validatedSequence) ");
         } else {
-            output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,strand,frame,exons,exonString,queryId) ");
+            output.append("proteinId,locusName,geneId,score,startPosition,stopPosition,lengthInAminoacids,chromosomeId,geneStart,geneEnd,strand,frame,exons,exonString,queryId, peptide_sequence,filename, comments ) ");
         }
-
         output.append("VALUES (");
         output.append(formColumnQuery(proteinId) + DELIMITER);
         output.append(formColumnQuery(locusName) + DELIMITER);
@@ -232,12 +209,11 @@ public class ResultsAnalyserOutputter {
         output.append(formColumnQuery(exonString) + DELIMITER); // / Change by
                                                                 // Ignatius Pang
                                                                 // *%*%*%
-
+        output.append(formColumnQuery(queryId) + DELIMITER);
+        output.append(formColumnQuery(peptideSequnce) + DELIMITER);
+        output.append(formColumnQuery(fileName) + DELIMITER);
         if (DebuggingFlag.get_sbi_debug_flag() == 1) {
-            output.append(formColumnQuery(queryId) + DELIMITER); // / Change by
-                                                                 // Ignatius
-                                                                 // Pang
-                                                                 // *%*%*%
+            output.append(formColumnQuery(comments) + DELIMITER);
             output.append(formColumnQuery(validatedSequence) + ");"); // /
                                                                       // Change
                                                                       // by
@@ -245,9 +221,8 @@ public class ResultsAnalyserOutputter {
                                                                       // Pang
                                                                       // *%*%*%
         } else {
-            output.append(formColumnQuery(queryId) + ");"); // / Change by
-                                                            // Ignatius Pang
-                                                            // *%*%*%
+            output.append(formColumnQuery(comments) +  ")");
+            
         }
 
         return output.toString();

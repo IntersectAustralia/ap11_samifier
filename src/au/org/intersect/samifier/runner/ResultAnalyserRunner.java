@@ -141,7 +141,7 @@ public class ResultAnalyserRunner {
             if (peptideSequence == null || peptideSequence.getNucleotideSequence().isEmpty()) {
                 continue;
             }
-
+            
             if (DebuggingFlag.get_sbi_debug_flag() == 1) {
                 CodonTranslationTable translationTable = CodonTranslationTable
                         .parseTableFile(translationTableFile);

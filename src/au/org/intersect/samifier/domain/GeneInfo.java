@@ -16,7 +16,10 @@ public class GeneInfo {
     private int direction;
     private List<GeneSequence> locations;
     private Map<String, VirtualProtein> virtualProteins;
-
+    private boolean fromVirtualProtein;
+    private String comments;
+    private String originalGeneId;
+    
     public GeneInfo() {
         // locations = new TreeSet(new GeneSequenceComparator());
         locations = new ArrayList<GeneSequence>();
@@ -127,5 +130,29 @@ public class GeneInfo {
 
     public VirtualProtein getVirtualProtein(String vpName) {
         return virtualProteins.get(vpName);
+    }
+
+    public boolean isFromVirtualProtein() {
+        return fromVirtualProtein;
+    }
+
+    public void setFromVirtualProtein(boolean fromVirtualProtein) {
+        this.fromVirtualProtein = fromVirtualProtein;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public String getOriginalGeneId() {
+        return originalGeneId;
+    }
+
+    public void setOriginalGeneId(String originalGeneId) {
+        this.originalGeneId = originalGeneId;
     }
 }

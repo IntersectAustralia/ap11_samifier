@@ -98,7 +98,7 @@ public class PeptideSearchResultsParserImpl implements
                     if (line.startsWith("--")) {
                         break;
                     }
-                    results.addAll(getProteinsFromQueryLine(line));
+                    results.addAll(getProteinsFromQueryLine(resultsFile.getName(),  line));
                 } else if (line.startsWith("Content-Type: application/x-Mascot; name=\"peptides\"") ||
                            line.startsWith("Content-Type: application/x-Mascot; name=peptides")) {
                     peptidesSectionStarted = true;
@@ -159,7 +159,7 @@ public class PeptideSearchResultsParserImpl implements
 
     }
 
-    private List<PeptideSearchResult> getProteinsFromQueryLine(String line)
+    private List<PeptideSearchResult> getProteinsFromQueryLine(String fileName, String line)
             throws IOException {
         List<PeptideSearchResult> results = new ArrayList<PeptideSearchResult>();
         // Expected format:
@@ -197,7 +197,7 @@ public class PeptideSearchResultsParserImpl implements
                     }
                     int start = Integer.parseInt(proteinPartMatcher.group(2));
                     int stop = Integer.parseInt(proteinPartMatcher.group(3));
-                    results.add(new PeptideSearchResult(id, peptideSequence,
+                    results.add(new PeptideSearchResult(fileName, id, peptideSequence,
                             protein, start, stop, confidenceScore));
                 }
             }
