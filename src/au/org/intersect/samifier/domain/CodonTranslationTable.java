@@ -90,7 +90,7 @@ public class CodonTranslationTable {
     public String toAminoAcid(String codon) {
         if (codonMap.containsKey(codon)) {
             return codonMap.get(codon);
-        } else if (codon.matches(".*[WSMKRY]+.*")) {
+        } else if (codon.matches(".*[WSMNKRY]+.*")) {
             // TODO: log this event
             return UNKNOWN_AMINO_ACID;
         }

@@ -151,4 +151,16 @@ public class CodonTranslationTableUnitTest
         CodonTranslationTable table = CodonTranslationTable.parseTableFile(f);
         table.proteinToAminoAcidSequence("ZZZ");
     }
+    
+    @Test
+    public void testNucleotideToAminoAcidContainingN() throws Exception {
+        File f = new File("test/resources/protein_generator/standard_code_translation_table.txt");
+        CodonTranslationTable table = CodonTranslationTable.parseTableFile(f);
+        assertEquals("Unknown aminacid should be returned", "X" , table.proteinToAminoAcidSequence("AAN"));
+        assertEquals("Unknown aminacid should be returned", "X" , table.proteinToAminoAcidSequence("ANN"));
+        assertEquals("Unknown aminacid should be returned", "X" , table.proteinToAminoAcidSequence("NNN"));
+        assertEquals("Unknown aminacid should be returned", "X" , table.proteinToAminoAcidSequence("NAA"));
+        assertEquals("Unknown aminacid should be returned", "X" , table.proteinToAminoAcidSequence("NNA"));
+        assertEquals("Unknown aminacid should be returned", "X" , table.proteinToAminoAcidSequence("NAN"));
+    }
 }

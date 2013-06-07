@@ -29,5 +29,4 @@ public class VirtualProtein {
     public void setEndOffset(int endOffset) {
         this.endOffset = endOffset;
     }
-    
 }

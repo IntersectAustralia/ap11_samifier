@@ -36,6 +36,7 @@ public class ProteinLocationFileGenerator {
             } catch (IOException e) {
                 System.exit(-1);
             } catch (OutputException e) {
+                System.err.println(e);
                 System.exit(-1);
             } finally {
                 if (writer != null) {

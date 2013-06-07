@@ -151,7 +151,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             }
             ProteinLocation loc = new ProteinLocation("?", getStartPosition(startPosition, stopPosition) , Math.abs(stopPosition - startPosition),
                     geneInfo.getDirectionStr(), "0", peptideSearchResult.getConfidenceScore(),
-                    peptideSearchResult.getProteinName() + "(" + virtualGeneStart + "-" + virtualGeneStop + ")", geneInfo.getChromosome());
+                    peptideSearchResult.getProteinName() + "(" + (virtualGeneStart + 1) + "-" + (virtualGeneStop + 1) + ")", geneInfo.getChromosome());
             loc.setAbsoluteStartStop(getStartPosition(startPosition, stopPosition) + "_" + Math.abs(stopOffset - startOffset));
             proteinLocations.add(loc);
         }
@@ -193,8 +193,6 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         return new ArrayList<ProteinLocation>(uniqueLocation.values());
     }
 
-    
-    
     private int searchStop(PeptideSearchResult peptideSearchResult, int peptideAbsoluteStart, GenomeNucleotides genomeNucleotides, GeneInfo geneInfo, boolean reverse) {
         boolean reachedStop = false;
         int endIterator = peptideAbsoluteStart;
