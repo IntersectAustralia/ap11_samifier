@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import au.org.intersect.samifier.domain.CodonTranslationTable;
 import au.org.intersect.samifier.domain.DebuggingFlag;
 import au.org.intersect.samifier.domain.Genome;
@@ -28,7 +30,7 @@ public class ResultAnalyserRunner {
     private File outputFile;
     private File chromosomeDir;
     private File translationTableFile;
-
+    private static Logger LOG = Logger.getLogger(ResultAnalyserRunner.class);
     private static DatabaseHelper hsqldb;
 
     public ResultAnalyserRunner(String[] searchResultsPaths, File genomeFile,
@@ -86,14 +88,17 @@ public class ResultAnalyserRunner {
                 PeptideSequence peptideSequence = sequenceGenerator
                         .getPeptideSequence(peptideSearchResult);
                 if (peptideSequence == null) {
+                    LOG.warn("Error while geting peptide sequnce for " + peptideSearchResult.getId());
                     continue;
                 }
                 ResultsAnalyserOutputter outputter;
                 outputter = new ResultsAnalyserOutputter(peptideSearchResult,
                         proteinToOLNMap, genome, peptideSequence,
                         translationTable);
-                output.write(outputter.toString());
-                output.write(System.getProperty("line.separator"));
+                if (outputter.isValid()) {
+                    output.write(outputter.toString());
+                    output.write(System.getProperty("line.separator"));
+                }
             }
 
         } else {
@@ -101,13 +106,16 @@ public class ResultAnalyserRunner {
                 PeptideSequence peptideSequence = sequenceGenerator
                         .getPeptideSequence(peptideSearchResult);
                 if (peptideSequence == null) {
+                    LOG.warn("Error while geting peptide sequnce for " + peptideSearchResult.getId());
                     continue;
                 }
                 ResultsAnalyserOutputter outputter;
                 outputter = new ResultsAnalyserOutputter(peptideSearchResult,
                         proteinToOLNMap, genome, peptideSequence);
-                output.write(outputter.toString());
-                output.write(System.getProperty("line.separator"));
+                if (outputter.isValid()) {
+                    output.write(outputter.toString());
+                    output.write(System.getProperty("line.separator"));
+                }
             }
 
         }
@@ -139,23 +147,27 @@ public class ResultAnalyserRunner {
             PeptideSequence peptideSequence = sequenceGenerator
                     .getPeptideSequence(peptideSearchResult);
             if (peptideSequence == null || peptideSequence.getNucleotideSequence().isEmpty()) {
+                LOG.warn("Error while geting peptide sequnce for " + peptideSearchResult.getId());
                 continue;
             }
-            
             if (DebuggingFlag.get_sbi_debug_flag() == 1) {
                 CodonTranslationTable translationTable = CodonTranslationTable
                         .parseTableFile(translationTableFile);
                 ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(
                         peptideSearchResult, proteinToOLNMap, genome,
                         peptideSequence, translationTable);
-                String query = outputter.toQuery();
+                if (outputter.isValid()) {
+                    String query = outputter.toQuery();
                 // System.out.println(query);
-                hsqldb.execute(query);
+                    hsqldb.execute(query);
+                }
             } else {
                 ResultsAnalyserOutputter outputter = new ResultsAnalyserOutputter(
                         peptideSearchResult, proteinToOLNMap, genome,
                         peptideSequence);
-                hsqldb.execute(outputter.toQuery());
+                if (outputter.isValid()) {
+                    hsqldb.execute(outputter.toQuery());
+                }
             }
         }
 

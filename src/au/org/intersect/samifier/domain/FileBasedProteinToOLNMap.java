@@ -20,7 +20,7 @@ public class FileBasedProteinToOLNMap implements ProteinToOLNMap {
 
     public void addMapping(String protein, String OLN) {
         if (proteinToOLNMap.containsKey(protein)) {
-            LOG.warn("ID " + protein + "is duplicated. Previous value was " + proteinToOLNMap.get(protein) + ". It will be replaced by " + OLN);
+            LOG.warn("ID " + protein + " is duplicated. Previous value was " + proteinToOLNMap.get(protein) + ". It will be replaced by " + OLN);
         }
         proteinToOLNMap.put(protein, OLN);
     }

@@ -1,6 +1,7 @@
 package au.org.intersect.samifier.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 public class ResultsAnalyserOutputter {
     private static final String SEPARATOR = "\t";
@@ -26,7 +27,8 @@ public class ResultsAnalyserOutputter {
     private String peptideSequnce;
     private String fileName;
     private String comments;
-
+    private boolean valid;
+    private static Logger LOG = Logger.getLogger(ResultsAnalyserOutputter.class);
     public ResultsAnalyserOutputter(PeptideSearchResult peptideSearchResult,
             ProteinToOLNMap proteinToOLNMap, Genome genome,
             PeptideSequence peptideSequence) throws UnknownCodonException {
@@ -37,6 +39,7 @@ public class ResultsAnalyserOutputter {
             ProteinToOLNMap proteinToOLNMap, Genome genome,
             PeptideSequence peptideSequence,
             CodonTranslationTable translationTable) throws UnknownCodonException {
+        this.valid = true;
         this.peptideSequnce = peptideSearchResult.getPeptideSequence();
         this.fileName = peptideSearchResult.getFileName();
         this.proteinId = peptideSearchResult.getProteinName();
@@ -67,12 +70,27 @@ public class ResultsAnalyserOutputter {
         this.queryId = peptideSearchResult.getId(); // / Change by Ignatius Pang
         if (geneInfo.isFromVirtualProtein()) {
             GeneInfo newInfo = genome.getGene(geneInfo.getOriginalGeneId());
+            long absoluteStart = Long.parseLong(this.geneStart) + (Long.parseLong(this.startPosition) - 1) * GenomeConstant.BASES_PER_CODON;
+            long absoluteStop = absoluteStart + newInfo.getDirection() * peptideSearchResult.getPeptideSequence().length() * GenomeConstant.BASES_PER_CODON + (-1);
             this.proteinId = newInfo.getId();
             this.locusName = newInfo.getId();
             this.geneId = newInfo.getId();
             this.geneStart = Integer.toString(newInfo.getStart());
             this.geneEnd = Integer.toString(newInfo.getStop());
+            long relativeStart = absoluteStart - Long.parseLong(this.geneStart);
+            long reletiveStop = absoluteStop -  Long.parseLong(this.geneStart) + 1;
+            this.startPosition = relativeStart < reletiveStop ? Long.toString(relativeStart) : Long.toString(reletiveStop);
+            this.stopPosition = relativeStart < reletiveStop ? Long.toString(reletiveStop) : Long.toString(relativeStart);
             comments = geneInfo.getComments();
+            String [] peptideGenomic = this.exonString.split("-");
+            long peptideGenomicStart = Long.parseLong(peptideGenomic[0]);
+            long peptideGenomicStop = Long.parseLong(peptideGenomic[1]);
+            if (peptideGenomicStart < newInfo.getStart() || peptideGenomicStop > newInfo.getStop()
+            || peptideGenomicStop < newInfo.getStart() || peptideGenomicStart > newInfo.getStop()
+            || Long.parseLong(startPosition) < 0 || Long.parseLong(stopPosition) > Math.abs(newInfo.getStop() - newInfo.getStart())) {
+                LOG.warn(" Search result " + peptideSearchResult + " from file "+ peptideSearchResult.getFileName() +" is invalid and will be removed.");
+                valid = false;
+            }
         }
         if (translationTable != null) {
             String nucleotideString = peptideSequence.getNucleotideSequence();
@@ -97,8 +115,6 @@ public class ResultsAnalyserOutputter {
             }
         }
         //if gene is build based on vp we'll reverse that process and put vp data in comments
-        
-        
     }
 
     private String getExonString(PeptideSequence peptideSequence,
@@ -230,5 +246,9 @@ public class ResultsAnalyserOutputter {
 
     private String formColumnQuery(String field) {
         return "'" + field + "'";
+    }
+
+    public boolean isValid() {
+        return valid;
     }
 }

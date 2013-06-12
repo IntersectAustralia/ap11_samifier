@@ -120,6 +120,7 @@ public class SamifierRunner {
 
             PeptideSequence peptide = sequenceGenerator.getPeptideSequence(result);
             if (peptide == null) {
+                LOG.warn("Error while geting peptide sequnce for " + result.getId());
                 continue;
             }
             String proteinName = result.getProteinName();
