@@ -132,6 +132,9 @@ public class FastaParserImpl implements FastaParser {
                     info = new ContigInfo(fastaFile, reader.getFilePointer());
                 }
             }
+            info.setEndOffset(reader.getFilePointer());
+            chromosomeToContigInfo.put(chromosomeName, info);
+            contig = true;
             reader.close();
             scannedFilesNames.add(fastaFile.getName());
             return contig;
