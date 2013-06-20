@@ -3,6 +3,7 @@ package au.org.intersect.samifier.generator;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.StringWriter;
@@ -54,6 +55,7 @@ public class ProteinGeneratorWithContigTest {
             verifyExpectedOutput(out,  "test/resources/protein_generator/expected_contig_interval.fa");
             verifyExpectedOutput(gff,  "test/resources/protein_generator/expected_gff_contig_interval.gff");
             verifyExpectedOutput(accession, "test/resources/protein_generator/expected_accession_file_contig_interval.txt");
+            
         }
         catch(Exception e)
         {

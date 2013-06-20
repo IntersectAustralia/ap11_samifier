@@ -25,6 +25,33 @@ import au.org.intersect.samifier.domain.GenomeConstant;
 import au.org.intersect.samifier.domain.NucleotideSequence;
 
 public class FastaParserImpl implements FastaParser {
+    /*GenBank     gi|gi-number|gb|accession|locus
+    EMBL Data Library   gi|gi-number|emb|accession|locus
+    DDBJ, DNA Database of Japan     gi|gi-number|dbj|accession|locus
+    SWISS-PROT  sp|accession|name
+    General database identifier     gnl|database|identifier
+    NCBI Reference Sequence     ref|accession|locus
+    Local Sequence identifier   lcl|identifier
+    */
+    private static final Pattern GENBANK_HEADER = Pattern.compile(">gi\\|\\d*\\|gb\\|(.*)");
+    private static final int GENBBANK_ID_POSITION = 3;
+    private static final Pattern EMBL_HEADER = Pattern.compile(">gi\\|\\d*\\|emb\\|(.*)");
+    private static final int EMBL_ID_POSITION = 3;
+    private static final Pattern DDBJ_HEADER = Pattern.compile(">gi\\|\\d*\\|dbj\\|(.*)");
+    private static final int DDBJ_ID_POSITION = 3;
+    private static final Pattern REFERENCE_HEADER = Pattern.compile(">gi\\|\\d*\\|ref\\|(.*)");
+    private static final int REFERENCE_ID_POSITION = 3;
+    private static final Pattern SWISS_PROT_HEADER = Pattern.compile(">sp\\|(.*)");
+    private static final int SWISS_PROT_POSITION = 1;
+    private static final Pattern GENERAL_DB_IDENTIFIER_HEADER = Pattern.compile(">gnl\\|(.*)\\|(.*)");
+    private static final int GENERAL_DB_IDENTIFIER_POSITION = 2;
+    private static final Pattern NCBI_HEADER = Pattern.compile(">ref\\|(.*)");
+    private static final int NCBI_POSITION = 1;
+    private static final Pattern  LOCAL_SEQUENCE_HEADER = Pattern.compile(">lcl\\|(.*)");
+    private static final int LOCAL_SEQUENCE_POSITION = 1;
+    
+    
+    
     private String previousChromosome;
     private String previousCode;
     private HashMap<String, Integer> chromosomeLength;
@@ -118,6 +145,9 @@ public class FastaParserImpl implements FastaParser {
             if (!line.startsWith(">")) {
                 throw new FastaParserException("Genome file not in FASTA format");
             }
+            /*if (! multipleHeaderLines(fastaFile)) {
+                return false;
+            }*/
             String chromosomeName = parseHeader(line);
             if (chromosomeName == null) {
                 return false;
@@ -132,7 +162,7 @@ public class FastaParserImpl implements FastaParser {
                     info = new ContigInfo(fastaFile, reader.getFilePointer());
                 }
             }
-            info.setEndOffset(reader.getFilePointer());
+            info.setEndOffset(reader.getFilePointer() + 1);
             chromosomeToContigInfo.put(chromosomeName, info);
             contig = true;
             reader.close();
@@ -238,7 +268,7 @@ public class FastaParserImpl implements FastaParser {
     }
     private String readFromContigFile(String chromosome) throws IOException, FastaParserException{
         ContigInfo contigInfo = chromosomeToContigInfo.get(chromosome);
-        byte[] buffer = new byte[(int) (contigInfo.endOffset - contigInfo.startOffset)];
+        byte[] buffer = new byte[(int) (contigInfo.endOffset - contigInfo.startOffset -1)];
         RandomAccessFile reader = null;
         try {
             reader = new RandomAccessFile(contigInfo.getFastaFile(), "r");
@@ -252,11 +282,47 @@ public class FastaParserImpl implements FastaParser {
         }
         return  cleanCode(new String(buffer));
     }
-    private String parseHeader(String line) {
-        String[] parts = line.split("\\|");
-        if (parts.length < 2) return null;
-        return parts[3];
+
+    protected String parseHeader(String line) {
+        Matcher matcher = GENBANK_HEADER.matcher(line);
+        if (matcher.matches()) {
+            return extractName(line, GENBBANK_ID_POSITION);
+        }
+        matcher = EMBL_HEADER.matcher(line);
+        if (matcher.matches()) {
+            return extractName(line, EMBL_ID_POSITION);
+        }
+        matcher = DDBJ_HEADER.matcher(line);
+        if (matcher.matches()) {
+            return extractName(line, DDBJ_ID_POSITION);
+        }
+        matcher = SWISS_PROT_HEADER.matcher(line);
+        if (matcher.matches()) {
+            return extractName(line, SWISS_PROT_POSITION);
+        }
+        matcher = GENERAL_DB_IDENTIFIER_HEADER.matcher(line);
+        if (matcher.matches()) {
+            return extractName(line, GENERAL_DB_IDENTIFIER_POSITION);
+        }
+        matcher = NCBI_HEADER.matcher(line);
+        if (matcher.matches()) {
+            return extractName(line, NCBI_POSITION);
+        }
+        matcher = LOCAL_SEQUENCE_HEADER.matcher(line);
+        if (matcher.matches()) {
+            return extractName(line, LOCAL_SEQUENCE_POSITION);
+        }
+        matcher = REFERENCE_HEADER.matcher(line);
+        if (matcher.matches()) {
+            return extractName(line, REFERENCE_ID_POSITION);
+        }
+        return null;
     }
+    private String extractName(String line, int idPosition) {
+        String name = line.split("\\|")[idPosition];
+        return name.split("\\s")[0];
+    }
+    
     private class ContigInfo {
         private File fastaFile;
         private long startOffset;
