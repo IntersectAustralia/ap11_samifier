@@ -104,6 +104,9 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
         c = getChromosome().compareTo(o.getChromosome());
         if (c == 0) {
             c = getStartIndex() - o.getStartIndex();
+        } 
+        if (c == 0) {
+            c = o.getStop() - getStop();
         }
         return c;
     }

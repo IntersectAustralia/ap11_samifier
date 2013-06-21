@@ -76,6 +76,24 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
                     setIterator.remove();
                 }
             }
+            if (locations.size() > 1) {
+              //remove all proteins that are contained inside bigger protein
+                setIterator = locations.iterator();
+                ProteinLocation base = setIterator.next();
+                while (setIterator.hasNext()) {
+                    ProteinLocation currentElement = setIterator.next();
+                    if (currentElement.getStartIndex() >= base.getStartIndex() && currentElement.getStop() <= base.getStop() 
+                        && currentElement.getStartIndex() % 3 == base.getStartIndex() % 3 ){
+                        base.update(currentElement);
+                        setIterator.remove();
+                    } else {
+                        base = currentElement;
+                    }
+                }
+            }
+            
+            
+            
             for (int i = 0; i < locations.size(); i++) {
                 locations.get(i).setName("q" + i);
             }
