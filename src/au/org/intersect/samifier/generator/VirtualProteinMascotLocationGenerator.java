@@ -91,9 +91,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
                     }
                 }
             }
-            
-            
-            
+
             for (int i = 0; i < locations.size(); i++) {
                 locations.get(i).setName("q" + i);
             }
@@ -134,7 +132,6 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
         for (PeptideSearchResult peptideSearchResult : peptideSearchResults) {
             GeneInfo geneInfo = genome.getGene(peptideSearchResult
                     .getProteinName());
-
             if (geneInfo == null) {
                 System.err.println(peptideSearchResult.getProteinName()
                         + " not found in the genome");
@@ -186,9 +183,9 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
     private List<ProteinLocation> mergeProteins(List<ProteinLocation> locations) {
         Map<Integer, ProteinLocation> proteinMap = new HashMap<Integer, ProteinLocation>();
         for (ProteinLocation location : locations) {
-            ProteinLocation loc = proteinMap.get(location.getStop());
+            ProteinLocation loc = proteinMap.get(location.getStartIndex());
             if (loc == null) {
-                proteinMap.put(location.getStop(), location);
+                proteinMap.put(location.getStartIndex(), location);
             } else {
                loc.update(location);
             }
