@@ -2,5 +2,5 @@ package au.org.intersect.samifier;
 
 public interface Version {
 
-    String VERSION = "1.0.7";
+    String VERSION = "1.0.8";
 }

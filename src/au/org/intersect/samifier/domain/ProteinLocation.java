@@ -15,8 +15,9 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
 
     private String frame;
     private String peptideAbsoluteStartStop;
-
+    
     private Set<String> virtualProteinNames;
+    private String origin;
 
     public ProteinLocation(String name, int startIndex, int length,
             String direction, String frame) {
@@ -126,6 +127,14 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
     
     public String getAbsoluteStartStop() {
         return peptideAbsoluteStartStop;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
 }

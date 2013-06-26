@@ -12,6 +12,7 @@ public class GffOutputter implements Outputter {
     private String directionFlag;
     private String glimmerName;
     private Set<String> virtualProteinNames;
+    private String origin;
 
     public GffOutputter(ProteinLocation location,
             String genomeFileNameWithExtension) {
@@ -26,6 +27,7 @@ public class GffOutputter implements Outputter {
         this.directionFlag = location.getDirection();
         this.glimmerName = location.getName();
         this.virtualProteinNames = location.getVirtualProteinNames();
+        this.origin = location.getOrigin();
     }
 
     @Override
@@ -45,7 +47,11 @@ public class GffOutputter implements Outputter {
     private String getOutputLine(String type, boolean addParent) {
         StringBuilder output = new StringBuilder();
         output.append(genomeFileName);
-        column(output, "Glimmer");
+        if (origin != null && origin.length() >0 ) {
+            column(output, origin);
+        } else {
+            column(output, "Glimmer");
+        }
         column(output, type);
         column(output, Integer.toString(start));
         column(output, Integer.toString(end));

@@ -208,7 +208,7 @@ public class SamifierRunner {
         }
         output.write("@HD\tVN:1.0\n");
         for (String chromosome : chromosomes) {
-            output.write("@SQ\tSN:" + chromosome + "\tLN:" + ((sequenceGenerator.getFastaParser().getChromosomeLength(chromosome)) / 3)  + "\n");
+            output.write("@SQ\tSN:" + chromosome + "\tLN:" + ((sequenceGenerator.getFastaParser().getChromosomeLength(chromosome)))  + "\n");
         }
 
         for (SAMEntry samEntry : samEntries) {
