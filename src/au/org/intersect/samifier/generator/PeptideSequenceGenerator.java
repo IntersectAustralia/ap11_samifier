@@ -10,9 +10,5 @@ public interface PeptideSequenceGenerator {
     PeptideSequence getPeptideSequence(PeptideSearchResult peptideSearchResult)
             throws PeptideSequenceGeneratorException;
 
-    List<PeptideSequence> getPeptideSequences(
-            List<PeptideSearchResult> peptideSearchResults)
-            throws PeptideSequenceGeneratorException;
-
     FastaParser getFastaParser();
 }

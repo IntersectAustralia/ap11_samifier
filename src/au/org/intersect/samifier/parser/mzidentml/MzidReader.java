@@ -114,13 +114,6 @@ public class MzidReader {
         results.add(searchResult);
     }
 
-    public void seeResults() {
-        for (PeptideSearchResult result : results) {
-            System.out.println(result.toString());
-        }
-        System.out.println("Size of results: " + results.size());
-    }
-
     private void switchHandler(DefaultHandler handler) {
         xmlReader.setContentHandler(handler);
     }
