@@ -15,7 +15,6 @@ public class ProteinLocation implements Comparable<ProteinLocation> {
 
     private String frame;
     private String peptideAbsoluteStartStop;
-    
     private Set<String> virtualProteinNames;
     private String origin;
 

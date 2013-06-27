@@ -37,6 +37,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
     private static Logger LOG = Logger.getLogger(VirtualProteinMascotLocationGenerator.class);
     private static int NOT_FOUND = -1;
 
+    private static final int MIN_PROTEIN_LENGTH = 2;
     private File genomeFile;
     private File translationTableFile;
     private File chromosomeDir;
@@ -72,7 +73,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
             Iterator<ProteinLocation> setIterator = locations.iterator();
             while (setIterator.hasNext()) {
                 ProteinLocation currentElement = setIterator.next();
-                if (currentElement.getLength() < 2) {
+                if (currentElement.getLength() < MIN_PROTEIN_LENGTH) {
                     setIterator.remove();
                 }
             }
@@ -82,7 +83,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
                 ProteinLocation base = setIterator.next();
                 while (setIterator.hasNext()) {
                     ProteinLocation currentElement = setIterator.next();
-                    if (currentElement.getStartIndex() >= base.getStartIndex() && currentElement.getStop() <= base.getStop() 
+                    if (currentElement.getStartIndex() >= base.getStartIndex() && currentElement.getStop() <= base.getStop()
                         && currentElement.getStartIndex() % 3 == base.getStartIndex() % 3 ){
                         base.update(currentElement);
                         setIterator.remove();

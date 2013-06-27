@@ -15,25 +15,13 @@ public class VirtualProtein {
     public String getName() {
         return name;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
     public int getStartOffset() {
         return startOffset;
-    }
-    public void setStartOffset(int offset) {
-        this.startOffset = offset;
     }
     public int getEndOffset() {
         return endOffset;
     }
-    public void setEndOffset(int endOffset) {
-        this.endOffset = endOffset;
-    }
     public String getGeneId() {
         return geneId;
-    }
-    public void setGeneId(String geneId) {
-        this.geneId = geneId;
     }
 }
