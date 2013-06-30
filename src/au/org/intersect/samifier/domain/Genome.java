@@ -105,7 +105,7 @@ public class Genome {
             List <GeneSequence> newEntries = new ArrayList<GeneSequence>();
             for (GeneSequence sequence : genInfo.getLocations()) {
                 if (sequence.getStart() < start) {
-                    String errorMessage = "Gene " + genInfo.getId() + " in chromosome " +  genInfo.getChromosome() + " has overlaping part at position (" + sequence.getStart() + "," + start + "). Cannot continue.";
+                    String errorMessage = "Gene " + genInfo.getId() + " in chromosome " +  genInfo.getChromosome() + " has overlaping part at position (" + sequence.getStart() + "," + start + "). Can not continue.";
                     LOG.error(errorMessage);
                     throw new GenomeFileParsingException(errorMessage);
                 }

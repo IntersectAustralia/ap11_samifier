@@ -37,7 +37,7 @@ public class VirtualProteinMascotLocationGenerator implements LocationGenerator 
     private static Logger LOG = Logger.getLogger(VirtualProteinMascotLocationGenerator.class);
     private static int NOT_FOUND = -1;
 
-    private static final int MIN_PROTEIN_LENGTH = 2;
+    private static final int MIN_PROTEIN_LENGTH = 5;
     private File genomeFile;
     private File translationTableFile;
     private File chromosomeDir;

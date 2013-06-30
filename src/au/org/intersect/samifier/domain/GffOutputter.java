@@ -47,7 +47,7 @@ public class GffOutputter implements Outputter {
     private String getOutputLine(String type, boolean addParent) {
         StringBuilder output = new StringBuilder();
         output.append(genomeFileName);
-        if (origin != null && origin.length() >0 ) {
+        if (origin != null && origin.length() >0){
             column(output, origin);
         } else {
             column(output, "Glimmer");
