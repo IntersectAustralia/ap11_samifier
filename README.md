@@ -77,8 +77,15 @@ Protein generator
 
 Having as input a genome, it generates a FASTA file with "proteins" suitable to be
 used as a database in Mascot. It operates in two modes, using Glimmer predicted
-genes, or simply by splitting the genome into overlaping regions of given lenght.
+genes, or simply by splitting the genome into overlaping regions of given length.
 
+Both Predicted Protein Generator (Glimmer gene prediction) and Virtual Protein 
+Generator (six-frame translation) are implemented under the command line tool 
+‘protein_generator.jar’ as both tools shares similar input files. However, the 
+Predicted Protein Generator can be accessed via command line parameter 
+‘-g <Glimmer File>’ to identify the input Glimmer prediction file. The Virtual 
+Protein Generator is accessed using the command line parameter ‘-i <Split Interval>’, 
+which indicates the length of the overlapping virtual proteins.   
  
     $ java -jar dist/protein_generator.jar
     usage: protein_generator -d <Database Name> -f <Genome File> [-g <Glimmer
