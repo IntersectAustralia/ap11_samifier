@@ -79,8 +79,8 @@ Having as input a genome, it generates a FASTA file with "proteins" suitable to 
 used as a database in Mascot. It operates in two modes, using Glimmer predicted
 genes, or simply by splitting the genome into overlaping regions of given length.
 
-Both Predicted Protein Generator (Glimmer gene prediction) and Virtual Protein 
-Generator (six-frame translation) are implemented under the command line tool 
+Both _Predicted Protein Generator_ (Glimmer gene prediction) and _Virtual Protein 
+Generator_ (six-frame translation) are implemented under the command line tool 
 ‘protein_generator.jar’ as both tools shares similar input files. However, the 
 Predicted Protein Generator can be accessed via command line parameter 
 ‘-g <Glimmer File>’ to identify the input Glimmer prediction file. The Virtual 
