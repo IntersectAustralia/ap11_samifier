@@ -55,7 +55,7 @@ Similar to *samifier* but instead of generating a SAM file, it generates a colum
 found peptides. This table that can be queried using SQL to extract a number of reports.
 
 
-    $ java -jar dist/samifier.jar 
+    $ java -jar dist/results_analyser.jar 
     usage: result_analyser -c <chromosomeDir> -g <genomeFile> -m <mappingFile>
            -o <outputFile> -r <searchResultsFile> [-rep <reportId>] [-replist
            <reportList>] [-sql <sqlQuery>]
