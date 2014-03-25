@@ -1,5 +1,8 @@
 package au.org.intersect.samifier.parser.mzidentml;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -23,7 +26,7 @@ public class SpectrumIdentificationItemHandler extends DefaultHandler {
     private String id;
     private String start;
     private String end;
-    private String reference;
+    private List<String> references;
 
     private MzidReader reader;
 
@@ -32,6 +35,7 @@ public class SpectrumIdentificationItemHandler extends DefaultHandler {
         super();
         this.reader = mzidReader;
         this.peptideSequence = peptideSequence;
+        this.references = new ArrayList<String>();
     }
 
     public void startElement(String uri, String name, String qName,
@@ -47,7 +51,7 @@ public class SpectrumIdentificationItemHandler extends DefaultHandler {
                 confidenceScore = attrs.getValue(ATTR_VALUE);
             }
         } else if (PEPTIDE_EVIDENCE_REF.equals(qName)) {
-            reference = attrs.getValue(ATTR_PEPTIDE_EVIDENCE_REF);
+            references.add(attrs.getValue(ATTR_PEPTIDE_EVIDENCE_REF));
         }
     }
 
@@ -56,8 +60,10 @@ public class SpectrumIdentificationItemHandler extends DefaultHandler {
             if (id != null) {
                 reader.build(id, peptideSequence, protein, start, end,
                         confidenceScore);
-            } else if (reference != null) {
-                reader.addReference(reference, confidenceScore, peptideSequence);
+            } else if (references.size() > 0) {
+                for (String reference : references) {
+                    reader.addReference(reference, confidenceScore, peptideSequence);
+                }
             }
             reader.removeHandler();
         }
